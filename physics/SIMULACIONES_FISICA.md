@@ -1,23 +1,35 @@
 # Simulaciones de fisica propuestas
 
-Base creada en `physics/`. Usar nombres ASCII y enlaces relativos.
+Base en `physics/`. Usar nombres ASCII y enlaces relativos. Cada simulacion nueva debe actualizar `physics/index.html` y el `index.html` raiz.
 
 ## Generadas
 
-- `pendulums.html`: cadena serial de pendulos, un bob colgando del anterior, hasta 10 bobs, modos linealizados, periodo aproximado, condiciones iniciales, arrastre con raton y rastro.
+- `pendulums.html`: cadena serial de pendulos, hasta 5 bobs, modos normales linealizados, condiciones iniciales, arrastre y rastro.
+- `double-pendulum.html`: doble pendulo, caos, divergencia de condiciones iniciales, rastro y arrastre.
 - `shm-spring.html`: oscilador masa-muelle.
-- `wave-interference.html`: interferencia de 1 a 10 fuentes puntuales configurables, arrastrables, con menu contextual, amortiguamiento global y vista 3D.
+- `coupled-springs.html`: cadena de osciladores masa-muelle, modos normales, impulso local y rastros.
+- `wave-interference.html`: interferencia de fuentes puntuales configurables, menu contextual, amortiguamiento global y vista 3D.
 - `projectile-motion.html`: tiro parabolico.
-- `double-pendulum.html`: doble pendulo, caos, divergencia de condiciones iniciales, rastro y arrastre de bobs.
-- `coupled-springs.html`: cadena de osciladores masa-muelle, modos normales, impulso local, arrastre y rastros.
+- `standing-waves-string.html`: cuerda vibrante con modos estacionarios.
+- `diffraction-slits.html`: difraccion e interferencia por rendijas.
+- `rlc-circuit.html`: circuito RLC serie en corriente alterna.
+- `orbital-gravity.html`: orbitas gravitatorias con energia ligada/escape.
+- `collisions-2d.html`: colisiones 2D con coeficiente de restitucion.
+- `bernoulli-fluids.html`: tubo de Venturi y ecuacion de Bernoulli.
+- `pv-thermodynamics.html`: ciclos termodinamicos en diagrama P-V.
+- `doppler-effect.html`: efecto Doppler con frentes de onda.
+- `photoelectric-effect.html`: efecto fotoelectrico y potencial de frenado.
+- `magnetic-induction.html`: induccion electromagnetica por flujo variable.
 
-## Siguientes
+## Ideas para futuras ampliaciones
 
-1. Cuerda vibrante y modos estacionarios.
-2. Difraccion por rendijas.
-3. Circuito RLC.
-4. Orbitas gravitatorias.
-5. Colisiones 1D/2D.
-6. Fluidos y Bernoulli.
-7. Ciclos termodinamicos PV.
-8. Efecto Doppler.
+1. Lentes delgadas y espejos: trazado de rayos y formacion de imagen.
+2. Polarizacion y ley de Malus.
+3. Campo gravitatorio y potencial para varias masas.
+4. Ondas en dos medios: reflexion, transmision e impedancia.
+5. Decaimiento radiactivo y estadistica de conteo.
+6. Transferencia de calor: conduccion 1D y equilibrio.
+7. Movimiento circular no uniforme y fuerzas en curva peraltada.
+8. Red de difraccion y espectrometro.
+9. Puente de Wheatstone y medidas electricas.
+10. Resonancia mecanica forzada con amortiguamiento.
