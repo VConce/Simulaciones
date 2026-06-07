@@ -8,37 +8,84 @@
       font-family: system-ui, sans-serif;
       max-width: 900px;
       margin: 40px auto;
-      padding: 20px;
+      padding: 24px;
       line-height: 1.6;
+      background: #f7f7f7;
+      color: #222;
     }
 
     h1 {
       font-size: 2.4rem;
+      margin-bottom: 0.2em;
     }
 
-    .simulacion {
+    .bloque {
+      background: white;
       border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 16px;
-      margin: 16px 0;
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin: 18px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     a {
-      font-size: 1.2rem;
-      font-weight: bold;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #075bbb;
       text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .categoria {
+      margin-top: 34px;
+      font-size: 1.5rem;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 6px;
     }
   </style>
 </head>
+
 <body>
   <h1>Simulaciones VConce</h1>
-
   <p>Biblioteca de simulaciones interactivas de matemáticas y física.</p>
 
-  <div class="simulacion">
-    <a href="./cicloide/">Cicloides</a>
-    <p>Movimiento de una rueda y generación de la cicloide.</p>
+  <h2 class="categoria">Matemáticas</h2>
+
+  <div class="bloque">
+    <a href="./Apolonio. Cónicas.html">Apolonio y cónicas</a>
   </div>
 
+  <div class="bloque">
+    <a href="./Cicloides.html">Cicloides</a>
+  </div>
+
+  <div class="bloque">
+    <a href="./Curvas polares.html">Curvas polares</a>
+  </div>
+
+  <div class="bloque">
+    <a href="./Excentricidad.html">Excentricidad</a>
+  </div>
+
+  <div class="bloque">
+    <a href="./Hipotrocoides.html">Hipotrocoides</a>
+  </div>
+
+  <div class="bloque">
+    <a href="./LugaresGeométricosMultimodo.html">Lugares geométricos</a>
+  </div>
+
+  <h2 class="categoria">Física</h2>
+
+  <div class="bloque">
+    <a href="./Relatividad/">Relatividad</a>
+  </div>
+
+  <div class="bloque">
+    <a href="./SimulaciónElecMag/">Simulación electromagnética</a>
+  </div>
 </body>
 </html>
