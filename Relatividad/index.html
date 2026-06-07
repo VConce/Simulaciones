@@ -1,85 +1,46 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Simulaciones de relatividad</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatividad</title>
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 24px;
-      line-height: 1.6;
-      background: #f7f7f7;
-      color: #222;
-    }
-
-    h1 {
-      font-size: 2.2rem;
-    }
-
-    .bloque {
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 14px;
-      padding: 18px 22px;
-      margin: 16px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    a {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #075bbb;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    .volver {
-      margin-top: 30px;
-      display: inline-block;
-    }
-  </style>
+  :root{--ink:#17202f;--muted:#607083;--paper:#f7f9fb;--panel:#fff;--line:#d9e2ec;--blue:#0b63ce;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}
+  main{max-width:1060px;margin:0 auto;padding:42px 22px 56px}
+  .back{display:inline-block;margin-bottom:22px;color:var(--blue);font-weight:800;text-decoration:none}
+  .back:hover{text-decoration:underline}
+  h1{margin:0 0 8px;font-size:clamp(2rem,5vw,3.2rem);line-height:1}
+  .intro{margin:0 0 30px;color:var(--muted);font-size:1.08rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:14px}
+  a.card{display:block;min-height:116px;padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:inherit;text-decoration:none;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+  a.card:hover{border-color:var(--blue);transform:translateY(-1px)}
+  .card strong{display:block;margin-bottom:8px;color:var(--blue);font-size:1.12rem}
+  .card span{color:var(--muted);line-height:1.35}
+</style>
 </head>
-
 <body>
-  <h1>Simulaciones de relatividad</h1>
-
-  <div class="bloque">
-    <a href="./gemelos.html">Paradoja de los gemelos</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./muon_einstein.html">Muón relativista</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./reloj_einstein.html">Reloj de Einstein</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./bicicleta_einstein.html">Bicicleta de Einstein</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./torre_gravitatoria.html">Torre gravitatoria</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./observador_paseando.html">Observador paseando</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./lente_gravitacional.html">Lente gravitacional</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./espaguetizacion.html">Espaguetización</a>
-  </div>
-
-  <a class="volver" href="../">← Volver al índice principal</a>
+  <main>
+    <a class="back" href="../">&larr; Volver al &iacute;ndice principal</a>
+    <h1>Relatividad</h1>
+    <p class="intro">Simulaciones interactivas de relatividad especial y general.</p>
+    <section class="grid" aria-label="Listado de simulaciones">
+      <a class="card" href="./Relatividad.html"><strong>Relatividad</strong><span>Simulador general de relatividad.</span></a>
+      <a class="card" href="./simulador_relatividad.html"><strong>Simulador de relatividad</strong><span>Escenarios b&aacute;sicos de relatividad especial.</span></a>
+      <a class="card" href="./simulador_relatividad_ib.html"><strong>Relatividad IB</strong><span>Versi&oacute;n orientada al curr&iacute;culo IB.</span></a>
+      <a class="card" href="./gemelos.html"><strong>Paradoja de los gemelos</strong><span>Comparaci&oacute;n de tiempos propios.</span></a>
+      <a class="card" href="./muon_einstein.html"><strong>Mu&oacute;n relativista</strong><span>Vida media y dilataci&oacute;n temporal.</span></a>
+      <a class="card" href="./reloj_einstein.html"><strong>Reloj de Einstein</strong><span>Reloj de luz y dilataci&oacute;n temporal.</span></a>
+      <a class="card" href="./dos_observadores.html"><strong>Dos observadores</strong><span>Sistemas de referencia y medidas relativas.</span></a>
+      <a class="card" href="./lanza_granero.html"><strong>Lanza y granero</strong><span>Contracci&oacute;n de longitudes y simultaneidad.</span></a>
+      <a class="card" href="./bicicleta_einstein.html"><strong>Bicicleta de Einstein</strong><span>Visualizaci&oacute;n de movimiento relativista.</span></a>
+      <a class="card" href="./ascensor_einstein.html"><strong>Ascensor de Einstein</strong><span>Principio de equivalencia.</span></a>
+      <a class="card" href="./torre_gravitatoria.html"><strong>Torre gravitatoria</strong><span>Gravedad y variaci&oacute;n temporal.</span></a>
+      <a class="card" href="./observador_paseando.html"><strong>Observador paseando</strong><span>Movimiento del observador y efectos aparentes.</span></a>
+      <a class="card" href="./lente_gravitacional.html"><strong>Lente gravitacional</strong><span>Desviaci&oacute;n de la luz por gravedad.</span></a>
+      <a class="card" href="./espaguetizacion.html"><strong>Espaguetizaci&oacute;n</strong><span>Gradientes gravitatorios cerca de objetos masivos.</span></a>
+    </section>
+  </main>
 </body>
 </html>

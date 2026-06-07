@@ -4,20 +4,20 @@ Base creada en `physics/`. Usar nombres ASCII y enlaces relativos.
 
 ## Generadas
 
-- `pendulums.html`: pendulos acoplados, hasta 10 bobs, modos normales, periodo por aproximaciones de orden 0 a 4, condiciones iniciales, arrastre con raton y rastro.
+- `pendulums.html`: cadena serial de pendulos, un bob colgando del anterior, hasta 10 bobs, modos linealizados, periodo aproximado, condiciones iniciales, arrastre con raton y rastro.
 - `shm-spring.html`: oscilador masa-muelle.
-- `wave-interference.html`: interferencia de dos fuentes coherentes.
+- `wave-interference.html`: interferencia de 1 a 10 fuentes puntuales configurables, arrastrables, con menu contextual, amortiguamiento global y vista 3D.
 - `projectile-motion.html`: tiro parabolico.
+- `double-pendulum.html`: doble pendulo, caos, divergencia de condiciones iniciales, rastro y arrastre de bobs.
+- `coupled-springs.html`: cadena de osciladores masa-muelle, modos normales, impulso local, arrastre y rastros.
 
 ## Siguientes
 
-1. Doble pendulo y caos.
-2. Osciladores acoplados masa-muelle.
-3. Cuerda vibrante y modos estacionarios.
-4. Difraccion por rendijas.
-5. Circuito RLC.
-6. Orbitas gravitatorias.
-7. Colisiones 1D/2D.
-8. Fluidos y Bernoulli.
-9. Ciclos termodinamicos PV.
-10. Efecto Doppler.
+1. Cuerda vibrante y modos estacionarios.
+2. Difraccion por rendijas.
+3. Circuito RLC.
+4. Orbitas gravitatorias.
+5. Colisiones 1D/2D.
+6. Fluidos y Bernoulli.
+7. Ciclos termodinamicos PV.
+8. Efecto Doppler.

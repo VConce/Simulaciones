@@ -1,57 +1,39 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ViMat | Simulaciones VConce</title>
+  <title>ViMat</title>
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f7f7f7;
-      color: #222;
-    }
-    main {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 36px 22px 52px;
-    }
-    .back { display: inline-block; margin-bottom: 22px; color: #075bbb; font-weight: 700; text-decoration: none; }
-    .back:hover { text-decoration: underline; }
-    h1 { margin: 0 0 8px; font-size: clamp(2rem, 5vw, 3rem); }
-    p { margin: 0 0 28px; color: #555; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(245px, 1fr)); gap: 14px; }
-    a.card {
-      display: block;
-      padding: 18px 20px;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      background: white;
-      color: #075bbb;
-      font-size: 1.08rem;
-      font-weight: 800;
-      text-decoration: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,.05);
-    }
-    a.card:hover { text-decoration: underline; border-color: #075bbb; }
-  </style>
+  :root{--ink:#17202f;--muted:#607083;--paper:#f7f9fb;--panel:#fff;--line:#d9e2ec;--blue:#0b63ce;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}
+  main{max-width:1060px;margin:0 auto;padding:42px 22px 56px}
+  .back{display:inline-block;margin-bottom:22px;color:var(--blue);font-weight:800;text-decoration:none}
+  .back:hover{text-decoration:underline}
+  h1{margin:0 0 8px;font-size:clamp(2rem,5vw,3.2rem);line-height:1}
+  .intro{margin:0 0 30px;color:var(--muted);font-size:1.08rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:14px}
+  a.card{display:block;min-height:116px;padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:inherit;text-decoration:none;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+  a.card:hover{border-color:var(--blue);transform:translateY(-1px)}
+  .card strong{display:block;margin-bottom:8px;color:var(--blue);font-size:1.12rem}
+  .card span{color:var(--muted);line-height:1.35}
+</style>
 </head>
 <body>
   <main>
-    <a class="back" href="../">← Volver a simulaciones</a>
+    <a class="back" href="../">&larr; Volver al &iacute;ndice principal</a>
     <h1>ViMat</h1>
-    <p>Simulaciones interactivas de matemáticas.</p>
-
-    <section class="grid" aria-label="Simulaciones ViMat">
-      <a class="card" href="./conics.html">Apolonio y cónicas</a>
-      <a class="card" href="./cycloids.html">Cicloides</a>
-      <a class="card" href="./polar-curves.html">Curvas polares</a>
-      <a class="card" href="./eccentricity.html">Excentricidad</a>
-      <a class="card" href="./hypotrochoids.html">Hipotrocoides</a>
-      <a class="card" href="./geometric-loci.html">Lugares geométricos</a>
+    <p class="intro">Simulaciones interactivas de matem&aacute;ticas.</p>
+    <section class="grid" aria-label="Listado de simulaciones">
+      <a class="card" href="./conics.html"><strong>Apolonio y c&oacute;nicas</strong><span>Construcciones y propiedades de c&oacute;nicas.</span></a>
+      <a class="card" href="./cycloids.html"><strong>Cicloides</strong><span>Generaci&oacute;n y visualizaci&oacute;n de cicloides.</span></a>
+      <a class="card" href="./polar-curves.html"><strong>Curvas polares</strong><span>Exploraci&oacute;n de curvas en coordenadas polares.</span></a>
+      <a class="card" href="./eccentricity.html"><strong>Excentricidad</strong><span>Relaci&oacute;n entre excentricidad y forma de las c&oacute;nicas.</span></a>
+      <a class="card" href="./hypotrochoids.html"><strong>Hipotrocoides</strong><span>Curvas generadas por rodadura interior.</span></a>
+      <a class="card" href="./epicycloids.html"><strong>Epicicloides</strong><span>Curvas generadas por rodadura exterior; incluye epitrocoides al variar la distancia trazadora.</span></a>
+      <a class="card" href="./geometric-loci.html"><strong>Lugares geom&eacute;tricos</strong><span>Construcci&oacute;n experimental de lugares geom&eacute;tricos.</span></a>
     </section>
   </main>
 </body>
 </html>
-
-
