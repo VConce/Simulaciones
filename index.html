@@ -1,99 +1,65 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Simulaciones VConce</title>
   <style>
+    :root { color-scheme: light; }
     body {
-      font-family: system-ui, sans-serif;
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 24px;
-      line-height: 1.6;
-      background: #f7f7f7;
-      color: #222;
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f6f7f9;
+      color: #1f2933;
     }
-
-    h1 {
-      font-size: 2.4rem;
-      margin-bottom: 0.2em;
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 42px 22px 56px;
     }
-
-    .bloque {
+    h1 { margin: 0 0 8px; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1; }
+    .intro { margin: 0 0 30px; color: #52606d; font-size: 1.08rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+    a.card {
+      display: block;
+      min-height: 112px;
+      padding: 20px;
+      border: 1px solid #d9e2ec;
+      border-radius: 12px;
       background: white;
-      border: 1px solid #ddd;
-      border-radius: 14px;
-      padding: 18px 22px;
-      margin: 18px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    a {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #075bbb;
+      color: inherit;
       text-decoration: none;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
     }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    .categoria {
-      margin-top: 34px;
-      font-size: 1.5rem;
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 6px;
-    }
+    a.card:hover { border-color: #0b63ce; transform: translateY(-1px); }
+    .card strong { display: block; margin-bottom: 8px; font-size: 1.18rem; color: #0b63ce; }
+    .card span { color: #52606d; }
   </style>
 </head>
-
 <body>
-  <h1>Simulaciones VConce</h1>
-  <p>Biblioteca de simulaciones interactivas de matemáticas y física.</p>
+  <main>
+    <h1>Simulaciones VConce</h1>
+    <p class="intro">Biblioteca de simulaciones interactivas de matemáticas y física.</p>
 
-  <h2 class="categoria">Matemáticas</h2>
-
-  <div class="bloque">
-    <a href="./Apolonio. Cónicas.html">Apolonio y cónicas</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./Cicloides.html">Cicloides</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./Curvas polares.html">Curvas polares</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./Excentricidad.html">Excentricidad</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./Hipotrocoides.html">Hipotrocoides</a>
-  </div>
-
-  <div class="bloque">
-    <a href="./LugaresGeométricosMultimodo.html">Lugares geométricos</a>
-  </div>
-
-  <h2 class="categoria">Física</h2>
-
-  <div class="bloque">
-    <a href="./Relatividad/">Relatividad</a>
-    <p>Simulaciones sobre dilatación temporal, paradoja de los gemelos, muones, relojes de Einstein y gravedad.</p>
-  </div>
-
-  <div class="bloque">
-    <a href="./SimulaciónElecMag/">Campo electromagnético</a>
-    <p>Simulación interactiva de campos eléctricos y magnéticos.</p>
-  </div>
-
-  <div class="bloque">
-    <a href="./Probabilidad/">Probabilidad</a>
-    <p>Simulaciones de dados, monedas y aproximación de π.</p>
-  </div>
-
+    <section class="grid" aria-label="Categorías de simulaciones">
+      <a class="card" href="./vimat/">
+        <strong>ViMat</strong>
+        <span>Apolonio, cónicas, cicloides, curvas polares, excentricidad, hipotrocoides y lugares geométricos.</span>
+      </a>
+      <a class="card" href="./Relatividad/">
+        <strong>Relatividad</strong>
+        <span>Dilatación temporal, paradoja de los gemelos, muones, relojes de Einstein y gravedad.</span>
+      </a>
+      <a class="card" href="./electromagnetism/">
+        <strong>Electromagnetismo</strong>
+        <span>Campos eléctricos y magnéticos con objetos interactivos.</span>
+      </a>
+      <a class="card" href="./Probabilidad/">
+        <strong>Probabilidad</strong>
+        <span>Dados, monedas y aproximación de π.</span>
+      </a>
+    </section>
+  </main>
 </body>
 </html>
+
