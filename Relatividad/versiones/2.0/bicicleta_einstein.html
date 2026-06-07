@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bicicleta de Einstein</title>
+  <style>
+    :root{
+      --ink:#102033;--muted:#5c6d82;--blue:#0866e8;--green:#148a55;
+      --red:#df3d35;--orange:#ff9f1c;--line:#d6e5f5;--soft:#f2f8ff;
+      --shadow:0 20px 60px rgba(16,55,102,.14);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;color:var(--ink);
+      font-family:Aptos,"Segoe UI Variable","Trebuchet MS",sans-serif;
+      background:radial-gradient(circle at 12% 2%,#d9efff,transparent 30rem),
+        radial-gradient(circle at 92% 10%,#fff1d7,transparent 28rem),
+        linear-gradient(135deg,#f9fcff,#edf6ff 52%,#f8fbef);
+    }
+    .wrap{width:min(1260px,calc(100vw - 28px));margin:16px auto 28px}
+    .top{
+      display:grid;grid-template-columns:1fr 430px;gap:14px;align-items:stretch;
+      margin-bottom:14px;
+    }
+    .card{
+      background:rgba(255,255,255,.88);border:1px solid var(--line);
+      border-radius:24px;box-shadow:var(--shadow);backdrop-filter:blur(14px);
+    }
+    .theory{padding:18px 20px}
+    .tag{
+      display:inline-flex;padding:6px 10px;border-radius:999px;background:#e9f4ff;
+      border:1px solid #cce3ff;color:#075bd2;font-size:12px;font-weight:950;
+      text-transform:uppercase;letter-spacing:.08em;
+    }
+    h1{margin:10px 0 6px;font-size:clamp(34px,5vw,58px);line-height:.92;letter-spacing:-.06em}
+    .lead{margin:0;color:#4f6177;font-size:16px;line-height:1.38;font-weight:720;max-width:740px}
+    .eqs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:13px}
+    .eq{
+      border:1px solid var(--line);border-radius:17px;background:#f8fbff;padding:10px 12px;
+      min-height:76px;
+    }
+    .eq span{display:block;color:#708095;font-size:11px;font-weight:950;letter-spacing:.07em;text-transform:uppercase}
+    .math{margin-top:7px;color:#075ee8;font-family:"Cambria Math",Cambria,Georgia,serif;font-size:20px;font-weight:700;line-height:1.15}
+    .frac{display:inline-grid;grid-template-rows:auto 1px auto;vertical-align:middle;text-align:center;line-height:1.05}
+    .frac i{display:block;border-top:2px solid currentColor;width:100%}
+    .side{padding:14px;display:grid;gap:11px}
+    .results{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .res{border:1px solid var(--line);border-radius:18px;background:#fff;padding:12px}
+    .res span{display:block;color:#66778c;font-size:11px;font-weight:950;letter-spacing:.07em;text-transform:uppercase}
+    .res strong{display:block;margin-top:4px;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+    .gal strong{color:var(--red)}.ein strong{color:var(--green)}
+    .controls{border:1px solid var(--line);border-radius:20px;background:#fff;padding:12px;display:grid;gap:10px}
+    label{display:flex;justify-content:space-between;gap:10px;margin-bottom:5px;font-size:14px;font-weight:900;color:#293b52}
+    output{color:var(--blue);font-variant-numeric:tabular-nums}
+    input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}
+    .buttons{display:flex;gap:9px}.buttons button{flex:1}
+    button{
+      border:0;border-radius:14px;padding:10px 12px;font-weight:950;cursor:pointer;
+      font-family:inherit;
+    }
+    .primary{color:#fff;background:linear-gradient(135deg,var(--orange),var(--red));box-shadow:0 12px 24px rgba(223,61,53,.22)}
+    .ghost{color:#17446f;background:#edf6ff;border:1px solid #d0e5fb}
+    .note{margin:0;border:1px solid #cfe4ff;border-radius:18px;background:#eaf6ff;color:#36546c;padding:11px 12px;font-size:14px;font-weight:760;line-height:1.35}
+    .warn{color:var(--red);font-weight:950}
+    .sim{overflow:hidden}
+    .simHead{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:12px 16px 8px;
+    }
+    .simHead h2{margin:0;font-size:23px;letter-spacing:-.03em}
+    .simHead p{margin:2px 0 0;color:var(--muted);font-size:14px;font-weight:760}
+    .gamma{background:linear-gradient(135deg,#0866e8,#4fb8ff);color:#fff;border-radius:999px;padding:9px 13px;font-weight:950;white-space:nowrap}
+    .canvasBox{padding:0 14px 14px}
+    canvas{width:100%;height:auto;display:block;border-radius:22px;border:1px solid #cfe0f4;background:#9bdcff}
+    @media(max-width:980px){.top{grid-template-columns:1fr}.eqs{grid-template-columns:1fr}.side{grid-row:auto}.res strong{font-size:28px}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <section class="top">
+    <article class="card theory">
+      <span class="tag">Relatividad especial · suma de velocidades</span>
+      <h1>La bicicleta de Einstein</h1>
+      <p class="lead">Einstein viaja a velocidad <strong>v<sub>E</sub></strong> y lanza una manzana con velocidad <strong>u′</strong> medida en su propio marco. El objetivo es comparar la suma clásica con la suma relativista.</p>
+      <div class="eqs">
+        <div class="eq"><span>Factor de Lorentz</span><div class="math">γ = 1 / √(1 − v<sub>E</sub><sup>2</sup>)</div></div>
+        <div class="eq"><span>Galileo</span><div class="math">u = v<sub>E</sub> + u′</div></div>
+        <div class="eq"><span>Einstein</span><div class="math">u = (v<sub>E</sub> + u′) / (1 + v<sub>E</sub>u′)</div></div>
+      </div>
+    </article>
+    <aside class="card side">
+      <div class="results">
+        <div class="res gal"><span>Según Galileo</span><strong id="galOut">0.75 c</strong></div>
+        <div class="res ein"><span>Según Einstein</span><strong id="einOut">0.68 c</strong></div>
+      </div>
+      <div class="controls">
+        <div><label>Velocidad de Einstein <output id="bikeOut">0.55 c</output></label><input id="bikeV" type="range" min="0" max="0.99" step="0.01" value="0.55"></div>
+        <div><label>Velocidad de la manzana <output id="appleOut">0.20 c</output></label><input id="appleV" type="range" min="-0.80" max="0.80" step="0.01" value="0.20"></div>
+        <div class="buttons"><button class="primary" id="dropBtn">Soltar manzana</button><button class="ghost" id="resetBtn">Reiniciar</button></div>
+      </div>
+      <p class="note" id="note">La suma relativista nunca supera <strong>c</strong>.</p>
+    </aside>
+  </section>
+
+  <section class="card sim">
+    <div class="simHead">
+      <div><h2>Simulación</h2><p>El paisaje se desplaza según v<sub>E</sub>, las ruedas son sprites rotando y la manzana sigue dos predicciones.</p></div>
+      <div class="gamma" id="gammaOut">γ = 1.20</div>
+    </div>
+    <div class="canvasBox"><canvas id="scene" width="1280" height="500"></canvas></div>
+  </section>
+</main>
+
+<script>
+const assets = {
+  einstein: Object.assign(new Image(), {src:"assets/einstein-bike-sprite.png"}),
+  wheel: Object.assign(new Image(), {src:"assets/wheel-sprite.png"}),
+  apple: Object.assign(new Image(), {src:"assets/apple-sprite.png"})
+};
+const canvas=document.getElementById("scene"),ctx=canvas.getContext("2d");
+const bikeV=document.getElementById("bikeV"),appleV=document.getElementById("appleV");
+const state={t:0,dropT:-99,bike:+bikeV.value,apple:+appleV.value};
+const fmt=(x,d=2)=>Number(x).toFixed(d), gamma=v=>1/Math.sqrt(Math.max(1e-6,1-v*v));
+const relAdd=(v,u)=>(v+u)/(1+v*u);
+function $(id){return document.getElementById(id)}
+function update(){
+  state.bike=+bikeV.value; state.apple=+appleV.value;
+  const gal=state.bike+state.apple, ein=relAdd(state.bike,state.apple);
+  $("bikeOut").textContent=fmt(state.bike)+" c"; $("appleOut").textContent=fmt(state.apple)+" c";
+  $("galOut").textContent=fmt(gal)+" c"; $("einOut").textContent=fmt(ein)+" c"; $("gammaOut").textContent="γ = "+fmt(gamma(state.bike));
+  $("note").innerHTML=Math.abs(gal)>1?`<span class="warn">Galileo predice ${fmt(gal)} c.</span> La fórmula de Einstein mantiene el límite c.`:`A velocidades pequeñas las dos predicciones se parecen; cerca de c se separan claramente.`;
+}
+function rr(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}}
+function drawBackground(speed){
+  const W=canvas.width,H=canvas.height;
+  let sky=ctx.createLinearGradient(0,0,0,H*.62);sky.addColorStop(0,"#7bd0ff");sky.addColorStop(1,"#eaf8ff");ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#bde79a";ctx.beginPath();ctx.moveTo(0,310);ctx.quadraticCurveTo(260,250,560,315);ctx.quadraticCurveTo(900,370,1280,295);ctx.lineTo(1280,410);ctx.lineTo(0,410);ctx.fill();
+  const treeSpeed=70+speed*760, off=(state.t*treeSpeed)%260;
+  for(let layer=0;layer<2;layer++){
+    for(let i=-2;i<8;i++){
+      const x=i*260-off*(layer?1:.45), y=235+layer*35, s=layer?1.08:.68;
+      ctx.fillStyle=layer?"rgba(97,70,40,.75)":"rgba(118,86,48,.5)";ctx.fillRect(x+90*s,y,20*s,130*s);
+      ctx.fillStyle=layer?"rgba(44,132,67,.74)":"rgba(72,155,82,.5)";
+      ctx.beginPath();ctx.ellipse(x+100*s,y-20*s,82*s,70*s,0,0,7);ctx.fill();
+      if(speed>.55){ctx.fillStyle=`rgba(57,121,63,${.18+speed*.18})`;ctx.fillRect(x+20*s,y-45*s,170*s,26*s)}
+    }
+  }
+  ctx.fillStyle="#d8d2c8";ctx.fillRect(0,405,W,H-405);ctx.fillStyle="#b6b0a8";ctx.fillRect(0,426,W,8);
+  ctx.strokeStyle="rgba(80,80,80,.35)";ctx.lineWidth=3;
+  const roadOff=(state.t*(160+speed*900))%180;
+  for(let i=-1;i<10;i++){ctx.beginPath();ctx.moveTo(i*180-roadOff,462);ctx.lineTo(i*180-roadOff+110,452);ctx.stroke()}
+}
+function drawRotated(img,x,y,size,angle){
+  if(!img.complete||!img.naturalWidth)return;
+  ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.drawImage(img,-size/2,-size/2,size,size);ctx.restore();
+}
+function drawEinstein(speed){
+  const bob=Math.sin(state.t*8*Math.max(.12,speed))*2.2;
+  const x=360,y=156+bob,w=600,h=338;
+  if(assets.einstein.complete&&assets.einstein.naturalWidth)ctx.drawImage(assets.einstein,x,y,w,h);
+  const spin=state.t*(5+speed*32);
+  drawRotated(assets.wheel,x+214,y+263,116,spin);
+  drawRotated(assets.wheel,x+380,y+263,116,spin);
+  // Small release gesture: a brief glow and shoulder bob when the apple is launched.
+  const age=state.t-state.dropT;
+  if(age>=0&&age<.55){
+    ctx.save();ctx.globalAlpha=1-age/.55;ctx.strokeStyle="#fff";ctx.lineWidth=7;ctx.lineCap="round";
+    ctx.beginPath();ctx.moveTo(x+375,y+112);ctx.quadraticCurveTo(x+428,y+84-age*34,x+488,y+110-age*46);ctx.stroke();ctx.restore();
+  }
+}
+function drawVelocityArrow(){
+  ctx.save();ctx.strokeStyle="#111827";ctx.fillStyle="#111827";ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(890,105);ctx.lineTo(1070,105);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(1070,105);ctx.lineTo(1038,88);ctx.lineTo(1038,122);ctx.fill();
+  ctx.font="900 28px Aptos,Segoe UI,sans-serif";ctx.fillText("v",975,88);ctx.restore();
+}
+function drawApple(){
+  const age=state.t-state.dropT;
+  if(age<0||age>4.4){
+    rr(470,585,340,40,20,"rgba(255,255,255,.9)","#cfe1f5");
+    ctx.fillStyle="#2c435c";ctx.font="850 18px Aptos,Segoe UI,sans-serif";ctx.textAlign="center";ctx.fillText("Pulsa “Soltar manzana”",640,611);return;
+  }
+  const sx=720,sy=268,gal=state.bike+state.apple,ein=relAdd(state.bike,state.apple);
+  const galX=sx+gal*65*age, galY=sy+10*age*age, einX=sx+ein*65*age, einY=sy+6.5*age*age;
+  ctx.save();ctx.setLineDash([10,8]);ctx.lineWidth=4;
+  ctx.strokeStyle="rgba(223,61,53,.86)";ctx.beginPath();ctx.moveTo(sx,sy);ctx.quadraticCurveTo((sx+galX)/2,sy-80,galX,galY);ctx.stroke();
+  ctx.strokeStyle="rgba(8,102,232,.86)";ctx.beginPath();ctx.moveTo(sx,sy);ctx.quadraticCurveTo((sx+einX)/2,sy-48,einX,einY);ctx.stroke();ctx.setLineDash([]);
+  if(assets.apple.complete&&assets.apple.naturalWidth){
+    ctx.drawImage(assets.apple,Math.min(1215,galX)-22,Math.min(610,galY)-22,44,44);
+    ctx.globalAlpha=.72;ctx.drawImage(assets.apple,Math.min(1215,einX)-14,Math.min(610,einY)-14,28,28);ctx.globalAlpha=1;
+  }
+  ctx.font="900 17px Aptos,Segoe UI,sans-serif";ctx.textAlign="center";
+  ctx.fillStyle="#df3d35";ctx.fillText("Galileo",Math.min(1190,galX),Math.min(630,galY+32));
+  ctx.fillStyle="#0866e8";ctx.fillText("Einstein",Math.min(1190,einX),Math.min(630,einY+32));
+  ctx.restore();
+}
+function drawOverlay(){
+  rr(46,34,250,88,20,"rgba(255,255,255,.94)","#cfe1f5");
+  ctx.fillStyle="#102033";ctx.textAlign="left";ctx.font="900 18px Aptos,Segoe UI,sans-serif";ctx.fillText("Bicicleta de Einstein",72,68);
+  ctx.fillStyle="#607086";ctx.font="800 13px Aptos,Segoe UI,sans-serif";ctx.fillText("velocidades medidas en c",72,92);
+}
+function frame(){
+  state.t+=0.016; const speed=Math.max(.02,state.bike);
+  ctx.clearRect(0,0,canvas.width,canvas.height);drawBackground(speed);drawVelocityArrow();drawEinstein(speed);drawApple();drawOverlay();
+  requestAnimationFrame(frame);
+}
+bikeV.oninput=update; appleV.oninput=update;
+$("dropBtn").onclick=()=>{state.dropT=state.t};
+$("resetBtn").onclick=()=>{bikeV.value=.55;appleV.value=.20;state.dropT=-99;update()};
+update();requestAnimationFrame(frame);
+</script>
+</body>
+</html>

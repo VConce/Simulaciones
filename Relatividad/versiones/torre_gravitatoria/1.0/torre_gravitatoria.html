@@ -1,0 +1,339 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Torre gravitatoria | Simulación IB</title>
+  <style>
+    :root{
+      --ink:#111827;--muted:#5d6980;--blue:#0b63e5;--violet:#6d49ff;--cyan:#2bd7ff;
+      --green:#1aa66f;--amber:#f1a42c;--line:#d9e4f2;--card:rgba(255,255,255,.92);
+      --shadow:0 24px 70px rgba(27,43,88,.16);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;color:var(--ink);
+      font-family:Bahnschrift,"Segoe UI Variable","Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 10% 8%,rgba(43,215,255,.24),transparent 25rem),
+        radial-gradient(circle at 85% 0%,rgba(109,73,255,.20),transparent 28rem),
+        linear-gradient(135deg,#f8fbff,#eef6ff 48%,#f7f3ff);
+    }
+    body::before{
+      content:"";position:fixed;inset:0;pointer-events:none;opacity:.23;
+      background-image:linear-gradient(rgba(31,52,91,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(31,52,91,.08) 1px,transparent 1px);
+      background-size:42px 42px;mask-image:radial-gradient(circle at 50% 18%,black,transparent 78%);
+    }
+    .page{width:min(1380px,calc(100vw - 28px));margin:18px auto 28px;position:relative}
+    .hero{
+      display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:14px;
+      border:1px solid var(--line);border-radius:30px;background:rgba(255,255,255,.76);box-shadow:var(--shadow);padding:18px 20px;
+      backdrop-filter:blur(16px);
+    }
+    .title{display:flex;gap:16px;align-items:center}.badge{width:74px;height:74px;border-radius:24px;display:grid;place-items:center;color:white;font-size:38px;font-weight:950;background:linear-gradient(145deg,#0d63e6,#6d49ff);box-shadow:0 18px 46px rgba(68,73,190,.26)}
+    h1{margin:0;font-size:clamp(34px,4.3vw,62px);line-height:.95;letter-spacing:-.055em}.tag{margin:0 0 7px;color:#6847df;font-weight:950;letter-spacing:.08em;text-transform:uppercase;font-size:12px}.lead{margin:8px 0 0;color:#4e5d74;font-size:17px;font-weight:680;line-height:1.35;max-width:760px}
+    .formula{min-width:300px;border:1px solid rgba(109,73,255,.2);border-radius:22px;background:linear-gradient(145deg,#ffffff,#f4f0ff);padding:13px 15px;color:#26233d;box-shadow:0 14px 38px rgba(46,56,107,.11)}
+    .formula span{display:block;color:#6d49ff;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:950;margin-bottom:5px}.formula strong{font-family:Cambria,"Times New Roman",serif;font-size:25px;white-space:nowrap}.formula p{margin:4px 0 0;color:var(--muted);font-weight:650;font-size:13px}
+    .workspace{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px}.sceneCard,.panel,.info{border:1px solid var(--line);border-radius:30px;background:var(--card);box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(14px)}
+    .sceneHead{padding:14px 18px 8px;display:flex;justify-content:space-between;align-items:center;gap:12px}.sceneHead h2{margin:0;font-size:25px;letter-spacing:-.035em}.sceneHead p{margin:2px 0 0;color:var(--muted);font-weight:720}.pill{border-radius:999px;padding:9px 13px;color:white;background:linear-gradient(135deg,var(--blue),var(--violet));font-weight:950;white-space:nowrap}
+    .canvasWrap{padding:0 14px 14px;position:relative}canvas{width:100%;height:auto;display:block;border:1px solid #17213b;border-radius:24px;background:#8fcaff}
+    .panel{padding:14px;display:grid;gap:11px}.control{border:1px solid #dde6f3;border-radius:18px;background:rgba(255,255,255,.86);padding:12px}.control label{display:flex;justify-content:space-between;gap:10px;font-weight:950;margin-bottom:7px}.control output{font-variant-numeric:tabular-nums;color:#6847df}.control input{width:100%;accent-color:var(--violet);cursor:pointer}.scale{display:flex;justify-content:space-between;color:#778397;font-size:12px;font-weight:800;margin-top:5px}
+    .delta{border-radius:20px;padding:14px 15px;background:linear-gradient(135deg,#eee8ff,#ffffff);border:1px solid rgba(109,73,255,.18)}.delta span{display:block;color:#6847df;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:950}.delta strong{display:block;margin-top:5px;font-size:32px;color:#452bd1;font-variant-numeric:tabular-nums}.delta p{margin:4px 0 0;color:var(--muted);font-weight:680;font-size:13px}
+    .buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}button{border:0;border-radius:15px;padding:11px 12px;font-family:inherit;font-weight:950;cursor:pointer}.primary{color:#081323;background:linear-gradient(135deg,#8df1ff,#ffffff)}.ghost{color:#19233b;background:#edf3ff;border:1px solid #d6e2f1}
+    .info{margin-top:16px;padding:16px 18px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.mini h3{margin:0 0 5px;font-size:18px}.mini p{margin:0;color:var(--muted);font-weight:650;line-height:1.38}
+    @media(max-width:1050px){.hero,.workspace{display:block}.formula{margin-top:12px}.panel{margin-top:16px}.info{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="title">
+        <div class="badge">2</div>
+        <div>
+          <p class="tag">Relatividad general · dilatación gravitatoria</p>
+          <h1>Torre gravitatoria</h1>
+          <p class="lead">Compara dos relojes situados a distintas alturas. El reloj más alejado del centro gravitatorio acumula ligeramente más tiempo propio.</p>
+        </div>
+      </div>
+      <aside class="formula">
+        <span>Modelo usado</span>
+        <strong>dτ/dt = √(1 − 2GM/(c²r))</strong>
+        <p>Aproximación de Schwarzschild para relojes estáticos.</p>
+      </aside>
+    </section>
+
+    <section class="workspace">
+      <article class="sceneCard">
+        <div class="sceneHead">
+          <div><h2>Relojes en una torre</h2><p>Arrastra los controles y observa cómo cambian las velocidades de los relojes.</p></div>
+          <div class="pill" id="modePill">Tierra ×1.00</div>
+        </div>
+        <div class="canvasWrap"><canvas id="scene" width="900" height="560"></canvas></div>
+      </article>
+
+      <aside class="panel" aria-label="Controles de la simulación">
+        <div class="control">
+          <label for="mass">Masa del planeta <output id="massOut">1.00 M⊕</output></label>
+          <input id="mass" type="range" min="0.1" max="10" step="0.01" value="1" />
+          <div class="scale"><span>0.1</span><span>1</span><span>10 M⊕</span></div>
+        </div>
+        <div class="control">
+          <label for="radius">Radio del planeta <output id="radiusOut">6371 km</output></label>
+          <input id="radius" type="range" min="3000" max="20000" step="10" value="6371" />
+          <div class="scale"><span>3000</span><span>6371</span><span>20000 km</span></div>
+        </div>
+        <div class="control">
+          <label for="tower">Altura de la torre <output id="towerOut">10000 km</output></label>
+          <input id="tower" type="range" min="0" max="5" step="0.01" value="4" />
+          <div class="scale"><span>1 km</span><span>100 km</span><span>100000 km</span></div>
+        </div>
+        <div class="control">
+          <label for="clock1">Altura reloj 1 <output id="clock1Out">0 km</output></label>
+          <input id="clock1" type="range" min="0" max="1" step="0.001" value="0" />
+          <div class="scale"><span>superficie</span><span></span><span>cima</span></div>
+        </div>
+        <div class="control">
+          <label for="clock2">Altura reloj 2 <output id="clock2Out">10000 km</output></label>
+          <input id="clock2" type="range" min="0" max="1" step="0.001" value="1" />
+          <div class="scale"><span>superficie</span><span></span><span>cima</span></div>
+        </div>
+        <div class="control">
+          <label for="warp">Escala temporal <output id="warpOut">1 año/s</output></label>
+          <input id="warp" type="range" min="0" max="8" step="0.01" value="7.5" />
+          <div class="scale"><span>1 s/s</span><span>días/s</span><span>años/s</span></div>
+        </div>
+        <div class="delta">
+          <span>Diferencia acumulada</span>
+          <strong id="deltaOut">0.000 ms</strong>
+          <p id="deltaNote">τ₂ − τ₁. Positivo si el reloj 2 va más rápido.</p>
+        </div>
+        <div class="buttons">
+          <button id="pause" class="primary" type="button">Pausar</button>
+          <button id="reset" class="ghost" type="button">Reiniciar</button>
+        </div>
+      </aside>
+    </section>
+
+    <section class="info">
+      <article class="mini"><h3>Idea física</h3><p>A mayor radio gravitatorio, menor potencial gravitatorio efectivo y mayor ritmo del tiempo propio.</p></article>
+      <article class="mini"><h3>Lectura IB</h3><p>La diferencia real cerca de la Tierra es pequeña; por eso la escala temporal acelera la acumulación visible.</p></article>
+      <article class="mini"><h3>Uso en clase</h3><p>Compara primero dos relojes en superficie y cima. Después cambia masa y radio para aislar cada variable.</p></article>
+    </section>
+  </main>
+
+  <script>
+    const G = 6.67430e-11;
+    const C = 299792458;
+    const EARTH_MASS = 5.9722e24;
+    const canvas = document.getElementById("scene");
+    const ctx = canvas.getContext("2d");
+    const towerSprite = new Image();
+    towerSprite.src = "assets/gravity-tower-sprite.png";
+
+    const state = {
+      massFactor: 1,
+      radiusKm: 6371,
+      towerLog: 4,
+      clock1Frac: 0,
+      clock2Frac: 1,
+      warpLog: 7.5,
+      coordTime: 0,
+      last: performance.now(),
+      paused: false,
+      render1: 0,
+      render2: 1
+    };
+
+    const els = {
+      mass: document.getElementById("mass"), radius: document.getElementById("radius"), tower: document.getElementById("tower"),
+      clock1: document.getElementById("clock1"), clock2: document.getElementById("clock2"), warp: document.getElementById("warp"),
+      massOut: document.getElementById("massOut"), radiusOut: document.getElementById("radiusOut"), towerOut: document.getElementById("towerOut"),
+      clock1Out: document.getElementById("clock1Out"), clock2Out: document.getElementById("clock2Out"), warpOut: document.getElementById("warpOut"),
+      deltaOut: document.getElementById("deltaOut"), deltaNote: document.getElementById("deltaNote"), modePill: document.getElementById("modePill"),
+      pause: document.getElementById("pause"), reset: document.getElementById("reset")
+    };
+
+    const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+    const towerHeightKm = () => Math.pow(10, state.towerLog);
+    const clockHeightKm = frac => frac * towerHeightKm();
+    const timeWarp = () => Math.pow(10, state.warpLog);
+
+    function rateAtHeight(heightKm) {
+      const m = EARTH_MASS * state.massFactor;
+      const r = Math.max(1, (state.radiusKm + heightKm) * 1000);
+      const factor = 1 - (2 * G * m) / (C * C * r);
+      return Math.sqrt(Math.max(0.000001, factor));
+    }
+
+    function metrics() {
+      const h1 = clockHeightKm(state.clock1Frac);
+      const h2 = clockHeightKm(state.clock2Frac);
+      const r1 = rateAtHeight(h1);
+      const r2 = rateAtHeight(h2);
+      const tau1 = state.coordTime * r1;
+      const tau2 = state.coordTime * r2;
+      return { h1, h2, r1, r2, tau1, tau2, delta: tau2 - tau1, towerH: towerHeightKm() };
+    }
+
+    function fmtKm(km) {
+      if (km < 10) return `${km.toFixed(2)} km`;
+      if (km < 1000) return `${km.toFixed(1)} km`;
+      return `${Math.round(km).toLocaleString("es-ES")} km`;
+    }
+
+    function fmtWarp(s) {
+      if (s < 60) return `${s.toFixed(0)} s/s`;
+      if (s < 86400) return `${(s / 3600).toFixed(1)} h/s`;
+      if (s < 31557600) return `${(s / 86400).toFixed(1)} días/s`;
+      return `${(s / 31557600).toFixed(2)} años/s`;
+    }
+
+    function fmtDuration(sec) {
+      const sign = sec < 0 ? "−" : "";
+      sec = Math.abs(sec);
+      const days = Math.floor(sec / 86400);
+      const h = Math.floor(sec / 3600) % 24;
+      const m = Math.floor(sec / 60) % 60;
+      const s = sec % 60;
+      const hh = String(h).padStart(2, "0");
+      const mm = String(m).padStart(2, "0");
+      const ss = s.toFixed(2).padStart(5, "0");
+      return days ? `${sign}${days} d ${hh}:${mm}:${ss}` : `${sign}${hh}:${mm}:${ss}`;
+    }
+
+    function fmtDelta(sec) {
+      const sign = sec < 0 ? "−" : "+";
+      const a = Math.abs(sec);
+      if (a < 1e-6) return `${sign}${(a * 1e9).toFixed(2)} ns`;
+      if (a < 1e-3) return `${sign}${(a * 1e6).toFixed(2)} µs`;
+      if (a < 1) return `${sign}${(a * 1e3).toFixed(3)} ms`;
+      return `${sign}${a.toFixed(3)} s`;
+    }
+
+    function updateUI() {
+      const m = metrics();
+      els.massOut.textContent = `${state.massFactor.toFixed(2)} M⊕`;
+      els.radiusOut.textContent = fmtKm(state.radiusKm);
+      els.towerOut.textContent = fmtKm(m.towerH);
+      els.clock1Out.textContent = fmtKm(m.h1);
+      els.clock2Out.textContent = fmtKm(m.h2);
+      els.warpOut.textContent = fmtWarp(timeWarp());
+      els.deltaOut.textContent = fmtDelta(m.delta);
+      els.deltaNote.textContent = m.delta >= 0 ? "τ₂ − τ₁. El reloj 2 acumula más tiempo." : "τ₂ − τ₁. El reloj 1 acumula más tiempo.";
+      els.modePill.textContent = `Tierra ×${state.massFactor.toFixed(2)}`;
+    }
+
+    function roundRect(x, y, w, h, r, fill, stroke) {
+      ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fillStyle = fill; ctx.fill();
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.stroke(); }
+    }
+
+    function drawBackground(w, h) {
+      const sky = ctx.createLinearGradient(0, 0, 0, h);
+      sky.addColorStop(0, "#86c9ff"); sky.addColorStop(.48, "#d9f0ff"); sky.addColorStop(1, "#a7d27f");
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = "rgba(255,255,255,.82)";
+      [[94,92,64],[196,72,52],[725,86,68]].forEach(([x,y,s]) => {
+        ctx.beginPath(); ctx.arc(x,y,s*.28,0,Math.PI*2); ctx.arc(x+s*.25,y-8,s*.22,0,Math.PI*2); ctx.arc(x+s*.48,y+2,s*.25,0,Math.PI*2); ctx.fill();
+      });
+      const far = ctx.createLinearGradient(0, 180, 0, 340);
+      far.addColorStop(0, "#7ca0bc"); far.addColorStop(1, "#e5edf3"); ctx.fillStyle = far;
+      ctx.beginPath(); ctx.moveTo(0,260); ctx.lineTo(90,210); ctx.lineTo(180,250); ctx.lineTo(270,190); ctx.lineTo(388,254); ctx.lineTo(520,205); ctx.lineTo(650,252); ctx.lineTo(760,206); ctx.lineTo(w,260); ctx.lineTo(w,360); ctx.lineTo(0,360); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,.85)";
+      [[270,190],[520,205],[760,206]].forEach(([x,y]) => { ctx.beginPath(); ctx.moveTo(x-28,y+20); ctx.lineTo(x,y); ctx.lineTo(x+32,y+22); ctx.closePath(); ctx.fill(); });
+      const river = ctx.createLinearGradient(0, 330, w, 390); river.addColorStop(0, "#5fb5df"); river.addColorStop(.5, "#d9f6ff"); river.addColorStop(1, "#3f91c8");
+      ctx.fillStyle = river; ctx.beginPath(); ctx.moveTo(0,340); ctx.bezierCurveTo(200,310,330,380,520,348); ctx.bezierCurveTo(690,320,770,352,w,338); ctx.lineTo(w,430); ctx.bezierCurveTo(650,450,430,400,250,432); ctx.bezierCurveTo(90,460,20,430,0,446); ctx.closePath(); ctx.fill();
+      const grass = ctx.createLinearGradient(0, 390, 0, h); grass.addColorStop(0, "#95c96a"); grass.addColorStop(1, "#4b8a45"); ctx.fillStyle = grass; ctx.fillRect(0,390,w,h-390);
+      ctx.fillStyle = "rgba(48,76,49,.28)";
+      for (let i=0;i<55;i++){ const x=(i*83)%w, y=420+(i*37)%120; ctx.fillRect(x,y,36+(i%5)*8,2); }
+    }
+
+    function yForFraction(frac) {
+      const top = 74, bottom = 470;
+      return bottom - frac * (bottom - top);
+    }
+
+    function drawTower() {
+      const h = 480;
+      const ratio = towerSprite.naturalWidth && towerSprite.naturalHeight ? towerSprite.naturalWidth / towerSprite.naturalHeight : 0.27;
+      const w = h * ratio;
+      const x = 515 - w / 2;
+      const y = 38;
+      if (towerSprite.complete && towerSprite.naturalWidth) ctx.drawImage(towerSprite, x, y, w, h);
+      else { ctx.fillStyle = "#606778"; ctx.fillRect(x, y, w, h); }
+      ctx.strokeStyle = "rgba(24,34,58,.45)"; ctx.lineWidth = 2; ctx.setLineDash([7,7]); ctx.beginPath(); ctx.moveTo(625, yForFraction(1)); ctx.lineTo(625, yForFraction(0)); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = "#172033"; ctx.font = "900 15px Bahnschrift, Segoe UI, sans-serif"; ctx.textAlign = "left"; ctx.fillText("h", 640, 280);
+    }
+
+    function drawAnalogClock(x, y, r, color, seconds, label, heightKm) {
+      ctx.save(); ctx.translate(x,y);
+      ctx.shadowColor = "rgba(10,25,55,.26)"; ctx.shadowBlur = 16; ctx.shadowOffsetY = 7;
+      ctx.fillStyle = "rgba(255,255,255,.94)"; ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; ctx.strokeStyle = color; ctx.lineWidth = 5; ctx.stroke();
+      ctx.fillStyle = "#1d2434";
+      for (let i=0;i<12;i++){ const a=i*Math.PI/6-Math.PI/2; const len=i%3===0?8:4; ctx.beginPath(); ctx.moveTo(Math.cos(a)*(r-9),Math.sin(a)*(r-9)); ctx.lineTo(Math.cos(a)*(r-9-len),Math.sin(a)*(r-9-len)); ctx.strokeStyle="#1d2434"; ctx.lineWidth=i%3===0?2.4:1.4; ctx.stroke(); }
+      const minute = (seconds / 60) * Math.PI * 2 - Math.PI / 2;
+      const hour = (seconds / 3600) * Math.PI * 2 - Math.PI / 2;
+      ctx.strokeStyle = "#111827"; ctx.lineCap = "round";
+      ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(hour)*r*.42,Math.sin(hour)*r*.42); ctx.stroke();
+      ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(minute)*r*.68,Math.sin(minute)*r*.68); ctx.stroke();
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(0,0,5,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      roundRect(x-r-22,y+r+9,(r+22)*2,54,14,"rgba(255,255,255,.90)","rgba(32,62,112,.16)");
+      ctx.fillStyle = "#172033"; ctx.font = "900 13px Bahnschrift, Segoe UI, sans-serif"; ctx.textAlign = "center"; ctx.fillText(label, x, y+r+29);
+      ctx.fillStyle = color; ctx.font = "950 14px Bahnschrift, Segoe UI, sans-serif"; ctx.fillText(fmtKm(heightKm), x, y+r+48);
+    }
+
+    function drawTimers(m) {
+      roundRect(24, 24, 280, 92, 20, "rgba(8,17,38,.78)", "rgba(141,241,255,.38)");
+      ctx.fillStyle = "#8df1ff"; ctx.font = "950 14px Bahnschrift, Segoe UI, sans-serif"; ctx.textAlign = "left"; ctx.fillText("Reloj 1 · tiempo propio τ₁", 44, 51);
+      ctx.fillStyle = "#ffffff"; ctx.font = "950 27px Consolas, monospace"; ctx.fillText(fmtDuration(m.tau1), 44, 86);
+      roundRect(24, 128, 280, 92, 20, "rgba(8,17,38,.78)", "rgba(184,168,255,.42)");
+      ctx.fillStyle = "#cfc4ff"; ctx.font = "950 14px Bahnschrift, Segoe UI, sans-serif"; ctx.fillText("Reloj 2 · tiempo propio τ₂", 44, 155);
+      ctx.fillStyle = "#ffffff"; ctx.font = "950 27px Consolas, monospace"; ctx.fillText(fmtDuration(m.tau2), 44, 190);
+      roundRect(24, 236, 280, 66, 18, "rgba(255,255,255,.88)", "rgba(255,255,255,.35)");
+      ctx.fillStyle = "#172033"; ctx.font = "900 13px Bahnschrift, Segoe UI, sans-serif"; ctx.fillText("Ritmos respecto a t coordenado", 44, 260);
+      ctx.fillStyle = "#0b63e5"; ctx.font = "950 15px Consolas, monospace"; ctx.fillText(`τ₁/t = ${m.r1.toFixed(12)}`, 44, 282);
+      ctx.fillStyle = "#6d49ff"; ctx.fillText(`τ₂/t = ${m.r2.toFixed(12)}`, 176, 282);
+    }
+
+    function draw() {
+      const m = metrics();
+      const w = canvas.width, h = canvas.height;
+      drawBackground(w,h); drawTower(); drawTimers(m);
+      state.render1 += (state.clock1Frac - state.render1) * .08;
+      state.render2 += (state.clock2Frac - state.render2) * .08;
+      const y1 = yForFraction(state.render1);
+      const y2 = yForFraction(state.render2);
+      ctx.strokeStyle = "rgba(16,33,62,.32)"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(380,y1); ctx.lineTo(455,y1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(585,y2); ctx.lineTo(525,y2); ctx.stroke();
+      drawAnalogClock(360, y1, 30, "#0b63e5", m.tau1, "Reloj 1", m.h1);
+      drawAnalogClock(610, y2, 27, "#6d49ff", m.tau2, "Reloj 2", m.h2);
+      ctx.fillStyle = "rgba(8,17,38,.66)"; ctx.beginPath(); ctx.roundRect(585, 430, 250, 70, 18); ctx.fill();
+      ctx.fillStyle = "#ffffff"; ctx.font = "900 15px Bahnschrift, Segoe UI, sans-serif"; ctx.textAlign = "left"; ctx.fillText("Diferencia visual acumulada", 607, 456);
+      ctx.fillStyle = m.delta >= 0 ? "#8df1ff" : "#ffd18b"; ctx.font = "950 28px Consolas, monospace"; ctx.fillText(fmtDelta(m.delta), 607, 488);
+    }
+
+    function frame(now) {
+      const dt = Math.min(0.08, (now - state.last) / 1000);
+      state.last = now;
+      if (!state.paused) state.coordTime += dt * timeWarp();
+      updateUI(); draw(); requestAnimationFrame(frame);
+    }
+
+    function bind() {
+      els.mass.addEventListener("input", e => state.massFactor = Number(e.target.value));
+      els.radius.addEventListener("input", e => state.radiusKm = Number(e.target.value));
+      els.tower.addEventListener("input", e => state.towerLog = Number(e.target.value));
+      els.clock1.addEventListener("input", e => state.clock1Frac = Number(e.target.value));
+      els.clock2.addEventListener("input", e => state.clock2Frac = Number(e.target.value));
+      els.warp.addEventListener("input", e => state.warpLog = Number(e.target.value));
+      els.pause.addEventListener("click", () => { state.paused = !state.paused; els.pause.textContent = state.paused ? "Reanudar" : "Pausar"; });
+      els.reset.addEventListener("click", () => { state.coordTime = 0; state.paused = false; els.pause.textContent = "Pausar"; });
+    }
+
+    bind(); updateUI(); requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

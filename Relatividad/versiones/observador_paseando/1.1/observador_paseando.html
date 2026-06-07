@@ -1,0 +1,224 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Observador paseando | Simulacion IB</title>
+  <style>
+    :root{--ink:#101827;--muted:#5d6880;--line:#dbe5f2;--blue:#0b63e5;--violet:#7048ff;--cyan:#38d5ff;--card:rgba(255,255,255,.92);--shadow:0 24px 70px rgba(24,38,70,.16)}
+    *{box-sizing:border-box}body{margin:0;font-family:Bahnschrift,"Segoe UI Variable","Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 10% 0%,rgba(56,213,255,.25),transparent 26rem),radial-gradient(circle at 88% 4%,rgba(112,72,255,.18),transparent 32rem),linear-gradient(135deg,#f8fbff,#edf4ff 48%,#f8f3ff)}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(31,52,91,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(31,52,91,.08) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at 50% 18%,black,transparent 78%)}
+    .page{width:min(1420px,calc(100vw - 28px));margin:18px auto 28px;position:relative}.hero{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:18px;margin-bottom:16px}.title,.panel,.card,.eqGrid article{background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.title{padding:22px 24px}.panel{padding:16px;display:grid;gap:13px}.tag{margin:0 0 9px;color:var(--blue);font-weight:950;text-transform:uppercase;letter-spacing:.08em;font-size:12px}h1{margin:0;font-size:clamp(34px,4vw,58px);line-height:.96;letter-spacing:-.05em}.lead{margin:10px 0 0;color:var(--muted);font-size:17px;line-height:1.42;font-weight:680;max-width:850px}.control{border:1px solid #dde6f3;border-radius:18px;background:rgba(255,255,255,.86);padding:12px}.control label{display:flex;justify-content:space-between;gap:12px;font-weight:950;margin-bottom:8px}.control output{font-variant-numeric:tabular-nums;color:var(--violet)}.control input{width:100%;accent-color:var(--violet);cursor:pointer}.scale{display:flex;justify-content:space-between;color:#718096;font-size:12px;font-weight:800;margin-top:5px}.readGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.read{border:1px solid #dde6f3;border-radius:18px;background:#fff;padding:12px}.read span{display:block;color:var(--muted);font-weight:850;font-size:12px}.read strong{font-size:22px;color:var(--blue);font-variant-numeric:tabular-nums}.status{border-radius:18px;padding:12px;background:linear-gradient(135deg,#eef8ff,#fff);border:1px solid rgba(11,99,229,.18)}.status b{display:block;color:#0b63e5;font-size:12px;text-transform:uppercase;letter-spacing:.08em}.status p{margin:5px 0 0;color:#43516a;font-weight:760}.card{overflow:hidden;padding:14px}.canvasWrap{position:relative;background:#020617;border:1px solid #111c35;border-radius:24px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}canvas{display:block;width:100%;height:auto}.restartOverlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:0;border-radius:22px;padding:17px 28px;font-family:inherit;font-weight:950;font-size:20px;color:white;background:linear-gradient(135deg,#0b63e5,#7048ff);box-shadow:0 24px 70px rgba(16,30,80,.45);cursor:pointer}.restartOverlay[hidden]{display:none}.eqGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}.eqGrid article{padding:16px}.eqGrid h3{margin:0 0 8px}.eqGrid p{margin:7px 0 0;color:var(--muted);font-weight:650;line-height:1.38}.math{font-family:Cambria,Georgia,serif;font-size:22px;color:#111827}.hint{font-size:13px;color:#5d6880;font-weight:750;line-height:1.35;margin:0}@media(max-width:980px){.hero{grid-template-columns:1fr}.eqGrid{grid-template-columns:1fr}.readGrid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="title">
+        <p class="tag">Relatividad especial · simultaneidad</p>
+        <h1>Observador paseando</h1>
+        <p class="lead">Galileo contempla dos estrellas en reposo desde la playa. Einstein pasea respecto a Galileo y observa que dos sucesos simultaneos para Galileo dejan de ser simultaneos en su marco.</p>
+      </div>
+      <aside class="panel" aria-label="Controles de la simulacion">
+        <div class="control">
+          <label for="v">Velocidad de Einstein <output id="vOut">0.50 c</output></label>
+          <input id="v" type="range" min="0" max="0.95" step="0.01" value="0.50" />
+          <div class="scale"><span>0 c</span><span>0.5 c</span><span>0.95 c</span></div>
+        </div>
+        <div class="readGrid">
+          <div class="read"><span>Factor gamma</span><strong id="gammaOut">1.15</strong></div>
+          <div class="read"><span>Desfase Einstein</span><strong id="delayOut">0.54 s</strong></div>
+        </div>
+        <div class="status"><b>Estado</b><p id="statusOut">Cuenta atras en marcha.</p></div>
+        <p class="hint">Cuando estallen las dos estrellas la animacion se detiene y aparece el boton de reinicio.</p>
+      </aside>
+    </section>
+
+    <section class="card">
+      <div class="canvasWrap">
+        <canvas id="sim" width="1200" height="650"></canvas>
+        <button id="restartOverlay" class="restartOverlay" type="button" hidden>Reiniciar</button>
+      </div>
+    </section>
+
+    <section class="eqGrid" aria-label="Teoria">
+      <article><h3>Transformacion temporal</h3><div class="math">Δt' = γ(Δt − vΔx/c²)</div><p>Si Galileo mide dos explosiones con Δt = 0 pero separadas por Δx, Einstein puede medir un desfase temporal.</p></article>
+      <article><h3>Factor gamma</h3><div class="math">γ = 1 / √(1 − v²/c²)</div><p>El desfase crece con la velocidad relativa. La animacion reescala el efecto para que sea visible en clase.</p></article>
+      <article><h3>Lectura didactica</h3><p>La simultaneidad no es absoluta: depende del estado de movimiento del observador.</p></article>
+    </section>
+  </main>
+<script>
+(() => {
+  const canvas = document.getElementById('sim');
+  const ctx = canvas.getContext('2d');
+  const restartButton = document.getElementById('restartOverlay');
+  const vSlider = document.getElementById('v');
+  const W = canvas.width, H = canvas.height;
+  const assets = {
+    bg: img('assets/observador-beach-night-background.png'),
+    galileo: img('assets/observador-galileo-sprite.png'),
+    einstein: img('assets/observador-einstein-walking-sprite.png'),
+    blueStar: img('assets/observador-star-blue.gif'),
+    yellowStar: img('assets/observador-star-yellow.gif')
+  };
+  const state = { t: 0, last: performance.now(), ended: false };
+  const COUNTDOWN = 3;
+  const EXPLOSION_DURATION = 1.35;
+  const scenes = {
+    galileo: { x: 28, y: 50, w: 552, h: 548, title: 'Galileo: playa en reposo' },
+    einstein: { x: 620, y: 50, w: 552, h: 548, title: 'Einstein: paseo a velocidad v' }
+  };
+
+  function img(src) { const im = new Image(); im.src = src; return im; }
+  function beta() { return Number(vSlider.value); }
+  function gamma() { const b = beta(); return 1 / Math.sqrt(1 - b * b); }
+  function delay() { return Math.min(1.85, gamma() * beta() * 1.08); }
+  function drawCover(im, x, y, w, h, offset = 0) {
+    if (!im.complete || !im.naturalWidth) { fallbackSky(x, y, w, h); return; }
+    const scale = Math.max(w / im.naturalWidth, h / im.naturalHeight);
+    const dw = im.naturalWidth * scale, dh = im.naturalHeight * scale;
+    const baseY = y + (h - dh) / 2;
+    if (offset === 0) {
+      ctx.drawImage(im, x + (w - dw) / 2, baseY, dw, dh);
+    } else {
+      const span = dw;
+      let start = x + ((-offset % span) + span) % span - span;
+      for (; start < x + w; start += span) ctx.drawImage(im, start, baseY, dw, dh);
+    }
+  }
+  function fallbackSky(x, y, w, h) {
+    const g = ctx.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, '#020617'); g.addColorStop(.68, '#0b1d3a'); g.addColorStop(1, '#173f62');
+    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+  }
+  function clipScene(s) { ctx.beginPath(); ctx.roundRect(s.x, s.y, s.w, s.h, 22); ctx.clip(); }
+  function drawSceneFrame(s, accent) {
+    ctx.save();
+    ctx.strokeStyle = accent; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.roundRect(s.x, s.y, s.w, s.h, 22); ctx.stroke();
+    ctx.fillStyle = 'rgba(5,10,25,.70)'; ctx.beginPath(); ctx.roundRect(s.x + 12, s.y + 12, 260, 36, 14); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = '950 16px Bahnschrift, Segoe UI, sans-serif'; ctx.textAlign = 'left'; ctx.fillText(s.title, s.x + 26, s.y + 36);
+    ctx.restore();
+  }
+  function drawMovingWaves(s, speed) {
+    ctx.save(); clipScene(s);
+    const base = s.y + s.h * .71;
+    for (let j = 0; j < 4; j++) {
+      ctx.strokeStyle = `rgba(190,230,255,${0.20 + j * .08})`;
+      ctx.lineWidth = 2 + j * .5;
+      ctx.beginPath();
+      for (let i = 0; i <= s.w; i += 10) {
+        const yy = base + j * 21 + Math.sin((i + state.t * speed * 34) * .035 + j) * (3 + j);
+        if (i === 0) ctx.moveTo(s.x + i, yy); else ctx.lineTo(s.x + i, yy);
+      }
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function drawCharacter(im, x, y, h, bob = 0) {
+    if (!im.complete || !im.naturalWidth) return;
+    const w = h * im.naturalWidth / im.naturalHeight;
+    ctx.drawImage(im, x - w / 2, y - h + bob, w, h);
+  }
+  function starPositions(s) {
+    return [{ x: s.x + 142, y: s.y + 118, im: assets.blueStar, tint: '#8fd3ff', label: 'azul' }, { x: s.x + s.w - 142, y: s.y + 118, im: assets.yellowStar, tint: '#ffd66b', label: 'amarilla' }];
+  }
+  function drawCountdown(s, timeToFirst, activeText) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(4,10,24,.80)'; ctx.beginPath(); ctx.roundRect(s.x + s.w - 154, s.y + 14, 130, 56, 16); ctx.fill();
+    ctx.fillStyle = '#8df1ff'; ctx.font = '900 11px Bahnschrift, Segoe UI, sans-serif'; ctx.textAlign = 'center'; ctx.fillText(activeText, s.x + s.w - 89, s.y + 32);
+    ctx.fillStyle = '#fff'; ctx.font = '950 27px Consolas, monospace'; ctx.fillText(`${Math.max(0, timeToFirst).toFixed(1)} s`, s.x + s.w - 89, s.y + 59);
+    ctx.restore();
+  }
+  function drawExplosion(x, y, progress, color) {
+    const p = Math.max(0, Math.min(1, progress));
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    const radius = 12 + p * 110;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, radius);
+    g.addColorStop(0, `rgba(255,255,255,${1 - p * .45})`);
+    g.addColorStop(.18, `rgba(255,230,120,${.95 - p * .35})`);
+    g.addColorStop(.45, `${color.replace(')', `,${.70 - p * .38})`).replace('rgb', 'rgba')}`);
+    g.addColorStop(1, 'rgba(255,80,0,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = `rgba(255,240,180,${1 - p})`; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(x, y, radius * .78, 0, Math.PI * 2); ctx.stroke();
+    for (let i = 0; i < 26; i++) {
+      const a = i * Math.PI * 2 / 26 + p * .7;
+      const r = radius * (.38 + ((i * 37) % 70) / 100);
+      ctx.strokeStyle = `rgba(255,220,110,${.95 - p * .65})`;
+      ctx.lineWidth = 2 + 3 * (1 - p);
+      ctx.beginPath(); ctx.moveTo(x + Math.cos(a) * 15, y + Math.sin(a) * 15); ctx.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function drawStarOrExplosion(star, eventTime) {
+    const local = state.t - eventTime;
+    if (local < 0) {
+      ctx.drawImage(star.im, star.x - 55, star.y - 55, 110, 110);
+      return false;
+    }
+    if (local <= EXPLOSION_DURATION) {
+      drawExplosion(star.x, star.y, local / EXPLOSION_DURATION, star.tint === '#8fd3ff' ? 'rgb(80,180,255)' : 'rgb(255,190,60)');
+      return true;
+    }
+    return true;
+  }
+  function drawGalileoScene() {
+    const s = scenes.galileo;
+    ctx.save(); clipScene(s); drawCover(assets.bg, s.x, s.y, s.w, s.h, 0); ctx.restore();
+    drawMovingWaves(s, 0.45);
+    const stars = starPositions(s);
+    stars.forEach(st => drawStarOrExplosion(st, COUNTDOWN));
+    drawCharacter(assets.galileo, s.x + 280, s.y + s.h - 18, 230, Math.sin(state.t * 2) * 1.5);
+    drawCountdown(s, COUNTDOWN - state.t, 'cuenta atras');
+    drawSceneFrame(s, 'rgba(141,241,255,.65)');
+  }
+  function drawEinsteinScene() {
+    const s = scenes.einstein;
+    const b = beta();
+    ctx.save(); clipScene(s); drawCover(assets.bg, s.x, s.y, s.w, s.h, state.t * (40 + 260 * b)); ctx.restore();
+    drawMovingWaves(s, 1.2 + b * 4.5);
+    const stars = starPositions(s);
+    const d = delay();
+    const leftTime = COUNTDOWN - d / 2;
+    const rightTime = COUNTDOWN + d / 2;
+    drawStarOrExplosion(stars[0], leftTime);
+    drawStarOrExplosion(stars[1], rightTime);
+    drawCharacter(assets.einstein, s.x + s.w / 2, s.y + s.h - 18, 220, Math.sin(state.t * 7.2) * 6);
+    drawCountdown(s, Math.min(leftTime, rightTime) - state.t, 'proxima explosion');
+    drawSceneFrame(s, 'rgba(207,196,255,.72)');
+  }
+  function updateReadouts() {
+    const b = beta();
+    document.getElementById('vOut').textContent = `${b.toFixed(2)} c`;
+    document.getElementById('gammaOut').textContent = gamma().toFixed(2);
+    document.getElementById('delayOut').textContent = `${delay().toFixed(2)} s`;
+    const lastExplosionEnds = COUNTDOWN + delay() / 2 + EXPLOSION_DURATION;
+    const status = state.ended ? 'Animacion terminada. Pulsa Reiniciar para repetir.' : state.t < COUNTDOWN ? 'Cuenta atras en marcha.' : 'Explosiones en curso.';
+    document.getElementById('statusOut').textContent = status;
+    restartButton.hidden = !state.ended;
+    return lastExplosionEnds;
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#eaf1ff'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#172033'; ctx.font = '950 20px Bahnschrift, Segoe UI, sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('Dos explosiones simultaneas para Galileo', 38, 30);
+    ctx.fillText('El observador en movimiento no conserva la simultaneidad', 630, 30);
+    drawGalileoScene(); drawEinsteinScene();
+    const endAt = updateReadouts();
+    if (!state.ended && state.t >= endAt) state.ended = true;
+    requestAnimationFrame(frame);
+  }
+  function frame(now) {
+    const dt = Math.min(.05, (now - state.last) / 1000);
+    state.last = now;
+    if (!state.ended) state.t += dt;
+    draw();
+  }
+  function reset() { state.t = 0; state.last = performance.now(); state.ended = false; restartButton.hidden = true; }
+  restartButton.addEventListener('click', reset);
+  vSlider.addEventListener('input', () => { if (state.ended) updateReadouts(); });
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,749 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Torre gravitatoria | Simulación IB</title>
+  <style>
+    :root{
+      --ink:#111827;--muted:#5d6980;--blue:#0b63e5;--violet:#6d49ff;--cyan:#2bd7ff;
+      --green:#1aa66f;--red:#e5383b;--line:#d9e4f2;--card:rgba(255,255,255,.92);
+      --shadow:0 24px 70px rgba(27,43,88,.16);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;min-height:100vh;color:var(--ink);
+      font-family:Bahnschrift,"Segoe UI Variable","Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at 10% 8%,rgba(43,215,255,.24),transparent 25rem),
+        radial-gradient(circle at 85% 0%,rgba(109,73,255,.20),transparent 28rem),
+        linear-gradient(135deg,#f8fbff,#eef6ff 48%,#f7f3ff);
+    }
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.23;background-image:linear-gradient(rgba(31,52,91,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(31,52,91,.08) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at 50% 18%,black,transparent 78%)}
+    .page{width:min(1380px,calc(100vw - 28px));margin:18px auto 28px;position:relative}.hero{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:18px;align-items:stretch;margin-bottom:14px;border:1px solid var(--line);border-radius:30px;background:rgba(255,255,255,.76);box-shadow:var(--shadow);padding:18px 20px;backdrop-filter:blur(16px)}
+    .title{display:flex;gap:16px;align-items:center}.badge{width:74px;height:74px;border-radius:24px;display:grid;place-items:center;color:white;font-size:38px;font-weight:950;background:linear-gradient(145deg,#0d63e6,#6d49ff);box-shadow:0 18px 46px rgba(68,73,190,.26)}
+    h1{margin:0;font-size:clamp(34px,4.3vw,62px);line-height:.95;letter-spacing:-.055em}.tag{margin:0 0 7px;color:#6847df;font-weight:950;letter-spacing:.08em;text-transform:uppercase;font-size:12px}.lead{margin:8px 0 0;color:#4e5d74;font-size:17px;font-weight:680;line-height:1.35;max-width:760px}
+    .formula{border:1px solid rgba(109,73,255,.2);border-radius:22px;background:linear-gradient(145deg,#ffffff,#f4f0ff);padding:13px 15px;color:#26233d;box-shadow:0 14px 38px rgba(46,56,107,.11)}.formula span,.eqCard span{display:block;color:#6d49ff;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:950;margin-bottom:5px}.formula p{margin:5px 0 0;color:var(--muted);font-weight:650;font-size:13px}
+    .math{font-family:Cambria,"Times New Roman",serif;font-style:italic;font-size:21px;line-height:1.35;color:#151b2c}.math.small{font-size:18px}.frac{display:inline-grid;grid-template-rows:auto 1px auto;align-items:center;text-align:center;vertical-align:middle;margin:0 .15em}.frac::before{content:"";grid-row:2;border-top:1.8px solid currentColor}.frac .top{grid-row:1;padding:0 .18em}.frac .bottom{grid-row:3;padding:0 .18em}.sqrt{border-top:1.7px solid currentColor;padding-left:.12em}.sqrt::before{content:"√";font-style:normal;margin-right:.08em}
+    .workspace{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px}.sceneCard,.panel,.info,.eqGrid{border:1px solid var(--line);border-radius:30px;background:var(--card);box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(14px)}
+    .sceneHead{padding:14px 18px 8px;display:flex;justify-content:space-between;align-items:center;gap:12px}.sceneHead h2{margin:0;font-size:25px;letter-spacing:-.035em}.sceneHead p{margin:2px 0 0;color:var(--muted);font-weight:720}.pill{border-radius:999px;padding:9px 13px;color:white;background:linear-gradient(135deg,var(--blue),var(--violet));font-weight:950;white-space:nowrap}
+    .canvasWrap{padding:0 14px 14px;position:relative}canvas{width:100%;height:auto;display:block;border:1px solid #17213b;border-radius:24px;background:#8fcaff;touch-action:none;cursor:grab}canvas.dragging{cursor:grabbing}
+    .panel{padding:14px;display:grid;gap:11px}.control{border:1px solid #dde6f3;border-radius:18px;background:rgba(255,255,255,.86);padding:12px}.control label{display:flex;justify-content:space-between;gap:10px;font-weight:950;margin-bottom:7px}.control output{font-variant-numeric:tabular-nums;color:#6847df}.control input{width:100%;accent-color:var(--violet);cursor:pointer}.scale{display:flex;justify-content:space-between;color:#778397;font-size:12px;font-weight:800;margin-top:5px}.unitTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 9px}.unitTabs button{padding:7px 8px;border-radius:12px;background:#eef3ff;color:#3a4660;border:1px solid #d6e2f1}.unitTabs button.active{background:linear-gradient(135deg,var(--blue),var(--violet));color:white;border-color:transparent}.presetGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.presetGrid button,.miniButton{padding:8px 9px;border-radius:13px;background:#eef3ff;color:#273449;border:1px solid #d6e2f1}.presetGrid button:hover,.miniButton:hover{background:#dfeaff}.towerHeader{display:flex;justify-content:space-between;align-items:center;gap:8px}.towerHeader label{margin-bottom:0;flex:1}.kerrControl[hidden]{display:none}.statusBox{border-radius:18px;padding:12px;background:linear-gradient(135deg,#eef8ff,#ffffff);border:1px solid rgba(11,99,229,.18)}.statusBox.blackHole{background:linear-gradient(135deg,#160812,#3a1010);border-color:rgba(255,118,118,.55);color:white}.statusBox span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:950;color:#0b63e5}.statusBox.blackHole span{color:#ffb3b3}.statusBox strong{display:block;margin-top:5px;font-size:17px}.statusBox p{margin:5px 0 0;font-size:13px;font-weight:700;color:var(--muted)}.statusBox.blackHole p{color:rgba(255,255,255,.76)}.factTable{grid-column:1/-1;border:1px solid #dde6f3;border-radius:22px;background:rgba(255,255,255,.92);padding:16px;box-shadow:0 16px 44px rgba(20,34,60,.08)}.factTable h3{margin:0 0 10px;font-size:18px}.factRows{display:grid;gap:8px}.factRow{display:grid;grid-template-columns:1fr 1.15fr 1.05fr;gap:10px;align-items:center;padding:10px 12px;border-radius:16px;background:#f5f8ff;border:1px solid #e1e9f5}.factRow b{color:#172033}.factRow span{font-size:13px;color:#4d5b72;font-weight:800}.movieBox{border:1px solid rgba(255,180,90,.45);border-radius:18px;background:linear-gradient(135deg,#fff8ed,#fff);padding:12px}.movieBox span{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:950;color:#b45309}.movieBox strong{display:block;margin-top:5px;color:#b45309;font-size:17px}.movieBox p{margin:5px 0 0;font-size:13px;font-weight:700;color:#5f4730}
+    .horizonWarning{border-radius:20px;padding:13px 14px;background:linear-gradient(135deg,#fff2c7,#fffaf0);border:2px solid rgba(226,128,20,.45);box-shadow:0 12px 30px rgba(226,128,20,.12)}.horizonWarning[hidden]{display:none}.horizonWarning span{display:block;color:#a34800;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:950}.horizonWarning p{margin:6px 0 0;color:#6d3a10;font-weight:750;line-height:1.28;font-size:13px}.delta{border-radius:20px;padding:14px 15px;background:linear-gradient(135deg,#ffe8e8,#ffffff);border:2px solid rgba(229,56,59,.42);box-shadow:0 16px 38px rgba(229,56,59,.12)}.delta span{display:block;color:#c8191f;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:950}.delta strong{display:block;margin-top:5px;font-size:31px;color:#c8191f;font-variant-numeric:tabular-nums}.delta p{margin:4px 0 0;color:#7b3740;font-weight:750;font-size:13px}
+    .buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}button{border:0;border-radius:15px;padding:11px 12px;font-family:inherit;font-weight:950;cursor:pointer}.primary{color:#081323;background:linear-gradient(135deg,#8df1ff,#ffffff)}.ghost{color:#19233b;background:#edf3ff;border:1px solid #d6e2f1}
+    .eqGrid{margin-top:16px;padding:16px;display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.eqCard{border:1px solid #dde6f3;border-radius:18px;background:rgba(255,255,255,.76);padding:12px;min-height:104px}.eqCard p{margin:6px 0 0;color:var(--muted);font-weight:650;font-size:13px}
+    .info{margin-top:16px;padding:16px 18px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.mini h3{margin:0 0 5px;font-size:18px}.mini p{margin:0;color:var(--muted);font-weight:650;line-height:1.38}
+    @media(max-width:1100px){.hero,.workspace{display:block}.formula{margin-top:12px}.panel{margin-top:16px}.eqGrid,.info{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="title">
+        <div class="badge">2</div>
+        <div>
+          <p class="tag">Relatividad general · dilatación gravitatoria</p>
+          <h1>Torre gravitatoria</h1>
+          <p class="lead">Compara dos relojes situados a distintas alturas. Puedes arrastrarlos por la torre o usar los deslizadores. La simulación empieza en la fecha actual y proyecta la fecha propia de cada reloj.</p>
+        </div>
+      </div>
+      <aside class="formula">
+        <span>Modelo usado</span>
+        <div class="math">dτ = dt&nbsp;<span class="sqrt">1 − <span class="frac"><span class="top">2GM</span><span class="bottom">c²r</span></span></span></div>
+        <p>Aproximación de Schwarzschild para relojes estáticos, suficiente para comparar alturas cerca de la Tierra.</p>
+      </aside>
+    </section>
+
+    <section class="workspace">
+      <article class="sceneCard">
+        <div class="sceneHead">
+          <div><h2>Relojes en una torre</h2><p>Arrastra los relojes con el ratón para colocarlos a la altura deseada.</p></div>
+          <div class="pill" id="modePill">Tierra ×1.00</div>
+        </div>
+        <div class="canvasWrap"><canvas id="scene" width="900" height="560"></canvas></div>
+      </article>
+
+      <aside class="panel" aria-label="Controles de la simulación">
+        <div class="control">
+          <label for="warp">Escala temporal <output id="warpOut">1 s/s</output></label>
+          <input id="warp" type="range" min="0" max="4" step="0.01" value="0" />
+          <div class="scale"><span>1 s/s</span><span>1 día/s</span><span>1 década/s</span></div>
+        </div>
+        <div class="control">
+          <label for="mass">Masa <output id="massOut">5.97×10²⁴ kg</output></label>
+          <div class="unitTabs" aria-label="Unidades de masa">
+            <button class="active" type="button" data-unit="kg">kg</button>
+            <button type="button" data-unit="earth">M⊕</button>
+            <button type="button" data-unit="solar">M☉</button>
+          </div>
+          <input id="mass" type="range" min="1" max="24.776" step="0.001" value="24.776" />
+          <div class="scale"><span id="massMinOut">10 kg</span><span id="massMidOut">10¹² kg</span><span id="massMaxOut">1 M⊕</span></div>
+        </div>
+        <div class="control">
+          <label for="radius">Radio del planeta <output id="radiusOut">6371 km</output></label>
+          <input id="radius" type="range" min="2" max="9" step="0.01" value="3.804" />
+          <div class="scale"><span>100 km</span><span>6371 km</span><span>10^9 km</span></div>
+        </div>
+        <div class="statusBox" id="gravityStatus">
+          <span>Régimen gravitatorio</span>
+          <strong id="regimeOut">Planeta / estrella</strong>
+          <p id="schwarzOut">rₛ = 8.87 mm · R/rₛ ≫ 1</p>
+        </div>
+        <div class="movieBox" id="movieBox">
+          <span>Escala tipo Interstellar</span>
+          <strong id="movieRatioOut">1 h local → 1.00 h lejos</strong>
+          <p id="movieNote">Activa Gargantúa para rozar el caso 1 h en el planeta = 7 años fuera.</p>
+        </div>
+        <div class="control">
+          <label>Presets físicos</label>
+          <div class="presetGrid">
+            <button type="button" onclick="window.__applyTowerPreset('earth')" data-preset="earth">Tierra</button>
+            <button type="button" onclick="window.__applyTowerPreset('moon')" data-preset="moon">Luna</button>
+            <button type="button" onclick="window.__applyTowerPreset('jupiter')" data-preset="jupiter">Júpiter</button>
+            <button type="button" onclick="window.__applyTowerPreset('sun')" data-preset="sun">Sol</button>
+            <button type="button" onclick="window.__applyTowerPreset('gargantua')" data-preset="gargantua">Gargantúa</button>
+          </div>
+        </div>
+        <div class="control kerrControl" id="kerrControl" hidden>
+          <label for="kerrSpin">Rotación Kerr <output id="kerrOut">χ = 0.000</output></label>
+          <input id="kerrSpin" type="range" min="0" max="0.998" step="0.001" value="0" />
+          <div class="scale"><span>sin giro</span><span>Kerr</span><span>χ = 0.998</span></div>
+        </div>
+        <div class="control">
+          <div class="towerHeader">
+            <label for="tower">Altura física de la torre <output id="towerOut">200 m</output></label>
+            <button id="towerTypical" class="miniButton" type="button" onclick="window.__towerTypical()">Torre típica</button>
+          </div>
+          <input id="tower" type="range" min="0" max="100000" step="100" value="200" />
+          <div class="scale"><span>0 m</span><span>10 km atmósfera</span><span>100 km</span></div>
+        </div>
+        <div class="control">
+          <label for="clock1">Altura reloj 1 <output id="clock1Out">0 m</output></label>
+          <input id="clock1" type="range" min="0" max="1" step="0.001" value="0" />
+          <div class="scale"><span>superficie</span><span>arrastra</span><span>cima</span></div>
+        </div>
+        <div class="control">
+          <label for="clock2">Altura reloj 2 <output id="clock2Out">200 m</output></label>
+          <input id="clock2" type="range" min="0" max="1" step="0.001" value="1" />
+          <div class="scale"><span>superficie</span><span>arrastra</span><span>cima</span></div>
+        </div>
+        <div class="delta">
+          <span>Diferencia reloj 2 frente a reloj 1</span>
+          <strong id="deltaOut">+0.00 ns</strong>
+          <p id="deltaNote">τ₂ − τ₁. Positivo si el reloj 2 va más rápido.</p>
+          <p id="annualOut">Referencia anual: +0.00 ns/año</p>
+        </div>
+        <div class="horizonWarning" id="horizonWarning" hidden>
+          <span>Advertencia física</span>
+          <p>En régimen de agujero negro se muestra una extrapolación hipotética sin horizonte de sucesos. Una torre o reloj estático no podría sostenerse dentro del horizonte; las fuerzas de marea y la aceleración necesaria serían físicamente problemáticas.</p>
+        </div>
+        <div class="buttons">
+          <button id="pause" class="primary" type="button">Pausar</button>
+          <button id="reset" class="ghost" type="button">Reiniciar</button>
+        </div>
+      </aside>
+    </section>
+
+    <section class="eqGrid" aria-label="Ecuaciones de la simulación">
+      <article class="eqCard"><span>Ritmo gravitatorio</span><div class="math small"><span class="frac"><span class="top">dτ</span><span class="bottom">dt</span></span> = <span class="sqrt">1 − <span class="frac"><span class="top">2GM</span><span class="bottom">c²r</span></span></span></div><p>Reloj estático a radio gravitatorio r.</p></article>
+      <article class="eqCard"><span>Radio usado</span><div class="math small">r = R + h</div><p>R es el radio del planeta y h la altura del reloj.</p></article>
+      <article class="eqCard"><span>Horizonte Kerr</span><div class="math small">r₊ = <span class="frac"><span class="top">GM</span><span class="bottom">c²</span></span>(1+√(1−χ²))</div><p>χ es el espín adimensional; χ &lt; 1.</p></article>
+      <article class="eqCard"><span>Tiempo propio</span><div class="math small">τᵢ = t&nbsp;<span class="sqrt">1 − <span class="frac"><span class="top">2GM</span><span class="bottom">c²(R+hᵢ)</span></span></span></div><p>Cada reloj acumula su propio τᵢ.</p></article>
+      <article class="eqCard"><span>Diferencia</span><div class="math small">Δτ = τ₂ − τ₁</div><p>El recuadro rojo muestra esta diferencia acumulada.</p></article>
+    </section>
+
+    <section class="info">
+      <article class="mini"><h3>Idea física</h3><p>A mayor radio gravitatorio, el reloj está menos profundo en el pozo gravitatorio y acumula ligeramente más tiempo propio.</p></article>
+      <article class="mini"><h3>Gargantúa</h3><p>El preset fuerza una dilatación pedagógica extrema: 1 hora local equivale aproximadamente a 7 años lejos del agujero negro.</p></article>
+      <article class="mini"><h3>Uso en clase</h3><p>Deja un reloj en superficie, sube el otro a 200 m, y compara cuánto tarda en acumularse 1 segundo de desfase.</p></article>
+      <article class="factTable"><h3>Desfase esperado en una torre de 200 m</h3><div class="factRows" id="factRows"></div></article>
+    </section>
+  </main>
+
+  <script>
+    const G = 6.67430e-11;
+    const C = 299792458;
+    const EARTH_MASS = 5.9722e24;
+    const SOLAR_MASS = 1.98847e30;
+    const EARTHS_PER_SUN = SOLAR_MASS / EARTH_MASS;
+    const LARGEST_BH_SOLAR_MASS = 6.6e10;
+    const YEAR_SECONDS = 31557600;
+    const MOVIE_RATIO = 7 * YEAR_SECONDS / 3600;
+    const SIM_START = new Date();
+    const canvas = document.getElementById("scene");
+    const ctx = canvas.getContext("2d");
+    const towerSprite = new Image();
+    towerSprite.src = "assets/gravity-tower-sprite.png";
+    const bgSprite = new Image();
+    bgSprite.src = "assets/gravity-tower-alps-background.png";
+    const blackHoleBg = new Image();
+    blackHoleBg.src = "assets/gravity-tower-black-hole-background.png";
+
+    const state = {
+      massKg: EARTH_MASS,
+      massUnit: "kg",
+      radiusKm: 6371,
+      kerrSpin: 0,
+      towerM: 200,
+      clock1Frac: 0,
+      clock2Frac: 1,
+      warpLog: 0,
+      coordTime: 0,
+      last: performance.now(),
+      paused: false,
+      render1: 0,
+      render2: 1,
+      dragClock: null
+    };
+
+    const els = {
+      mass: document.getElementById("mass"), massUnitButtons: [...document.querySelectorAll(".unitTabs button")], presetButtons: [...document.querySelectorAll("[data-preset]")], massMinOut: document.getElementById("massMinOut"), massMidOut: document.getElementById("massMidOut"), massMaxOut: document.getElementById("massMaxOut"), radius: document.getElementById("radius"), kerrControl: document.getElementById("kerrControl"), kerrSpin: document.getElementById("kerrSpin"), kerrOut: document.getElementById("kerrOut"), tower: document.getElementById("tower"), towerTypical: document.getElementById("towerTypical"),
+      clock1: document.getElementById("clock1"), clock2: document.getElementById("clock2"), warp: document.getElementById("warp"),
+      massOut: document.getElementById("massOut"), radiusOut: document.getElementById("radiusOut"), towerOut: document.getElementById("towerOut"),
+      clock1Out: document.getElementById("clock1Out"), clock2Out: document.getElementById("clock2Out"), warpOut: document.getElementById("warpOut"),
+      deltaOut: document.getElementById("deltaOut"), deltaNote: document.getElementById("deltaNote"), annualOut: document.getElementById("annualOut"), horizonWarning: document.getElementById("horizonWarning"), gravityStatus: document.getElementById("gravityStatus"), regimeOut: document.getElementById("regimeOut"), schwarzOut: document.getElementById("schwarzOut"), modePill: document.getElementById("modePill"), movieRatioOut: document.getElementById("movieRatioOut"), movieNote: document.getElementById("movieNote"), factRows: document.getElementById("factRows"),
+      pause: document.getElementById("pause"), reset: document.getElementById("reset")
+    };
+
+    const MASS_UNITS = {
+      kg: { base: 1, label: "kg", min: 1, max: Math.log10(EARTH_MASS), mid: 12, minLabel: "10 kg", midLabel: "10¹² kg", maxLabel: "1 M⊕" },
+      earth: { base: EARTH_MASS, label: "M⊕", min: -1, max: Math.log10(EARTHS_PER_SUN), mid: 0, minLabel: "0.1 M⊕", midLabel: "1 M⊕", maxLabel: "1 M☉ ≈ 3.33×10⁵ M⊕" },
+      solar: { base: SOLAR_MASS, label: "M☉", min: -1, max: Math.log10(10 * LARGEST_BH_SOLAR_MASS), mid: 6, minLabel: "0.1 M☉", midLabel: "10⁶ M☉", maxLabel: "6.6×10¹¹ M☉" }
+    };
+
+    function movieRadiusForMass(massKg) {
+      const rsKm = (2 * G * massKg) / (C * C * 1000);
+      return rsKm / (1 - 1 / (MOVIE_RATIO * MOVIE_RATIO));
+    }
+
+    const PRESETS = {
+      earth: { massKg: EARTH_MASS, radiusKm: 6371, unit: "earth", spin: 0 },
+      moon: { massKg: 7.342e22, radiusKm: 1737.4, unit: "kg", spin: 0 },
+      jupiter: { massKg: 1.89813e27, radiusKm: 69911, unit: "earth", spin: 0 },
+      sun: { massKg: SOLAR_MASS, radiusKm: 696340, unit: "solar", spin: 0 },
+      gargantua: { massKg: 1e8 * SOLAR_MASS, radiusKm: movieRadiusForMass(1e8 * SOLAR_MASS), unit: "solar", spin: 0.999999 }
+    };
+
+    const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+    const towerHeightKm = () => state.towerM / 1000;
+    const clockHeightKm = frac => frac * towerHeightKm();
+    const WARP_ANCHORS = [
+      { x: 0, seconds: 1 },
+      { x: 1, seconds: 3600 },
+      { x: 2, seconds: 86400 },
+      { x: 3, seconds: YEAR_SECONDS },
+      { x: 4, seconds: 10 * YEAR_SECONDS }
+    ];
+    function timeWarp() {
+      const x = clamp(state.warpLog, WARP_ANCHORS[0].x, WARP_ANCHORS[WARP_ANCHORS.length - 1].x);
+      for (let i = 0; i < WARP_ANCHORS.length - 1; i++) {
+        const a = WARP_ANCHORS[i], b = WARP_ANCHORS[i + 1];
+        if (x >= a.x && x <= b.x) {
+          const t = (x - a.x) / (b.x - a.x);
+          return Math.exp(Math.log(a.seconds) + (Math.log(b.seconds) - Math.log(a.seconds)) * t);
+        }
+      }
+      return WARP_ANCHORS[WARP_ANCHORS.length - 1].seconds;
+    }
+    const radiusFromSlider = () => Math.pow(10, Number(els.radius.value));
+    const schwarzschildRadiusKm = () => (2 * G * state.massKg) / (C * C * 1000);
+    const gravitationalRadiusKm = () => schwarzschildRadiusKm() / 2;
+    const kerrHorizonRadiusKm = () => gravitationalRadiusKm() * (1 + Math.sqrt(Math.max(0, 1 - state.kerrSpin * state.kerrSpin)));
+    const isBlackHole = () => state.radiusKm <= kerrHorizonRadiusKm();
+    const horizonAngularVelocity = () => {
+      const denom = 2 * G * state.massKg * (1 + Math.sqrt(Math.max(0, 1 - state.kerrSpin * state.kerrSpin)));
+      return denom > 0 ? state.kerrSpin * C * C * C / denom : 0;
+    };
+
+    function rateAtHeight(heightKm) {
+      const r = Math.max(1, (state.radiusKm + heightKm) * 1000);
+      const factor = 1 - (2 * G * state.massKg) / (C * C * r);
+      if (factor >= 0) return Math.sqrt(Math.max(1e-12, factor));
+      // Extrapolacion pedagogica no fisica: conserva diferencias radiales aunque r este dentro de r_s.
+      return Math.sqrt(Math.abs(factor));
+    }
+
+    function metrics() {
+      const h1 = clockHeightKm(state.clock1Frac);
+      const h2 = clockHeightKm(state.clock2Frac);
+      const r1 = rateAtHeight(h1);
+      const r2 = rateAtHeight(h2);
+      const tau1 = state.coordTime * r1;
+      const tau2 = state.coordTime * r2;
+      const annualDelta = (r2 - r1) * YEAR_SECONDS;
+      return { h1, h2, r1, r2, tau1, tau2, delta: tau2 - tau1, annualDelta, towerH: towerHeightKm(), rsKm: schwarzschildRadiusKm(), rPlusKm: kerrHorizonRadiusKm(), omegaH: horizonAngularVelocity(), blackHole: isBlackHole() };
+    }
+
+    function amountInCurrentUnit() {
+      return state.massKg / MASS_UNITS[state.massUnit].base;
+    }
+
+    function formatSci(value, digits = 2) {
+      if (value === 0) return "0";
+      const exp = Math.floor(Math.log10(Math.abs(value)));
+      const mant = value / Math.pow(10, exp);
+      return `${mant.toFixed(digits)}×10^${exp}`;
+    }
+
+    function fmtMass() {
+      const cfg = MASS_UNITS[state.massUnit];
+      const amount = amountInCurrentUnit();
+      if (state.massUnit === "kg") return `${formatSci(amount, 2)} kg`;
+      if (amount < 0.001 || amount >= 100000) return `${formatSci(amount, 2)} ${cfg.label}`;
+      return `${amount.toLocaleString("es-ES", { maximumFractionDigits: amount < 10 ? 4 : 2 })} ${cfg.label}`;
+    }
+
+    function fmtRadius(km) {
+      if (km < 1e-3) return `${(km * 1e6).toFixed(2)} mm`;
+      if (km < 1) return `${(km * 1000).toFixed(2)} m`;
+      if (km < 1000) return `${km.toFixed(2)} km`;
+      if (km < 1e6) return `${Math.round(km).toLocaleString("es-ES")} km`;
+      return `${formatSci(km, 2)} km`;
+    }
+
+    function configureMassSliderFromState() {
+      const cfg = MASS_UNITS[state.massUnit];
+      els.mass.min = cfg.min;
+      els.mass.max = cfg.max;
+      els.mass.step = "0.001";
+      const logValue = Math.log10(Math.max(Number.MIN_VALUE, amountInCurrentUnit()));
+      const clampedLogValue = clamp(logValue, cfg.min, cfg.max);
+      if (Math.abs(clampedLogValue - logValue) > 1e-9) state.massKg = Math.pow(10, clampedLogValue) * cfg.base;
+      els.mass.value = clampedLogValue.toFixed(3);
+      els.massMinOut.textContent = cfg.minLabel;
+      els.massMidOut.textContent = cfg.midLabel;
+      els.massMaxOut.textContent = cfg.maxLabel;
+      els.massUnitButtons.forEach(button => button.classList.toggle("active", button.dataset.unit === state.massUnit));
+    }
+
+    function setMassFromSlider() {
+      const cfg = MASS_UNITS[state.massUnit];
+      state.massKg = Math.pow(10, Number(els.mass.value)) * cfg.base;
+    }
+
+    function configureRadiusSliderFromState() {
+      els.radius.value = clamp(Math.log10(Math.max(100, state.radiusKm)), Number(els.radius.min), Number(els.radius.max)).toFixed(3);
+    }
+
+    function applyPreset(name) {
+      const preset = PRESETS[name];
+      if (!preset) return;
+      state.massKg = preset.massKg;
+      state.radiusKm = preset.radiusKm;
+      state.massUnit = preset.unit;
+      state.kerrSpin = preset.spin;
+      configureMassSliderFromState();
+      configureRadiusSliderFromState();
+      els.kerrSpin.value = state.kerrSpin.toFixed(6);
+    }
+
+    window.__applyTowerPreset = applyPreset;
+    window.__towerTypical = () => { state.towerM = 200; els.tower.value = "200"; };
+
+    function fmtHeight(km) {
+      const m = km * 1000;
+      if (m < 1000) return `${m.toFixed(m < 10 ? 1 : 0)} m`;
+      return `${km.toFixed(km < 10 ? 2 : 1)} km`;
+    }
+
+    function fmtWarp(s) {
+      if (s < 60) return `${s.toFixed(0)} s/s`;
+      if (s < 86400) return `${(s / 3600).toFixed(s < 3600 ? 2 : 1)} h/s`;
+      if (s < YEAR_SECONDS) return `${(s / 86400).toFixed(1)} días/s`;
+      const years = s / YEAR_SECONDS;
+      if (years < 10) return `${years.toFixed(2)} años/s`;
+      return `${(years / 10).toFixed(2)} décadas/s`;
+    }
+
+    function fmtLongDurationYears(years) {
+      if (!Number.isFinite(years)) return "no medible";
+      if (years < 1) return `${(years * 365.25).toFixed(1)} días`;
+      if (years < 1e4) return `${years.toLocaleString("es-ES", { maximumFractionDigits: 1 })} años`;
+      if (years < 1e7) return `${Math.round(years).toLocaleString("es-ES")} años`;
+      return `${formatSci(years, 2)} años`;
+    }
+
+    function oneHourLocalFarText(rate) {
+      const farHours = 1 / Math.max(1e-14, rate);
+      if (farHours < 24) return `1 h local → ${farHours.toFixed(2)} h lejos`;
+      if (farHours < 24 * 365.25) return `1 h local → ${(farHours / 24).toFixed(2)} días lejos`;
+      return `1 h local → ${(farHours / (24 * 365.25)).toFixed(2)} años lejos`;
+    }
+
+    function scenarioRate(massKg, radiusKm, heightM = 0) {
+      const r = (radiusKm + heightM / 1000) * 1000;
+      const factor = 1 - (2 * G * massKg) / (C * C * r);
+      return factor >= 0 ? Math.sqrt(Math.max(1e-18, factor)) : Math.sqrt(Math.abs(factor));
+    }
+
+    function scenarioFact(name, massKg, radiusKm) {
+      const base = scenarioRate(massKg, radiusKm, 0);
+      const top = scenarioRate(massKg, radiusKm, 200);
+      const perYear = (top - base) * YEAR_SECONDS;
+      const yearsForSecond = 1 / Math.max(1e-30, Math.abs(perYear));
+      return { name, perYear, yearsForSecond };
+    }
+
+    function updateFactRows() {
+      if (!els.factRows) return;
+      const scenarios = [
+        scenarioFact("Tierra", EARTH_MASS, 6371),
+        scenarioFact("Jupiter", 1.89813e27, 69911),
+        scenarioFact("Sol", SOLAR_MASS, 696340),
+        scenarioFact("Gargantúa", 1e8 * SOLAR_MASS, movieRadiusForMass(1e8 * SOLAR_MASS))
+      ];
+      els.factRows.innerHTML = scenarios.map(row => `<div class="factRow"><b>${row.name}</b><span>${fmtDelta(row.perYear)}/año a 200 m</span><span>1 s en ${fmtLongDurationYears(row.yearsForSecond)}</span></div>`).join("");
+    }
+
+    function fmtElapsed(sec) {
+      sec = Math.max(0, sec);
+      const years = Math.floor(sec / YEAR_SECONDS);
+      const days = Math.floor((sec % YEAR_SECONDS) / 86400);
+      const h = Math.floor(sec / 3600) % 24;
+      const m = Math.floor(sec / 60) % 60;
+      const s = Math.floor(sec % 60);
+      if (years) return `${years} a ${days} d ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+      if (days) return `${days} d ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+      return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+    }
+
+    function fmtDateFromTau(tau) {
+      return new Intl.DateTimeFormat("es-ES", { dateStyle: "medium", timeStyle: "medium" }).format(new Date(SIM_START.getTime() + tau * 1000));
+    }
+
+    function datePartsFromTau(tau) {
+      const d = new Date(SIM_START.getTime() + tau * 1000);
+      const month = new Intl.DateTimeFormat("es-ES", { month: "short" }).format(d).replace(".", "").toUpperCase();
+      return {
+        day: String(d.getDate()).padStart(2, "0"),
+        month,
+        year: String(d.getFullYear())
+      };
+    }
+
+    function fmtDelta(sec) {
+      const sign = sec < 0 ? "-" : "+";
+      const a = Math.abs(sec);
+      if (a < 1e-6) return `${sign}${(a * 1e9).toFixed(2)} ns`;
+      if (a < 1e-3) return `${sign}${(a * 1e6).toFixed(2)} us`;
+      if (a < 1) return `${sign}${(a * 1e3).toFixed(3)} ms`;
+      if (a <= 1000) return `${sign}${a.toFixed(3)} s`;
+      const minutes = a / 60;
+      if (minutes <= 1000) return `${sign}${minutes.toFixed(minutes < 10 ? 2 : 1)} min`;
+      const hours = minutes / 60;
+      if (hours <= 100) return `${sign}${hours.toFixed(hours < 10 ? 2 : 1)} h`;
+      const days = hours / 24;
+      if (days <= 500) return `${sign}${days.toFixed(days < 10 ? 2 : 1)} días`;
+      const years = days / 365.25;
+      if (years <= 300) return `${sign}${years.toFixed(years < 10 ? 2 : 1)} años`;
+      const centuries = years / 100;
+      return `${sign}${centuries.toFixed(centuries < 10 ? 2 : 1)} siglos`;
+    }
+
+    function updateUI() {
+      const m = metrics();
+      els.massOut.textContent = fmtMass();
+      els.radiusOut.textContent = fmtRadius(state.radiusKm);
+      els.towerOut.textContent = fmtHeight(m.towerH);
+      els.clock1Out.textContent = fmtHeight(m.h1);
+      els.clock2Out.textContent = fmtHeight(m.h2);
+      els.warpOut.textContent = fmtWarp(timeWarp());
+      els.kerrOut.textContent = `χ = ${state.kerrSpin.toFixed(state.kerrSpin > 0.999 ? 6 : 3)}`;
+      els.deltaOut.textContent = fmtDelta(m.delta);
+      els.deltaNote.textContent = m.blackHole ? "Extrapolacion no fisica: se ignora el horizonte para comparar ritmos." : (m.delta >= 0 ? "tau2 - tau1. El reloj 2 mide mas tiempo." : "tau2 - tau1. El reloj 1 mide mas tiempo.");
+      els.annualOut.textContent = `Referencia anual: ${fmtDelta(m.annualDelta)}/año`;
+      els.horizonWarning.hidden = !m.blackHole;
+      els.kerrControl.hidden = !(m.blackHole || state.massKg > 1e5 * SOLAR_MASS || state.kerrSpin > 0);
+      els.gravityStatus.classList.toggle("blackHole", m.blackHole);
+      els.regimeOut.textContent = m.blackHole ? "Agujero negro: R ≤ rₛ" : "Planeta / estrella: R > rₛ";
+      const ratio = m.rsKm > 0 ? state.radiusKm / m.rsKm : Infinity;
+      els.schwarzOut.textContent = `rₛ = ${fmtRadius(m.rsKm)} · R/rₛ = ${ratio >= 1e5 ? formatSci(ratio, 2) : ratio.toFixed(2)}`;
+      els.modePill.textContent = m.blackHole || state.massKg > 1e5 * SOLAR_MASS ? "Entorno: agujero negro" : `Inicio: ${new Intl.DateTimeFormat("es-ES", { dateStyle: "short" }).format(SIM_START)}`;
+      if (els.movieRatioOut) els.movieRatioOut.textContent = oneHourLocalFarText(rateAtHeight(0));
+      if (els.movieNote) els.movieNote.textContent = state.kerrSpin > 0.9999 ? "Kerr extremo: ajuste pedagógico inspirado en Gargantúa." : "La rotación desplaza el horizonte; el ritmo local depende de lo cerca que está el reloj.";
+      updateFactRows();
+      els.clock1.value = state.clock1Frac.toFixed(3);
+      els.clock2.value = state.clock2Frac.toFixed(3);
+      els.radius.value = Math.log10(Math.max(100, state.radiusKm)).toFixed(3);
+    }
+
+    function roundRect(x, y, w, h, r, fill, stroke) {
+      ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fillStyle = fill; ctx.fill();
+      if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.stroke(); }
+    }
+
+    function drawCoverImage(img, w, h) {
+      const scale = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+      const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
+      ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    }
+
+    function drawFallbackBackground(w, h) {
+      const sky = ctx.createLinearGradient(0, 0, 0, h);
+      sky.addColorStop(0, "#86c9ff"); sky.addColorStop(.48, "#d9f0ff"); sky.addColorStop(1, "#a7d27f");
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, w, h);
+      const far = ctx.createLinearGradient(0, 180, 0, 340);
+      far.addColorStop(0, "#7ca0bc"); far.addColorStop(1, "#e5edf3"); ctx.fillStyle = far;
+      ctx.beginPath(); ctx.moveTo(0,260); ctx.lineTo(120,200); ctx.lineTo(230,252); ctx.lineTo(360,170); ctx.lineTo(515,255); ctx.lineTo(640,190); ctx.lineTo(w,260); ctx.lineTo(w,380); ctx.lineTo(0,380); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "#66a45b"; ctx.fillRect(0,390,w,h-390);
+    }
+
+    function drawSpaceLayer(w, yBottom) {
+      const bottom = clamp(yBottom, 0, canvas.height);
+      if (bottom <= 0) return;
+      const grad = ctx.createLinearGradient(0, 0, 0, bottom);
+      grad.addColorStop(0, "#020617");
+      grad.addColorStop(0.55, "#081126");
+      grad.addColorStop(1, "rgba(10,24,48,.86)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, bottom);
+      for (let i = 0; i < 120; i++) {
+        const x = (i * 79 + 23) % w;
+        const y = (i * 47 + 11) % Math.max(1, bottom);
+        const a = 0.35 + ((i * 19) % 55) / 100;
+        ctx.fillStyle = `rgba(255,255,255,${a})`;
+        ctx.fillRect(x, y, i % 9 ? 1.4 : 2.4, i % 9 ? 1.4 : 2.4);
+      }
+    }
+
+    function drawKerrSpinOverlay(w, h) {
+      if (!isBlackHole() || state.kerrSpin <= 0) return;
+      const cx = w * .62, cy = h * .47;
+      const phase = state.coordTime * 0.00002 * state.kerrSpin;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(phase);
+      ctx.scale(1.85, .34);
+      ctx.strokeStyle = `rgba(126,220,255,${0.18 + state.kerrSpin * .22})`;
+      ctx.lineWidth = 3;
+      for (let i = 0; i < 6; i++) {
+        ctx.beginPath();
+        ctx.arc(0, 0, 50 + i * 24, phase + i * .55, phase + Math.PI * 1.25 + i * .55);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawBackground(w, h) {
+      if (isBlackHole() || state.massKg > 1e5 * SOLAR_MASS) {
+        if (blackHoleBg.complete && blackHoleBg.naturalWidth) drawCoverImage(blackHoleBg, w, h);
+        else drawFallbackBackground(w, h);
+        drawKerrSpinOverlay(w, h);
+      } else {
+        if (bgSprite.complete && bgSprite.naturalWidth) drawCoverImage(bgSprite, w, h);
+        else drawFallbackBackground(w, h);
+        const towerKm = Math.max(0.001, towerHeightKm());
+        if (towerKm >= 10) {
+          const atmosphereBoundary = yForFraction(clamp(10 / towerKm, 0, 1));
+          drawSpaceLayer(w, atmosphereBoundary);
+          const glow = ctx.createLinearGradient(0, atmosphereBoundary - 26, 0, atmosphereBoundary + 32);
+          glow.addColorStop(0, "rgba(3,8,25,0)");
+          glow.addColorStop(.45, "rgba(80,190,255,.38)");
+          glow.addColorStop(1, "rgba(255,255,255,0)");
+          ctx.fillStyle = glow;
+          ctx.fillRect(0, atmosphereBoundary - 28, w, 64);
+          ctx.fillStyle = "rgba(255,255,255,.78)";
+          ctx.font = "900 13px Bahnschrift, Segoe UI, sans-serif";
+          ctx.textAlign = "right";
+          ctx.fillText("límite visual de atmósfera: 10 km", w - 24, atmosphereBoundary - 8);
+        }
+      }
+      const vignette = ctx.createLinearGradient(0, 0, 0, h);
+      vignette.addColorStop(0, "rgba(255,255,255,.02)");
+      vignette.addColorStop(.55, "rgba(255,255,255,0)");
+      vignette.addColorStop(1, "rgba(10,25,30,.20)");
+      ctx.fillStyle = vignette; ctx.fillRect(0,0,w,h);
+    }
+
+    function towerBounds() {
+      const h = 486;
+      const ratio = towerSprite.naturalWidth && towerSprite.naturalHeight ? towerSprite.naturalWidth / towerSprite.naturalHeight : 0.27;
+      const w = h * ratio;
+      return { x: 535 - w / 2, y: 36, w, h, guideX: 650, top: 74, bottom: 483 };
+    }
+
+    function yForFraction(frac) {
+      const b = towerBounds();
+      return b.bottom - frac * (b.bottom - b.top);
+    }
+
+    function fractionForY(y) {
+      const b = towerBounds();
+      return clamp((b.bottom - y) / (b.bottom - b.top), 0, 1);
+    }
+
+    function clockPositions() {
+      return [
+        { id: 1, x: 365, y: yForFraction(state.render1), r: 31 },
+        { id: 2, x: 625, y: yForFraction(state.render2), r: 28 }
+      ];
+    }
+
+    function drawTower() {
+      const b = towerBounds();
+      ctx.globalAlpha = isBlackHole() ? 0.78 : 1;
+      if (towerSprite.complete && towerSprite.naturalWidth) ctx.drawImage(towerSprite, b.x, b.y, b.w, b.h);
+      else { ctx.fillStyle = "#606778"; ctx.fillRect(b.x, b.y, b.w, b.h); }
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = "rgba(24,34,58,.55)"; ctx.lineWidth = 2; ctx.setLineDash([7,7]); ctx.beginPath(); ctx.moveTo(b.guideX, b.top); ctx.lineTo(b.guideX, b.bottom); ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle = "#172033"; ctx.font = "900 15px Bahnschrift, Segoe UI, sans-serif"; ctx.textAlign = "left"; ctx.fillText("h", b.guideX + 15, (b.top + b.bottom)/2);
+    }
+
+    function drawAnalogClock(x, y, r, color, seconds, label, heightKm, active=false) {
+      ctx.save(); ctx.translate(x,y);
+      ctx.shadowColor = active ? "rgba(255,255,255,.8)" : "rgba(10,25,55,.28)"; ctx.shadowBlur = active ? 24 : 16; ctx.shadowOffsetY = active ? 0 : 7;
+      ctx.fillStyle = "rgba(255,255,255,.95)"; ctx.beginPath(); ctx.arc(0,0,r,0,Math.PI*2); ctx.fill();
+      ctx.shadowBlur = 0; ctx.shadowOffsetY = 0; ctx.strokeStyle = color; ctx.lineWidth = active ? 7 : 5; ctx.stroke();
+      for (let i=0;i<12;i++){ const a=i*Math.PI/6-Math.PI/2; const len=i%3===0?8:4; ctx.beginPath(); ctx.moveTo(Math.cos(a)*(r-9),Math.sin(a)*(r-9)); ctx.lineTo(Math.cos(a)*(r-9-len),Math.sin(a)*(r-9-len)); ctx.strokeStyle="#1d2434"; ctx.lineWidth=i%3===0?2.4:1.4; ctx.stroke(); }
+      const minute = (seconds / 60) * Math.PI * 2 - Math.PI / 2;
+      const hour = (seconds / 3600) * Math.PI * 2 - Math.PI / 2;
+      ctx.strokeStyle = "#111827"; ctx.lineCap = "round";
+      ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(hour)*r*.42,Math.sin(hour)*r*.42); ctx.stroke();
+      ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(minute)*r*.68,Math.sin(minute)*r*.68); ctx.stroke();
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(0,0,5,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      roundRect(x-r-24,y+r+9,(r+24)*2,55,14,"rgba(255,255,255,.92)",active ? color : "rgba(32,62,112,.16)");
+      ctx.fillStyle = "#172033"; ctx.font = "900 13px Bahnschrift, Segoe UI, sans-serif"; ctx.textAlign = "center"; ctx.fillText(label, x, y+r+29);
+      ctx.fillStyle = color; ctx.font = "950 14px Bahnschrift, Segoe UI, sans-serif"; ctx.fillText(fmtHeight(heightKm), x, y+r+48);
+    }
+
+    function drawDateCell(x, y, w, label, value, accent) {
+      roundRect(x, y, w, 52, 10, "rgba(2,6,18,.92)", "rgba(255,255,255,.24)");
+      ctx.fillStyle = "rgba(255,255,255,.64)";
+      ctx.font = "900 10px Bahnschrift, Segoe UI, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(label, x + w / 2, y + 14);
+      ctx.fillStyle = accent;
+      ctx.shadowColor = accent;
+      ctx.shadowBlur = 9;
+      ctx.font = label === "AÑO" ? "950 24px Consolas, monospace" : "950 25px Consolas, monospace";
+      ctx.fillText(value, x + w / 2, y + 39);
+      ctx.shadowBlur = 0;
+    }
+
+    function drawBackToFutureDate(x, y, tau, accent) {
+      const parts = datePartsFromTau(tau);
+      drawDateCell(x, y, 60, "DÍA", parts.day, accent);
+      drawDateCell(x + 70, y, 74, "MES", parts.month, accent);
+      drawDateCell(x + 154, y, 112, "AÑO", parts.year, accent);
+    }
+
+    function drawTimerPanel(x, y, accent, title, tau) {
+      roundRect(x, y, 326, 148, 20, "rgba(8,17,38,.84)", `${accent}66`);
+      ctx.fillStyle = accent;
+      ctx.font = "950 14px Bahnschrift, Segoe UI, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(title, x + 20, y + 27);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "950 22px Consolas, monospace";
+      ctx.fillText(fmtElapsed(tau), x + 20, y + 58);
+      drawBackToFutureDate(x + 20, y + 72, tau, accent);
+      ctx.fillStyle = "rgba(255,255,255,.70)";
+      ctx.font = "800 11px Bahnschrift, Segoe UI, sans-serif";
+      ctx.fillText(`desde ${new Intl.DateTimeFormat("es-ES", { dateStyle: "medium" }).format(SIM_START)}`, x + 20, y + 137);
+    }
+
+    function drawTimers(m) {
+      drawTimerPanel(24, 24, "#8df1ff", "Reloj 1 · tiempo propio τ₁", m.tau1);
+      drawTimerPanel(24, 188, "#cfc4ff", "Reloj 2 · tiempo propio τ₂", m.tau2);
+    }
+
+    function drawDeltaBox(m) {
+      roundRect(572, 430, 285, 96, 18, "rgba(130,0,8,.84)", "rgba(255,210,210,.82)");
+      ctx.fillStyle = "#ffd6d6"; ctx.font = "950 14px Bahnschrift, Segoe UI, sans-serif"; ctx.textAlign = "left"; ctx.fillText("Diferencia acumulada Δτ = τ₂ − τ₁", 594, 458);
+      ctx.fillStyle = "#ffffff"; ctx.font = "950 30px Consolas, monospace"; ctx.fillText(fmtDelta(m.delta), 594, 490);
+      ctx.fillStyle = "rgba(255,255,255,.82)"; ctx.font = "850 13px Bahnschrift, Segoe UI, sans-serif"; ctx.fillText(`Referencia anual: ${fmtDelta(m.annualDelta)}/año`, 594, 513);
+    }
+
+    function draw() {
+      const m = metrics();
+      const w = canvas.width, h = canvas.height;
+      drawBackground(w,h); drawTower(); drawTimers(m);
+      const smoothing = state.dragClock ? .35 : .08;
+      state.render1 += (state.clock1Frac - state.render1) * smoothing;
+      state.render2 += (state.clock2Frac - state.render2) * smoothing;
+      const y1 = yForFraction(state.render1);
+      const y2 = yForFraction(state.render2);
+      ctx.strokeStyle = "rgba(16,33,62,.45)"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(390,y1); ctx.lineTo(483,y1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(604,y2); ctx.lineTo(542,y2); ctx.stroke();
+      drawAnalogClock(365, y1, 31, "#0b63e5", m.tau1, "Reloj 1", m.h1, state.dragClock === 1);
+      drawAnalogClock(625, y2, 28, "#6d49ff", m.tau2, "Reloj 2", m.h2, state.dragClock === 2);
+      drawDeltaBox(m);
+    }
+
+    function frame(now) {
+      const dt = Math.min(0.08, (now - state.last) / 1000);
+      state.last = now;
+      if (!state.paused) state.coordTime += dt * timeWarp();
+      updateUI(); draw(); requestAnimationFrame(frame);
+    }
+
+    function pointerToCanvas(event) {
+      const rect = canvas.getBoundingClientRect();
+      return { x: (event.clientX - rect.left) * canvas.width / rect.width, y: (event.clientY - rect.top) * canvas.height / rect.height };
+    }
+
+    function setClockFromY(id, y) {
+      const frac = fractionForY(y);
+      if (id === 1) state.clock1Frac = frac;
+      if (id === 2) state.clock2Frac = frac;
+      updateUI();
+    }
+
+    function bindPointerDrag() {
+      canvas.addEventListener("pointerdown", event => {
+        const p = pointerToCanvas(event);
+        const clocks = clockPositions();
+        let hit = null;
+        let best = Infinity;
+        for (const c of clocks) {
+          const d = Math.hypot(p.x - c.x, p.y - c.y);
+          if (d < c.r + 32 && d < best) { hit = c.id; best = d; }
+        }
+        if (hit) {
+          state.dragClock = hit;
+          canvas.classList.add("dragging");
+          canvas.setPointerCapture(event.pointerId);
+          setClockFromY(hit, p.y);
+        }
+      });
+      canvas.addEventListener("pointermove", event => {
+        if (!state.dragClock) return;
+        const p = pointerToCanvas(event);
+        setClockFromY(state.dragClock, p.y);
+      });
+      function endDrag(event) {
+        if (!state.dragClock) return;
+        state.dragClock = null;
+        canvas.classList.remove("dragging");
+        try { canvas.releasePointerCapture(event.pointerId); } catch {}
+      }
+      canvas.addEventListener("pointerup", endDrag);
+      canvas.addEventListener("pointercancel", endDrag);
+      canvas.addEventListener("pointerleave", event => { if (event.buttons === 0) endDrag(event); });
+    }
+
+    function bind() {
+      els.mass.addEventListener("input", setMassFromSlider);
+      els.massUnitButtons.forEach(button => button.addEventListener("click", () => {
+        state.massUnit = button.dataset.unit;
+        configureMassSliderFromState();
+      }));
+      els.radius.addEventListener("input", () => state.radiusKm = radiusFromSlider());
+      els.tower.addEventListener("input", e => state.towerM = Number(e.target.value));
+      els.towerTypical.addEventListener("click", () => { state.towerM = 200; els.tower.value = "200"; });
+      els.presetButtons.forEach(button => button.addEventListener("click", () => applyPreset(button.dataset.preset)));
+      els.kerrSpin.addEventListener("input", e => state.kerrSpin = Number(e.target.value));
+      els.clock1.addEventListener("input", e => state.clock1Frac = Number(e.target.value));
+      els.clock2.addEventListener("input", e => state.clock2Frac = Number(e.target.value));
+      els.warp.addEventListener("input", e => state.warpLog = Number(e.target.value));
+      els.pause.addEventListener("click", () => { state.paused = !state.paused; els.pause.textContent = state.paused ? "Reanudar" : "Pausar"; });
+      els.reset.addEventListener("click", () => { state.coordTime = 0; state.paused = false; els.pause.textContent = "Pausar"; state.last = performance.now(); });
+      bindPointerDrag();
+    }
+
+    configureMassSliderFromState(); configureRadiusSliderFromState(); bind(); updateUI(); requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
