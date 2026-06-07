@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio de apuestas | Moneda</title>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [["\\(", "\\)"]],
+        displayMath: [["\\[", "\\]"]],
+        processEscapes: true
+      },
+      svg: { fontCache: "global" }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #eef6f5;
+      --ink: #152126;
+      --muted: #617076;
+      --panel: rgba(255, 255, 255, 0.88);
+      --panel-strong: #ffffff;
+      --line: #cbdcda;
+      --teal: #0f8b8d;
+      --teal-dark: #0b6264;
+      --coral: #e4574f;
+      --amber: #f2b84b;
+      --green: #2f9e68;
+      --green-soft: rgba(47, 158, 104, 0.12);
+      --red-soft: rgba(228, 87, 79, 0.12);
+      --violet: #7b61b8;
+      --shadow: 0 18px 48px rgba(25, 47, 51, 0.14);
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(135deg, rgba(15, 139, 141, 0.12), transparent 36%),
+        linear-gradient(315deg, rgba(228, 87, 79, 0.12), transparent 32%),
+        var(--bg);
+      color: var(--ink);
+    }
+
+    button, input { font: inherit; }
+
+    .shell {
+      width: min(1380px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 36px;
+    }
+
+    .hero {
+      min-height: 188px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
+      align-items: end;
+      gap: 24px;
+      padding: 28px;
+      border: 1px solid rgba(15, 139, 141, 0.22);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(120deg, rgba(255,255,255,0.94), rgba(255,255,255,0.72)),
+        repeating-linear-gradient(90deg, rgba(15,139,141,0.08) 0 1px, transparent 1px 42px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(2rem, 4vw, 4.2rem);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      max-width: 690px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.55;
+    }
+
+    .hero-visual {
+      min-height: 132px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 9px;
+      align-items: end;
+    }
+
+    .mini-coin {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #2b2112;
+      font-weight: 900;
+      border: 2px solid rgba(120, 85, 28, 0.26);
+      background: radial-gradient(circle at 35% 25%, #fff1a9, #f2b84b 48%, #b96f22);
+      box-shadow: inset -10px -14px 18px rgba(90, 47, 14, 0.22), 0 12px 22px rgba(80, 53, 20, 0.16);
+      transform: translateY(var(--lift));
+    }
+
+    .mini-coin:nth-child(2n) {
+      background: radial-gradient(circle at 35% 25%, #f8fbff, #cfd7df 54%, #7f8b98);
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(310px, 390px) minmax(0, 1fr);
+      gap: 18px;
+      margin-top: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 18px 0;
+      align-items: baseline;
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: 1.02rem;
+      letter-spacing: 0;
+    }
+
+    .tag {
+      border: 1px solid rgba(15, 139, 141, 0.26);
+      background: rgba(15, 139, 141, 0.08);
+      color: var(--teal-dark);
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .controls-panel {
+      position: sticky;
+      top: 16px;
+      padding-bottom: 18px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 750;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid #b9ccca;
+      border-radius: var(--radius);
+      padding: 10px 34px 10px 12px;
+      background: rgba(255,255,255,0.92);
+      color: var(--ink);
+      font-weight: 800;
+      outline: none;
+    }
+
+    .field.player-field label,
+    .field.player-field .suffix { color: var(--green); }
+
+    .field.machine-field label,
+    .field.machine-field .suffix { color: var(--coral); }
+
+    .field.player-field input {
+      border-color: rgba(47, 158, 104, 0.48);
+      background: linear-gradient(135deg, rgba(47, 158, 104, 0.10), rgba(255,255,255,0.98));
+      box-shadow: inset 0 0 0 1px rgba(47, 158, 104, 0.10);
+    }
+
+    .field.machine-field input {
+      border-color: rgba(228, 87, 79, 0.52);
+      background: linear-gradient(135deg, rgba(228, 87, 79, 0.11), rgba(255,255,255,0.98));
+      box-shadow: inset 0 0 0 1px rgba(228, 87, 79, 0.10);
+    }
+
+    .suffix {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--green);
+    }
+
+    .speed-box {
+      padding: 0 18px 16px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .speed-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 0 18px 18px;
+    }
+
+    .btn {
+      min-height: 42px;
+      border: 1px solid #aec4c1;
+      border-radius: var(--radius);
+      background: #ffffff;
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 850;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(25, 47, 51, 0.12);
+      border-color: #87aaa5;
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, var(--teal), #39b7a7);
+      border-color: transparent;
+      color: white;
+    }
+
+    .btn.warn {
+      background: linear-gradient(135deg, var(--coral), #ff836f);
+      border-color: transparent;
+      color: white;
+    }
+
+    .expectation {
+      margin: 0 18px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(15,139,141,0.08), rgba(242,184,75,0.16));
+      border: 1px solid rgba(15, 139, 141, 0.18);
+      display: grid;
+      gap: 10px;
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+
+    .expectation.player-favorable {
+      background: linear-gradient(135deg, rgba(47, 158, 104, 0.13), rgba(47, 158, 104, 0.04));
+      border-color: rgba(47, 158, 104, 0.45);
+    }
+
+    .expectation.machine-favorable {
+      background: linear-gradient(135deg, rgba(228, 87, 79, 0.14), rgba(228, 87, 79, 0.04));
+      border-color: rgba(228, 87, 79, 0.48);
+    }
+
+    .expectation.fair {
+      background: linear-gradient(135deg, rgba(242,184,75,0.16), rgba(255,255,255,0.55));
+      border-color: rgba(242,184,75,0.38);
+    }
+
+    .formula {
+      display: grid;
+      gap: 7px;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-weight: 850;
+      color: var(--ink);
+    }
+
+    .math-block {
+      overflow-x: auto;
+      padding: 6px 8px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.70);
+      border: 1px solid rgba(203, 220, 218, 0.78);
+    }
+
+    .math-block mjx-container {
+      margin: 2px 0 !important;
+    }
+
+    .formula-label {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .expect-value {
+      font-size: 1.8rem;
+      font-weight: 950;
+      line-height: 1;
+    }
+
+    .expect-note {
+      color: var(--muted);
+      line-height: 1.38;
+      font-size: 0.9rem;
+    }
+
+    .stage-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1.18fr);
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .stage {
+      min-height: 348px;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.9), rgba(240,248,247,0.84)),
+        radial-gradient(circle at 50% 22%, rgba(242,184,75,0.32), transparent 38%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .coin-zone {
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+    }
+
+    .coin {
+      width: min(210px, 50vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #2f2414;
+      font-size: clamp(4rem, 11vw, 7rem);
+      font-weight: 1000;
+      border: 7px solid rgba(127, 83, 24, 0.25);
+      background:
+        radial-gradient(circle at 32% 23%, rgba(255,255,255,0.88), transparent 20%),
+        radial-gradient(circle at 50% 50%, #ffe28a 0 24%, #f2b84b 25% 58%, #c97925 59% 100%);
+      box-shadow:
+        inset -18px -22px 28px rgba(111, 55, 17, 0.25),
+        inset 11px 10px 18px rgba(255, 255, 255, 0.25),
+        0 26px 42px rgba(88, 55, 18, 0.24);
+      transform-style: preserve-3d;
+    }
+
+    .coin.player-coin {
+      color: #134c35;
+      border-color: rgba(47, 158, 104, 0.45);
+      box-shadow:
+        inset -18px -22px 28px rgba(111, 55, 17, 0.20),
+        inset 11px 10px 18px rgba(255, 255, 255, 0.25),
+        0 26px 42px rgba(47, 158, 104, 0.24),
+        0 0 0 8px rgba(47, 158, 104, 0.08);
+    }
+
+    .coin.machine-coin {
+      color: #6a1f1a;
+      border-color: rgba(228, 87, 79, 0.52);
+      background:
+        radial-gradient(circle at 32% 23%, rgba(255,255,255,0.88), transparent 20%),
+        radial-gradient(circle at 50% 50%, #ffd2cc 0 24%, #e4574f 25% 58%, #a92f2b 59% 100%);
+      box-shadow:
+        inset -18px -22px 28px rgba(111, 25, 20, 0.25),
+        inset 11px 10px 18px rgba(255, 255, 255, 0.25),
+        0 26px 42px rgba(228, 87, 79, 0.25),
+        0 0 0 8px rgba(228, 87, 79, 0.08);
+    }
+
+    .coin.flip {
+      animation: coinFlip 420ms cubic-bezier(.2,.8,.2,1);
+    }
+
+    @keyframes coinFlip {
+      0% { transform: rotateY(0deg) translateY(0); }
+      48% { transform: rotateY(540deg) translateY(-14px) scale(1.04); }
+      100% { transform: rotateY(1080deg) translateY(0); }
+    }
+
+    .result-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      padding: 8px 11px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .pill.player-outcome {
+      border-color: rgba(47, 158, 104, 0.42);
+      background: rgba(47, 158, 104, 0.10);
+    }
+
+    .pill.machine-outcome {
+      border-color: rgba(228, 87, 79, 0.48);
+      background: rgba(228, 87, 79, 0.10);
+    }
+
+    .main-panel {
+      display: grid;
+      gap: 18px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 18px;
+    }
+
+    .stat {
+      min-height: 86px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-strong);
+      padding: 12px;
+      display: grid;
+      align-content: space-between;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat strong {
+      font-size: clamp(1.28rem, 2vw, 2rem);
+      line-height: 1.1;
+    }
+
+    .positive { color: var(--green); }
+    .negative { color: var(--coral); }
+    .neutral { color: var(--teal-dark); }
+
+    .chart-wrap {
+      padding: 14px 18px 18px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 300px;
+      display: block;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    .chart-caption {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.83rem;
+      font-weight: 750;
+    }
+
+    .bars {
+      padding: 0 18px 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 108px 1fr 72px;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+    }
+
+    .bar {
+      height: 12px;
+      border-radius: 999px;
+      background: #e6eeee;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: var(--green);
+      transition: width 160ms ease;
+    }
+
+    .bar-fill.loss { background: var(--coral); }
+
+    .history {
+      padding: 0 18px 18px;
+      display: grid;
+      gap: 7px;
+      max-height: 370px;
+      overflow: auto;
+    }
+
+    .history-row {
+      display: grid;
+      grid-template-columns: 74px 1fr auto;
+      gap: 9px;
+      align-items: center;
+      padding: 9px 10px;
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.78);
+      border: 1px solid #d7e5e3;
+      font-size: 0.86rem;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 4px 8px;
+      color: white;
+      background: var(--green);
+      font-weight: 900;
+      font-size: 0.73rem;
+      text-align: center;
+    }
+
+    .badge.loss { background: var(--coral); }
+
+    .theory {
+      margin-top: 18px;
+      padding: 8px 18px 18px;
+    }
+
+    details {
+      border-top: 1px solid var(--line);
+      padding: 14px 0;
+    }
+
+    details:first-of-type { border-top: 0; }
+
+    summary {
+      cursor: pointer;
+      font-weight: 900;
+      color: var(--teal-dark);
+      list-style-position: outside;
+    }
+
+    details p, details li {
+      color: var(--muted);
+      line-height: 1.55;
+      max-width: 980px;
+    }
+
+    details ul {
+      margin: 10px 0 0;
+      padding-left: 20px;
+    }
+
+    .theory .math-block {
+      max-width: 860px;
+      margin: 10px 0;
+    }
+
+
+    @media (max-width: 1050px) {
+      .hero, .workspace, .stage-grid {
+        grid-template-columns: 1fr;
+      }
+      .controls-panel {
+        position: static;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100% - 20px, 1380px);
+        padding-top: 10px;
+      }
+      .hero {
+        padding: 20px;
+      }
+      .hero-visual {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .field-grid, .stats, .toolbar {
+        grid-template-columns: 1fr 1fr;
+      }
+      .bar-row {
+        grid-template-columns: 92px 1fr 58px;
+      }
+      .history-row {
+        grid-template-columns: 64px 1fr;
+      }
+      .history-row strong {
+        grid-column: 2;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <h1>Laboratorio de apuestas: moneda</h1>
+        <p>Una moneda justa decide la ronda: si sale cara gana el jugador y su capital sube; si sale cruz gana la máquina y el capital del jugador baja. Verde significa jugador; rojo significa máquina.</p>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="mini-coin" style="--lift: -4px">C</div>
+        <div class="mini-coin" style="--lift: -22px">X</div>
+        <div class="mini-coin" style="--lift: -11px">C</div>
+        <div class="mini-coin" style="--lift: -34px">C</div>
+        <div class="mini-coin" style="--lift: -16px">X</div>
+        <div class="mini-coin" style="--lift: -28px">C</div>
+      </div>
+    </section>
+
+    <section class="workspace">
+      <aside class="panel controls-panel">
+        <div class="panel-head">
+          <h2>Configuración</h2>
+          <span class="tag">p(cara) = 1/2</span>
+        </div>
+
+        <div class="field-grid">
+          <div class="field player-field">
+            <label for="winPay">Jugador gana con cara</label>
+            <div class="input-wrap">
+              <input id="winPay" type="number" min="0" step="0.5" value="1">
+              <span class="suffix">€</span>
+            </div>
+          </div>
+          <div class="field machine-field">
+            <label for="lossPay">Máquina gana con cruz</label>
+            <div class="input-wrap">
+              <input id="lossPay" type="number" min="0" step="0.5" value="1">
+              <span class="suffix">€</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="speed-box">
+          <div class="speed-line">
+            <label for="speed">Velocidad continua</label>
+            <span id="speedText">12 jugadas/s</span>
+          </div>
+          <input id="speed" type="range" min="1" max="80" step="1" value="12">
+        </div>
+
+        <div class="toolbar">
+          <button class="btn primary" id="playBtn">▶ Ejecutar</button>
+          <button class="btn" id="pauseBtn" disabled>⏸ Pausa</button>
+          <button class="btn warn" id="resetBtn">↺ Cero</button>
+          <button class="btn" data-batch="1">+1</button>
+          <button class="btn" data-batch="100">+100</button>
+          <button class="btn" data-batch="1000">+1000</button>
+        </div>
+
+        <div id="expectBox" class="expectation fair">
+          <div class="formula">
+            <span class="formula-label">Esperanza matemática del jugador</span>
+            <div class="math-block">\[E(X)=\frac{1}{2}\,U-\frac{1}{2}\,P\]</div>
+            <span class="formula-label">Versión con sumatorio</span>
+            <div class="math-block">\[E(X)=\sum_{i=1}^{2} x_i p_i = U\cdot\frac{1}{2}+(-P)\cdot\frac{1}{2}\]</div>
+          </div>
+          <div id="expectValue" class="expect-value neutral">0,000 €/jugada</div>
+          <div id="expectNote" class="expect-note">Juego justo: la ganancia esperada es cero.</div>
+        </div>
+      </aside>
+
+      <section class="main-panel">
+        <div class="stage-grid">
+          <div class="panel stage">
+            <div class="coin-zone">
+              <div id="coin" class="coin" aria-live="polite">?</div>
+              <div class="result-strip">
+                <span id="lastResultPill" class="pill">Último: <strong id="lastResult">sin lanzar</strong></span>
+                <span id="lastDeltaPill" class="pill">Cambio: <strong id="lastDelta">0,00 €</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Marcador</h2>
+              <span class="tag" id="edgeTag">juego justo</span>
+            </div>
+            <div class="stats">
+              <div class="stat"><span>Rondas</span><strong id="rounds">0</strong></div>
+              <div class="stat"><span>Capital</span><strong id="balance" class="neutral">0,00 €</strong></div>
+              <div class="stat"><span>Jugador / caras</span><strong id="wins" class="positive">0</strong></div>
+              <div class="stat"><span>Máquina / cruces</span><strong id="losses" class="negative">0</strong></div>
+            </div>
+            <div class="bars">
+              <div class="bar-row">
+                <span>Jugador</span>
+                <div class="bar"><div id="winBar" class="bar-fill"></div></div>
+                <strong id="winPct">0%</strong>
+              </div>
+              <div class="bar-row">
+                <span>Máquina</span>
+                <div class="bar"><div id="lossBar" class="bar-fill loss"></div></div>
+                <strong id="lossPct">0%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Trayectoria del capital</h2>
+            <span class="tag">línea punteada: teoría</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="chart" width="1100" height="360"></canvas>
+            <div class="chart-caption">
+              <span id="chartLeft">0 jugadas</span>
+              <span id="chartRight">Media observada: 0,000 €/jugada</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Historial reciente</h2>
+            <span class="tag">últimas 28</span>
+          </div>
+          <div id="history" class="history"></div>
+        </div>
+      </section>
+    </section>
+
+    <section class="panel theory">
+      <div class="panel-head">
+        <h2>Teoría desplegable</h2>
+        <span class="tag">bachillerato</span>
+      </div>
+      <details>
+        <summary>Modelo probabilístico</summary>
+        <p>Definimos la variable aleatoria \(X\) como la variación del capital del jugador en una jugada.</p>
+        <div class="math-block">\[
+          X=\begin{cases}
+          U, & \text{si sale cara: gana el jugador} \\
+          -P, & \text{si sale cruz: gana la máquina}
+          \end{cases}
+        \]</div>
+        <p>Como la moneda es justa, las dos probabilidades son iguales:</p>
+        <div class="math-block">\[
+          \mathbb{P}(X=U)=\frac{1}{2}, \qquad
+          \mathbb{P}(X=-P)=\frac{1}{2}
+        \]</div>
+        <p>El signo es importante: verde significa que aumenta el capital del jugador; rojo significa que aumenta el beneficio de la máquina y baja el capital del jugador.</p>
+      </details>
+      <details>
+        <summary>Esperanza matemática y juego justo</summary>
+        <p>La esperanza matemática por jugada, desde el punto de vista del jugador, es:</p>
+        <div class="math-block">\[
+          E(X)=U\cdot\frac{1}{2}+(-P)\cdot\frac{1}{2}
+        \]</div>
+        <p>Equivalente:</p>
+        <div class="math-block">\[
+          E(X)=\frac{U-P}{2}
+        \]</div>
+        <p>En forma de sumatorio:</p>
+        <div class="math-block">\[
+          E(X)=\sum_{i=1}^{2} x_i p_i,
+          \qquad x_1=U,\; x_2=-P,\; p_1=p_2=\frac{1}{2}
+        \]</div>
+        <p>Por tanto, el juego es justo cuando:</p>
+        <div class="math-block">\[
+          E(X)=0 \Longleftrightarrow U=P
+        \]</div>
+        <ul>
+          <li>Si \(U>P\), entonces \(E(X)>0\): ventaja para el jugador.</li>
+          <li>Si \(U<P\), entonces \(E(X)<0\): ventaja para la máquina.</li>
+          <li>Si \(U=P\), entonces \(E(X)=0\): juego justo.</li>
+        </ul>
+      </details>
+      <details>
+        <summary>Qué observar en clase</summary>
+        <ul>
+          <li>Con pocas jugadas puede ganar cualquiera, incluso en un juego desfavorable.</li>
+          <li>Con muchas jugadas, la media observada por jugada suele acercarse a la esperanza teórica \(E(X)\).</li>
+          <li>Una esperanza negativa pequeña puede quedar escondida durante un rato, pero termina inclinando la trayectoria hacia valores negativos.</li>
+          <li>La línea punteada representa la predicción teórica: si es verde favorece al jugador; si es roja favorece a la máquina.</li>
+        </ul>
+      </details>
+    </section>
+  </main>
+
+  <script>
+    const els = {
+      winPay: document.getElementById("winPay"),
+      lossPay: document.getElementById("lossPay"),
+      speed: document.getElementById("speed"),
+      speedText: document.getElementById("speedText"),
+      playBtn: document.getElementById("playBtn"),
+      pauseBtn: document.getElementById("pauseBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      coin: document.getElementById("coin"),
+      lastResultPill: document.getElementById("lastResultPill"),
+      lastDeltaPill: document.getElementById("lastDeltaPill"),
+      lastResult: document.getElementById("lastResult"),
+      lastDelta: document.getElementById("lastDelta"),
+      rounds: document.getElementById("rounds"),
+      balance: document.getElementById("balance"),
+      wins: document.getElementById("wins"),
+      losses: document.getElementById("losses"),
+      winBar: document.getElementById("winBar"),
+      lossBar: document.getElementById("lossBar"),
+      winPct: document.getElementById("winPct"),
+      lossPct: document.getElementById("lossPct"),
+      expectBox: document.getElementById("expectBox"),
+      expectValue: document.getElementById("expectValue"),
+      expectNote: document.getElementById("expectNote"),
+      edgeTag: document.getElementById("edgeTag"),
+      chart: document.getElementById("chart"),
+      chartLeft: document.getElementById("chartLeft"),
+      chartRight: document.getElementById("chartRight"),
+      history: document.getElementById("history")
+    };
+
+    const ctx = els.chart.getContext("2d");
+    let state = { running: false, timer: null, rounds: 0, wins: 0, losses: 0, balance: 0, points: [0] };
+    const maxHistory = 28;
+
+    function money(value) {
+      return value.toLocaleString("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+    }
+
+    function signedMoney(value) {
+      return (value > 0 ? "+" : "") + money(value);
+    }
+
+    function number(value, digits = 0) {
+      return value.toLocaleString("es-ES", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+    }
+
+    function params() {
+      return {
+        win: Math.max(0, Number(els.winPay.value) || 0),
+        loss: Math.max(0, Number(els.lossPay.value) || 0),
+        expectation: 0.5 * (Math.max(0, Number(els.winPay.value) || 0) - Math.max(0, Number(els.lossPay.value) || 0))
+      };
+    }
+
+    function setTone(el, value) {
+      el.classList.remove("positive", "negative", "neutral");
+      el.classList.add(value > 0 ? "positive" : value < 0 ? "negative" : "neutral");
+    }
+
+    function setPillOutcome(el, playerWins) {
+      el.classList.remove("player-outcome", "machine-outcome");
+      el.classList.add(playerWins ? "player-outcome" : "machine-outcome");
+    }
+
+    function setExpectationBoxTone(value) {
+      els.expectBox.classList.remove("player-favorable", "machine-favorable", "fair");
+      els.expectBox.classList.add(value > 0 ? "player-favorable" : value < 0 ? "machine-favorable" : "fair");
+    }
+
+    function updateExpectation() {
+      const p = params();
+      els.expectValue.textContent = signedMoney(p.expectation).replace(" €", " €/jugada");
+      setTone(els.expectValue, p.expectation);
+      setTone(els.edgeTag, p.expectation);
+      setExpectationBoxTone(p.expectation);
+      if (Math.abs(p.expectation) < 1e-10) {
+        els.expectNote.textContent = "Juego justo: la ganancia esperada es cero.";
+        els.edgeTag.textContent = "juego justo";
+      } else if (p.expectation > 0) {
+        els.expectNote.textContent = "Ventaja teórica para el jugador: el capital esperado sube con el número de jugadas.";
+        els.edgeTag.textContent = "ventaja jugador";
+      } else {
+        els.expectNote.textContent = "Ventaja teórica para la máquina: el capital esperado del jugador baja con el tiempo.";
+        els.edgeTag.textContent = "ventaja máquina";
+      }
+      drawChart();
+    }
+
+    function addHistory(result, delta, won) {
+      const row = document.createElement("div");
+      row.className = "history-row";
+      row.innerHTML = '<span class="badge ' + (won ? "" : "loss") + '">' + (won ? "JUGADOR" : "MÁQUINA") + '</span><span>Ronda ' + number(state.rounds) + " · " + result + (won ? " · gana el jugador" : " · gana la máquina") + '</span><strong class="' + (delta >= 0 ? "positive" : "negative") + '">' + signedMoney(delta) + "</strong>";
+      els.history.insertBefore(row, els.history.firstChild);
+      while (els.history.childElementCount > maxHistory) els.history.removeChild(els.history.lastChild);
+    }
+
+    function flipOnce(record = true) {
+      const p = params();
+      const won = Math.random() < 0.5;
+      const delta = won ? p.win : -p.loss;
+      state.rounds += 1;
+      state.balance += delta;
+      if (won) state.wins += 1; else state.losses += 1;
+      state.points.push(state.balance);
+      if (state.points.length > 900) {
+        const reduced = [state.points[0]];
+        for (let i = 1; i < state.points.length; i += 2) reduced.push(state.points[i]);
+        state.points = reduced;
+      }
+      if (record) {
+        els.coin.textContent = won ? "C" : "X";
+        els.coin.classList.remove("flip", "player-coin", "machine-coin");
+        els.coin.classList.add(won ? "player-coin" : "machine-coin");
+        void els.coin.offsetWidth;
+        els.coin.classList.add("flip");
+        els.lastResult.textContent = won ? "cara · gana el jugador" : "cruz · gana la máquina";
+        els.lastDelta.textContent = signedMoney(delta);
+        setTone(els.lastResult, delta);
+        setTone(els.lastDelta, delta);
+        setPillOutcome(els.lastResultPill, won);
+        setPillOutcome(els.lastDeltaPill, won);
+        addHistory(won ? "cara" : "cruz", delta, won);
+      }
+    }
+
+    function runBatch(amount) {
+      const historyStart = Math.max(0, amount - maxHistory);
+      for (let i = 0; i < amount; i += 1) flipOnce(i >= historyStart);
+      updateUI();
+    }
+
+    function updateUI() {
+      els.rounds.textContent = number(state.rounds);
+      els.balance.textContent = signedMoney(state.balance);
+      setTone(els.balance, state.balance);
+      els.wins.textContent = number(state.wins);
+      els.losses.textContent = number(state.losses);
+      const winPct = state.rounds ? state.wins / state.rounds * 100 : 0;
+      const lossPct = state.rounds ? state.losses / state.rounds * 100 : 0;
+      els.winBar.style.width = winPct + "%";
+      els.lossBar.style.width = lossPct + "%";
+      els.winPct.textContent = number(winPct, 1) + "%";
+      els.lossPct.textContent = number(lossPct, 1) + "%";
+      const observed = state.rounds ? state.balance / state.rounds : 0;
+      els.chartLeft.textContent = number(state.rounds) + " jugadas";
+      els.chartRight.textContent = "Media observada: " + signedMoney(observed).replace(" €", " €/jugada");
+      setTone(els.chartRight, observed);
+      drawChart();
+    }
+
+    function drawChart() {
+      const width = els.chart.width;
+      const height = els.chart.height;
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, width, height);
+      const p = params();
+      const theoryEnd = p.expectation * state.rounds;
+      const values = state.points.concat([theoryEnd, 0]);
+      let min = Math.min(...values);
+      let max = Math.max(...values);
+      if (max - min < 1) { max += 1; min -= 1; }
+      const pad = 32;
+      const y = v => height - pad - (v - min) / (max - min) * (height - pad * 2);
+      const x = i => pad + i / Math.max(1, state.points.length - 1) * (width - pad * 2);
+      ctx.strokeStyle = "#d8e5e3";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let i = 0; i < 5; i += 1) {
+        const gy = pad + i * (height - pad * 2) / 4;
+        ctx.moveTo(pad, gy);
+        ctx.lineTo(width - pad, gy);
+      }
+      ctx.stroke();
+      ctx.strokeStyle = "#8aa4a0";
+      ctx.beginPath();
+      ctx.moveTo(pad, y(0));
+      ctx.lineTo(width - pad, y(0));
+      ctx.stroke();
+      ctx.setLineDash([8, 7]);
+      ctx.strokeStyle = p.expectation > 0 ? "#2f9e68" : p.expectation < 0 ? "#e4574f" : "#7b61b8";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pad, y(0));
+      ctx.lineTo(width - pad, y(theoryEnd));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.lineWidth = 3;
+      for (let i = 1; i < state.points.length; i += 1) {
+        const previous = state.points[i - 1];
+        const current = state.points[i];
+        ctx.strokeStyle = current >= 0 ? "#2f9e68" : "#e4574f";
+        ctx.beginPath();
+        ctx.moveTo(x(i - 1), y(previous));
+        ctx.lineTo(x(i), y(current));
+        ctx.stroke();
+      }
+      ctx.fillStyle = state.balance >= 0 ? "#2f9e68" : "#e4574f";
+      ctx.font = "700 18px system-ui";
+      ctx.fillText(signedMoney(state.balance), pad, 26);
+    }
+
+    function play() {
+      if (state.running) return;
+      state.running = true;
+      els.playBtn.disabled = true;
+      els.pauseBtn.disabled = false;
+      const speed = Math.max(1, Number(els.speed.value) || 12);
+      const batch = Math.ceil(speed / 40);
+      const tick = () => runBatch(batch);
+      state.timer = setInterval(tick, Math.max(16, 1000 * batch / speed));
+    }
+
+    function pause() {
+      state.running = false;
+      els.playBtn.disabled = false;
+      els.pauseBtn.disabled = true;
+      clearInterval(state.timer);
+    }
+
+    function reset() {
+      pause();
+      state = { running: false, timer: null, rounds: 0, wins: 0, losses: 0, balance: 0, points: [0] };
+      els.coin.textContent = "?";
+      els.coin.classList.remove("flip", "player-coin", "machine-coin");
+      els.lastResult.textContent = "sin lanzar";
+      els.lastDelta.textContent = "0,00 €";
+      [els.lastResult, els.lastDelta].forEach(el => {
+        el.classList.remove("positive", "negative", "neutral");
+        el.classList.add("neutral");
+      });
+      [els.lastResultPill, els.lastDeltaPill].forEach(el => el.classList.remove("player-outcome", "machine-outcome"));
+      els.history.innerHTML = "";
+      updateUI();
+    }
+
+    els.playBtn.addEventListener("click", play);
+    els.pauseBtn.addEventListener("click", pause);
+    els.resetBtn.addEventListener("click", reset);
+    document.querySelectorAll("[data-batch]").forEach(btn => btn.addEventListener("click", () => runBatch(Number(btn.dataset.batch))));
+    [els.winPay, els.lossPay].forEach(input => input.addEventListener("input", updateExpectation));
+    els.speed.addEventListener("input", () => {
+      els.speedText.textContent = number(Number(els.speed.value)) + " jugadas/s";
+      if (state.running) { pause(); play(); }
+    });
+
+    updateExpectation();
+    updateUI();
+  </script>
+</body>
+</html>

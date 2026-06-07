@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Juego de los dos seises · Probabilidad con dos dados</title>
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['\\(', '\\)'], ['$', '$']], displayMath: [['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+  <style>
+    :root {
+      --bg1: #0f172a;
+      --bg2: #1e293b;
+      --panel: rgba(255, 255, 255, 0.10);
+      --panel-strong: rgba(255, 255, 255, 0.16);
+      --line: rgba(255, 255, 255, 0.22);
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --student: #22c55e;
+      --student-soft: rgba(34, 197, 94, 0.18);
+      --teacher: #ef4444;
+      --teacher-soft: rgba(239, 68, 68, 0.18);
+      --gold: #fbbf24;
+      --blue: #38bdf8;
+      --shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+      --radius: 26px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font-family: var(--font);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.22), transparent 28rem),
+        radial-gradient(circle at top right, rgba(34, 197, 94, 0.18), transparent 26rem),
+        radial-gradient(circle at bottom, rgba(239, 68, 68, 0.15), transparent 30rem),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow-x: hidden;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.05;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1260px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 46px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 22px;
+    }
+
+    .hero, .card {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.08));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero {
+      padding: 30px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 270px;
+      height: 270px;
+      border-radius: 50%;
+      right: -90px;
+      top: -110px;
+      background: radial-gradient(circle, rgba(251,191,36,0.22), transparent 64%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      color: #e0f2fe;
+      border: 1px solid rgba(56, 189, 248, 0.38);
+      background: rgba(56, 189, 248, 0.12);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      font-size: 0.82rem;
+    }
+
+    h1 {
+      margin: 16px 0 10px;
+      font-size: clamp(2.05rem, 4vw, 4.25rem);
+      line-height: 1.02;
+      letter-spacing: -0.055em;
+    }
+
+    .hero p {
+      max-width: 850px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.4vw, 1.18rem);
+      line-height: 1.65;
+    }
+
+    .highlight {
+      color: white;
+      font-weight: 800;
+    }
+
+    .rules {
+      padding: 24px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .rule-title {
+      font-size: 1rem;
+      color: var(--muted);
+      margin: 0;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .payoff-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .payoff {
+      border-radius: 22px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      min-height: 132px;
+      display: grid;
+      align-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .payoff.teacher { background: linear-gradient(135deg, var(--teacher-soft), rgba(255,255,255,0.08)); }
+    .payoff.student { background: linear-gradient(135deg, var(--student-soft), rgba(255,255,255,0.08)); }
+
+    .payoff::before {
+      content: "";
+      position: absolute;
+      inset: auto -30px -50px auto;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      opacity: 0.38;
+      filter: blur(4px);
+    }
+
+    .payoff.teacher::before { background: var(--teacher); }
+    .payoff.student::before { background: var(--student); }
+
+    .payoff span {
+      position: relative;
+      z-index: 1;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+
+    .payoff strong {
+      position: relative;
+      z-index: 1;
+      display: block;
+      font-size: clamp(2rem, 3.3vw, 3.35rem);
+      letter-spacing: -0.06em;
+      line-height: 1;
+    }
+
+    .teacher strong { color: #fecaca; }
+    .student strong { color: #bbf7d0; }
+
+    main {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .left-stack, .right-stack { display: grid; gap: 22px; }
+
+    .card { padding: 22px; }
+
+    .section-title {
+      margin: 0 0 16px;
+      font-size: 1.25rem;
+      letter-spacing: -0.025em;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      background: rgba(255,255,255,0.09);
+      border: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    .game-board {
+      position: relative;
+      display: grid;
+      justify-items: center;
+      gap: 18px;
+      min-height: 370px;
+      padding: 18px;
+      border-radius: 24px;
+      background:
+        linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+        radial-gradient(circle at center, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      background-size: 32px 32px, 32px 32px, auto;
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .game-result {
+      min-height: 58px;
+      width: min(100%, 600px);
+      display: grid;
+      place-items: center;
+      padding: 12px 14px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.08);
+      font-weight: 900;
+      font-size: clamp(1rem, 2vw, 1.35rem);
+      text-align: center;
+      transition: 0.25s ease;
+    }
+
+    .game-result.student-win {
+      color: #dcfce7;
+      background: rgba(34, 197, 94, 0.18);
+      border-color: rgba(34, 197, 94, 0.5);
+      box-shadow: 0 0 30px rgba(34, 197, 94, 0.14);
+    }
+
+    .game-result.teacher-win {
+      color: #fee2e2;
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.5);
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.14);
+    }
+
+    .dice-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      perspective: 900px;
+      margin-top: 10px;
+    }
+
+    .die {
+      width: clamp(92px, 11vw, 128px);
+      aspect-ratio: 1;
+      border-radius: 24px;
+      background: linear-gradient(145deg, #ffffff, #dbeafe);
+      box-shadow: inset -8px -8px 18px rgba(15, 23, 42, 0.18), inset 7px 7px 16px rgba(255,255,255,0.8), 0 20px 35px rgba(0,0,0,0.32);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      padding: 18px;
+      gap: 9px;
+      transform: rotateX(8deg) rotateY(-10deg);
+      transition: transform 0.18s ease;
+    }
+
+    .rolling .die {
+      animation: tumble 0.34s ease-in-out infinite alternate;
+    }
+
+    .rolling .die:nth-child(2) { animation-delay: 0.08s; }
+
+    @keyframes tumble {
+      from { transform: rotateX(18deg) rotateY(-24deg) rotateZ(-3deg) scale(1.01); }
+      to { transform: rotateX(-14deg) rotateY(22deg) rotateZ(5deg) scale(1.04); }
+    }
+
+    .pip {
+      border-radius: 50%;
+      background: #0f172a;
+      box-shadow: inset 1px 1px 2px rgba(255,255,255,0.18);
+      opacity: 0;
+      transform: scale(0.65);
+      transition: 0.15s ease;
+    }
+
+    .pip.on { opacity: 1; transform: scale(1); }
+
+    .dice-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-align: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+      background: var(--blue);
+      box-shadow: 0 0 16px var(--blue);
+    }
+
+    .controls {
+      display: grid;
+      gap: 16px;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 9px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 0.92rem;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      color: white;
+      background: rgba(15, 23, 42, 0.48);
+      border-radius: 16px;
+      padding: 13px 14px;
+      font: inherit;
+      font-weight: 900;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    input[type="number"]:focus {
+      border-color: rgba(56, 189, 248, 0.8);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12);
+    }
+
+    .slider-wrap {
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.07);
+      display: grid;
+      gap: 12px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--gold);
+      cursor: pointer;
+    }
+
+    .speed-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+
+    .speed-info strong { color: var(--gold); font-size: 1.15rem; }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 17px;
+      padding: 13px 14px;
+      color: white;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+      box-shadow: 0 16px 30px rgba(0,0,0,0.22);
+    }
+
+    button:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    button:active { transform: translateY(1px) scale(0.99); }
+    button:disabled { cursor: not-allowed; opacity: 0.55; transform: none; }
+
+    .primary { background: linear-gradient(135deg, #0284c7, #22c55e); }
+    .secondary { background: linear-gradient(135deg, #7c3aed, #2563eb); }
+    .danger { background: linear-gradient(135deg, #ef4444, #f97316); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      min-height: 96px;
+      padding: 15px;
+      border-radius: 19px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.075);
+      display: grid;
+      align-content: space-between;
+      overflow: hidden;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .stat strong {
+      font-size: clamp(1.35rem, 2.2vw, 2.1rem);
+      line-height: 1;
+      letter-spacing: -0.05em;
+    }
+
+    .green { color: var(--student) !important; }
+    .red { color: var(--teacher) !important; }
+    .gold { color: var(--gold) !important; }
+    .blue { color: var(--blue) !important; }
+
+    .chart-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      height: clamp(260px, 34vh, 360px);
+      border-radius: 24px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px),
+        rgba(15, 23, 42, 0.42);
+      background-size: 44px 44px, 44px 44px, auto;
+      overflow: hidden;
+    }
+
+    canvas { display: block; width: 100%; height: 100%; }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .legend-item { display: inline-flex; align-items: center; gap: 8px; }
+    .line-sample { width: 30px; height: 4px; border-radius: 999px; display: inline-block; }
+    .sample-balance { background: var(--student); }
+    .sample-ev { background: var(--gold); }
+    .sample-zero { background: rgba(255,255,255,0.5); }
+
+    .theory {
+      grid-column: 1 / -1;
+      padding: 28px;
+    }
+
+    .theory-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .theory-box {
+      border-radius: 22px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.075);
+      min-height: 160px;
+    }
+
+    .theory-box h3 {
+      margin: 0 0 10px;
+      font-size: 1.02rem;
+      letter-spacing: -0.02em;
+    }
+
+    .theory-box p {
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 0 0 10px;
+    }
+
+    .formula {
+      overflow-x: auto;
+      padding: 10px 0 0;
+    }
+
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 7px;
+      margin-top: 12px;
+    }
+
+    .cell {
+      min-height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .cell.double-six {
+      color: white;
+      border-color: rgba(239, 68, 68, 0.7);
+      background: rgba(239, 68, 68, 0.32);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.16);
+    }
+
+    .teacher-glow { box-shadow: 0 0 0 5px rgba(239,68,68,0.18), var(--shadow); }
+    .student-glow { box-shadow: 0 0 0 5px rgba(34,197,94,0.18), var(--shadow); }
+
+
+    @media (max-width: 1060px) {
+      header, main { grid-template-columns: 1fr; }
+      .theory-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 680px) {
+      .wrap { width: min(100% - 18px, 1260px); padding-top: 18px; }
+      .hero, .card, .theory { padding: 17px; border-radius: 22px; }
+      .control-grid, .payoff-grid, .buttons { grid-template-columns: 1fr; }
+      .dice-row { gap: 12px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .chart-wrap { height: 280px; }
+      .section-title { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  <div class="wrap">
+    <header>
+      <section class="hero">
+        <span class="eyebrow">🎲 Probabilidad experimental · Ley de los grandes números</span>
+        <h1>El juego de los dos seises</h1>
+        <p>
+          Tiramos dos dados. Si salen <span class="highlight">dos seises</span>, gana el profesor.
+          Si sale cualquier otro resultado, gana el alumno. Cambia los premios, acelera la simulación
+          y observa cómo el balance se acerca al <span class="highlight">valor esperado</span>.
+        </p>
+      </section>
+
+      <aside class="rules card" id="rulesCard">
+        <p class="rule-title">Reglas del juego</p>
+        <div class="payoff-grid">
+          <div class="payoff teacher" id="teacherPayoffBox">
+            <span>Profesor gana si sale 6 y 6</span>
+            <strong><span id="teacherPrizeDisplay">35</span> €</strong>
+          </div>
+          <div class="payoff student" id="studentPayoffBox">
+            <span>Alumno gana en los otros 35 casos</span>
+            <strong><span id="studentPrizeDisplay">1</span> €</strong>
+          </div>
+        </div>
+      </aside>
+    </header>
+
+    <main>
+      <section class="left-stack">
+        <article class="card">
+          <h2 class="section-title">Mesa de juego <span class="badge" id="stateBadge">Preparado</span></h2>
+          <div class="game-board" id="gameBoard">
+            <div class="dice-row" id="diceRow">
+              <div class="die" id="die1" aria-label="Dado 1"></div>
+              <div class="die" id="die2" aria-label="Dado 2"></div>
+            </div>
+            <div class="game-result" id="gameResult">Pulsa «Empezar» para lanzar los dados.</div>
+            <div class="dice-label"><span class="dot"></span><span id="lastRollText">Última tirada: —</span></div>
+          </div>
+        </article>
+
+        <article class="card controls">
+          <h2 class="section-title">Controles <span class="badge">premios editables</span></h2>
+
+          <div class="control-grid">
+            <label>
+              Premio del profesor si salen dos seises
+              <input type="number" id="teacherPrize" min="0" step="1" value="35" />
+            </label>
+            <label>
+              Premio del alumno si no salen dos seises
+              <input type="number" id="studentPrize" min="0" step="1" value="1" />
+            </label>
+          </div>
+
+          <div class="slider-wrap">
+            <label for="speed">Velocidad de simulación</label>
+            <input type="range" id="speed" min="0" max="7" value="2" />
+            <div class="speed-info">
+              <span>Jugadas por segundo: <strong id="speedText">5</strong></span>
+              <span id="fairnessText">Juego justo: \(E=0\)</span>
+            </div>
+          </div>
+
+          <div class="buttons">
+            <button class="primary" id="startBtn">▶ Empezar</button>
+            <button class="secondary" id="stepBtn">🎲 Una tirada</button>
+            <button class="secondary" id="add100Btn">+100 tiradas</button>
+            <button class="secondary" id="add1000Btn">+1000 tiradas</button>
+            <button class="danger" id="resetBtn">↺ Reiniciar</button>
+          </div>
+        </article>
+      </section>
+
+      <section class="right-stack">
+        <article class="card">
+          <h2 class="section-title">Marcador <span class="badge">balance del alumno</span></h2>
+          <div class="stats-grid">
+            <div class="stat">
+              <span>Jugadas</span>
+              <strong id="plays">0</strong>
+            </div>
+            <div class="stat">
+              <span>Doble 6</span>
+              <strong class="red" id="doubleSixes">0</strong>
+            </div>
+            <div class="stat">
+              <span>Balance alumno</span>
+              <strong id="balance">0 €</strong>
+            </div>
+            <div class="stat">
+              <span>Frecuencia doble 6</span>
+              <strong class="gold" id="frequency">—</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="card chart-card">
+          <h2 class="section-title">Evolución de la apuesta <span class="badge">simulación acumulada</span></h2>
+          <div class="chart-wrap">
+            <canvas id="chart" aria-label="Gráfica del balance acumulado"></canvas>
+          </div>
+          <div class="legend">
+            <span class="legend-item"><span class="line-sample sample-balance"></span> Balance real del alumno</span>
+            <span class="legend-item"><span class="line-sample sample-ev"></span> Valor esperado acumulado</span>
+            <span class="legend-item"><span class="line-sample sample-zero"></span> Línea 0</span>
+          </div>
+        </article>
+      </section>
+
+      <section class="theory card">
+        <h2 class="section-title">Resumen teórico <span class="badge">probabilidad, esperanza y juego justo</span></h2>
+        <div class="theory-grid">
+          <div class="theory-box">
+            <h3>1. Espacio muestral</h3>
+            <p>Al tirar dos dados equilibrados hay 36 resultados equiprobables: seis posibilidades para el primer dado y seis para el segundo.</p>
+            <div class="formula">
+              \[
+                |\Omega| = 6 \cdot 6 = 36
+              \]
+            </div>
+            <div class="matrix" id="outcomesMatrix"></div>
+          </div>
+
+          <div class="theory-box">
+            <h3>2. Probabilidad de dos seises</h3>
+            <p>Solo hay un caso favorable: que el primer dado sea 6 y el segundo dado también sea 6.</p>
+            <div class="formula">
+              \[
+                P(6,6)=\frac{1}{36}\approx 0{,}0278 = 2{,}78\% 
+              \]
+              \[
+                P(\text{no doble 6})=\frac{35}{36}\approx 97{,}22\%
+              \]
+            </div>
+          </div>
+
+          <div class="theory-box">
+            <h3>3. Valor esperado del alumno</h3>
+            <p>Si el alumno gana \(a\) euros cuando no sale doble 6 y pierde \(p\) euros cuando sale doble 6, entonces:</p>
+            <div class="formula" id="formulaBox">
+              \[
+                E(X)=\frac{35}{36}\,a-\frac{1}{36}\,p
+              \]
+              \[
+                E(X)=\frac{35a-p}{36}
+              \]
+              \[
+                \text{Juego justo} \Longleftrightarrow E(X)=0 \Longleftrightarrow p=35a
+              \]
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const diePatterns = {
+      1: [4],
+      2: [0, 8],
+      3: [0, 4, 8],
+      4: [0, 2, 6, 8],
+      5: [0, 2, 4, 6, 8],
+      6: [0, 2, 3, 5, 6, 8]
+    };
+
+    const speedMap = [1, 2, 5, 10, 25, 60, 150, 400];
+
+    const state = {
+      running: false,
+      plays: 0,
+      doubleSixes: 0,
+      balance: 0,
+      history: [0],
+      timer: null,
+      lastRender: 0,
+      lastRoll: null,
+      teacherPrize: 35,
+      studentPrize: 1
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    const die1 = $('die1');
+    const die2 = $('die2');
+    const diceRow = $('diceRow');
+    const gameResult = $('gameResult');
+    const lastRollText = $('lastRollText');
+    const stateBadge = $('stateBadge');
+    const teacherPrizeInput = $('teacherPrize');
+    const studentPrizeInput = $('studentPrize');
+    const teacherPrizeDisplay = $('teacherPrizeDisplay');
+    const studentPrizeDisplay = $('studentPrizeDisplay');
+    const speedSlider = $('speed');
+    const speedText = $('speedText');
+    const fairnessText = $('fairnessText');
+    const startBtn = $('startBtn');
+    const stepBtn = $('stepBtn');
+    const add100Btn = $('add100Btn');
+    const add1000Btn = $('add1000Btn');
+    const resetBtn = $('resetBtn');
+    const playsEl = $('plays');
+    const doubleSixesEl = $('doubleSixes');
+    const balanceEl = $('balance');
+    const frequencyEl = $('frequency');
+    const chart = $('chart');
+    const ctx = chart.getContext('2d');
+    const teacherPayoffBox = $('teacherPayoffBox');
+    const studentPayoffBox = $('studentPayoffBox');
+    const rulesCard = $('rulesCard');
+
+    function createPips(die) {
+      die.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const pip = document.createElement('div');
+        pip.className = 'pip';
+        die.appendChild(pip);
+      }
+    }
+
+    function setDie(die, value) {
+      [...die.children].forEach((pip, i) => {
+        pip.classList.toggle('on', diePatterns[value].includes(i));
+      });
+    }
+
+    function buildMatrix() {
+      const matrix = $('outcomesMatrix');
+      matrix.innerHTML = '';
+      for (let i = 1; i <= 6; i++) {
+        for (let j = 1; j <= 6; j++) {
+          const cell = document.createElement('div');
+          cell.className = 'cell' + (i === 6 && j === 6 ? ' double-six' : '');
+          cell.textContent = `${i},${j}`;
+          matrix.appendChild(cell);
+        }
+      }
+    }
+
+    function expectedValue() {
+      return (35 * state.studentPrize - state.teacherPrize) / 36;
+    }
+
+    function formatMoney(value) {
+      const sign = value > 0 ? '+' : value < 0 ? '−' : '';
+      const abs = Math.abs(value);
+      return `${sign}${abs.toLocaleString('es-ES', { maximumFractionDigits: 2 })} €`;
+    }
+
+    function formatDecimal(value, digits = 3) {
+      return value.toLocaleString('es-ES', { maximumFractionDigits: digits, minimumFractionDigits: digits });
+    }
+
+    function updatePrizeState() {
+      state.teacherPrize = Math.max(0, Number(teacherPrizeInput.value) || 0);
+      state.studentPrize = Math.max(0, Number(studentPrizeInput.value) || 0);
+      teacherPrizeDisplay.textContent = state.teacherPrize.toLocaleString('es-ES');
+      studentPrizeDisplay.textContent = state.studentPrize.toLocaleString('es-ES');
+
+      const ev = expectedValue();
+      const evText = formatMoney(ev);
+      if (Math.abs(ev) < 1e-9) {
+        fairnessText.innerHTML = 'Juego justo: \\(E=0\\)';
+        fairnessText.className = '';
+      } else if (ev > 0) {
+        fairnessText.innerHTML = `Ventaja para el alumno: \\(E=${evText.replace('€', '')}\\)`;
+        fairnessText.className = 'green';
+      } else {
+        fairnessText.innerHTML = `Ventaja para el profesor: \\(E=${evText.replace('€', '')}\\)`;
+        fairnessText.className = 'red';
+      }
+
+      if (window.MathJax?.typesetPromise) MathJax.typesetPromise([fairnessText]);
+      drawChart();
+    }
+
+    function updateSpeedText() {
+      speedText.textContent = speedMap[Number(speedSlider.value)].toLocaleString('es-ES');
+      if (state.running) restartTimer();
+    }
+
+    function rollDie() {
+      return Math.floor(Math.random() * 6) + 1;
+    }
+
+    function playOne(animate = true) {
+      const a = rollDie();
+      const b = rollDie();
+      const teacherWins = a === 6 && b === 6;
+      const delta = teacherWins ? -state.teacherPrize : state.studentPrize;
+
+      state.plays += 1;
+      state.balance += delta;
+      state.history.push(state.balance);
+      state.lastRoll = [a, b];
+      if (teacherWins) state.doubleSixes += 1;
+
+      if (animate || state.plays % 15 === 0) {
+        setDie(die1, a);
+        setDie(die2, b);
+        lastRollText.textContent = `Última tirada: ${a} y ${b}`;
+      }
+
+      if (teacherWins) {
+        gameResult.textContent = `Doble 6: gana el profesor ${state.teacherPrize} €`;
+        gameResult.className = 'game-result teacher-win';
+        rulesCard.classList.remove('student-glow');
+        rulesCard.classList.add('teacher-glow');
+      } else {
+        gameResult.textContent = `No ha salido doble 6: gana el alumno ${state.studentPrize} €`;
+        gameResult.className = 'game-result student-win';
+        rulesCard.classList.remove('teacher-glow');
+        rulesCard.classList.add('student-glow');
+      }
+
+      updateStats();
+
+      const now = performance.now();
+      if (animate || now - state.lastRender > 80) {
+        drawChart();
+        state.lastRender = now;
+      }
+    }
+
+    function addExperiments(count) {
+      const wasRunning = state.running;
+      if (wasRunning) startStop();
+      for (let i = 0; i < count; i++) playOne(false);
+      const [a, b] = state.lastRoll || [6, 6];
+      setDie(die1, a);
+      setDie(die2, b);
+      lastRollText.textContent = `Última tirada: ${a} y ${b}`;
+      updateStats();
+      drawChart();
+      stateBadge.textContent = `Añadidas ${count.toLocaleString('es-ES')} tiradas`;
+    }
+
+    function playBatch() {
+      const speed = speedMap[Number(speedSlider.value)];
+      const visibleLimit = 15;
+      const batchSize = Math.max(1, Math.floor(speed / 10));
+      const reps = speed <= visibleLimit ? 1 : batchSize;
+      for (let i = 0; i < reps; i++) playOne(speed <= visibleLimit);
+    }
+
+    function restartTimer() {
+      clearInterval(state.timer);
+      const speed = speedMap[Number(speedSlider.value)];
+      const interval = speed <= 15 ? 1000 / speed : 80;
+      state.timer = setInterval(playBatch, interval);
+    }
+
+    function startStop() {
+      state.running = !state.running;
+      if (state.running) {
+        diceRow.classList.add('rolling');
+        stateBadge.textContent = 'Simulando';
+        startBtn.textContent = '⏸ Pausar';
+        stepBtn.disabled = true;
+        restartTimer();
+      } else {
+        diceRow.classList.remove('rolling');
+        stateBadge.textContent = 'Pausado';
+        startBtn.textContent = '▶ Continuar';
+        stepBtn.disabled = false;
+        clearInterval(state.timer);
+      }
+    }
+
+    function reset() {
+      clearInterval(state.timer);
+      state.running = false;
+      state.plays = 0;
+      state.doubleSixes = 0;
+      state.balance = 0;
+      state.history = [0];
+      state.lastRoll = null;
+      setDie(die1, 6);
+      setDie(die2, 6);
+      gameResult.textContent = 'Pulsa «Empezar» para lanzar los dados.';
+      gameResult.className = 'game-result';
+      lastRollText.textContent = 'Última tirada: —';
+      stateBadge.textContent = 'Preparado';
+      startBtn.textContent = '▶ Empezar';
+      stepBtn.disabled = false;
+      diceRow.classList.remove('rolling');
+      rulesCard.classList.remove('teacher-glow', 'student-glow');
+      updateStats();
+      drawChart();
+    }
+
+    function updateStats() {
+      playsEl.textContent = state.plays.toLocaleString('es-ES');
+      doubleSixesEl.textContent = state.doubleSixes.toLocaleString('es-ES');
+      balanceEl.textContent = formatMoney(state.balance);
+      balanceEl.className = state.balance > 0 ? 'green' : state.balance < 0 ? 'red' : '';
+      frequencyEl.textContent = state.plays ? `${formatDecimal((100 * state.doubleSixes) / state.plays, 2)}%` : '—';
+    }
+
+    function resizeCanvas() {
+      const rect = chart.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      chart.width = Math.floor(rect.width * dpr);
+      chart.height = Math.floor(rect.height * dpr);
+      chart.style.width = `${rect.width}px`;
+      chart.style.height = `${rect.height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      drawChart();
+    }
+
+    function niceNumber(x) {
+      if (x === 0) return 1;
+      const exp = Math.floor(Math.log10(Math.abs(x)));
+      const frac = Math.abs(x) / Math.pow(10, exp);
+      let nice;
+      if (frac < 1.5) nice = 1;
+      else if (frac < 3) nice = 2;
+      else if (frac < 7) nice = 5;
+      else nice = 10;
+      return nice * Math.pow(10, exp);
+    }
+
+    function drawChart() {
+      const rect = chart.parentElement.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+      if (!width || !height) return;
+      ctx.clearRect(0, 0, width, height);
+
+      const pad = { l: 58, r: 24, t: 26, b: 42 };
+      const w = width - pad.l - pad.r;
+      const h = height - pad.t - pad.b;
+      const n = state.history.length - 1;
+      const ev = expectedValue();
+
+      const values = state.history.slice();
+      values.push(ev * Math.max(n, 1));
+      values.push(0);
+      let minY = Math.min(...values);
+      let maxY = Math.max(...values);
+      if (Math.abs(maxY - minY) < 1e-9) {
+        maxY += 10;
+        minY -= 10;
+      }
+      const margin = Math.max(5, (maxY - minY) * 0.14);
+      minY -= margin;
+      maxY += margin;
+
+      const xScale = (i) => pad.l + (n === 0 ? 0 : (i / n) * w);
+      const yScale = (v) => pad.t + (1 - (v - minY) / (maxY - minY)) * h;
+
+      ctx.save();
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+      ctx.fillStyle = 'rgba(203,213,225,0.75)';
+      ctx.font = '12px Inter, system-ui, sans-serif';
+
+      const step = niceNumber((maxY - minY) / 5);
+      const start = Math.ceil(minY / step) * step;
+      for (let y = start; y <= maxY; y += step) {
+        const py = yScale(y);
+        ctx.beginPath();
+        ctx.moveTo(pad.l, py);
+        ctx.lineTo(width - pad.r, py);
+        ctx.stroke();
+        ctx.fillText(formatMoney(y).replace(' €', ''), 8, py + 4);
+      }
+
+      const xLabels = n < 10 ? [0, n] : [0, Math.round(n * 0.25), Math.round(n * 0.5), Math.round(n * 0.75), n];
+      xLabels.forEach(x => {
+        const px = xScale(x);
+        ctx.beginPath();
+        ctx.moveTo(px, pad.t);
+        ctx.lineTo(px, height - pad.b);
+        ctx.stroke();
+        ctx.fillText(String(x.toLocaleString('es-ES')), px - 10, height - 15);
+      });
+
+      const zeroY = yScale(0);
+      ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+      ctx.lineWidth = 1.8;
+      ctx.setLineDash([7, 8]);
+      ctx.beginPath();
+      ctx.moveTo(pad.l, zeroY);
+      ctx.lineTo(width - pad.r, zeroY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      if (n > 0) {
+        const evEnd = ev * n;
+        ctx.strokeStyle = '#fbbf24';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([10, 10]);
+        ctx.beginPath();
+        ctx.moveTo(xScale(0), yScale(0));
+        ctx.lineTo(xScale(n), yScale(evEnd));
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const gradient = ctx.createLinearGradient(0, pad.t, 0, height - pad.b);
+        gradient.addColorStop(0, 'rgba(34,197,94,0.30)');
+        gradient.addColorStop(0.5, 'rgba(56,189,248,0.22)');
+        gradient.addColorStop(1, 'rgba(239,68,68,0.30)');
+
+        ctx.strokeStyle = state.balance >= 0 ? '#22c55e' : '#ef4444';
+        ctx.lineWidth = 3.5;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+
+        const maxPoints = 900;
+        const stride = Math.max(1, Math.floor(state.history.length / maxPoints));
+        for (let i = 0; i < state.history.length; i += stride) {
+          const px = xScale(i);
+          const py = yScale(state.history[i]);
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        if ((state.history.length - 1) % stride !== 0) {
+          ctx.lineTo(xScale(n), yScale(state.history[n]));
+        }
+        ctx.stroke();
+
+        ctx.lineTo(xScale(n), yScale(0));
+        ctx.lineTo(xScale(0), yScale(0));
+        ctx.closePath();
+        ctx.fillStyle = gradient;
+        ctx.globalAlpha = 0.46;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        ctx.fillStyle = state.balance >= 0 ? '#bbf7d0' : '#fecaca';
+        ctx.font = 'bold 13px Inter, system-ui, sans-serif';
+        const label = `Balance: ${formatMoney(state.balance)}`;
+        const labelX = Math.min(width - pad.r - 160, Math.max(pad.l + 8, xScale(n) - 78));
+        ctx.fillText(label, labelX, yScale(state.balance) - 12);
+      }
+
+      ctx.fillStyle = 'rgba(248,250,252,0.88)';
+      ctx.font = 'bold 13px Inter, system-ui, sans-serif';
+      ctx.fillText('Jugadas', width - 95, height - 15);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('€ alumno', -95, 19);
+      ctx.restore();
+    }
+
+    createPips(die1);
+    createPips(die2);
+    setDie(die1, 6);
+    setDie(die2, 6);
+    buildMatrix();
+    updatePrizeState();
+    updateSpeedText();
+    updateStats();
+
+    startBtn.addEventListener('click', startStop);
+    stepBtn.addEventListener('click', () => playOne(true));
+    add100Btn.addEventListener('click', () => addExperiments(100));
+    add1000Btn.addEventListener('click', () => addExperiments(1000));
+    resetBtn.addEventListener('click', reset);
+    speedSlider.addEventListener('input', updateSpeedText);
+    teacherPrizeInput.addEventListener('input', updatePrizeState);
+    studentPrizeInput.addEventListener('input', updatePrizeState);
+    window.addEventListener('resize', resizeCanvas);
+
+    const ro = new ResizeObserver(resizeCanvas);
+    ro.observe(chart.parentElement);
+    setTimeout(resizeCanvas, 100);
+  </script>
+</body>
+</html>
