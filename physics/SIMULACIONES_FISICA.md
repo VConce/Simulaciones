@@ -33,3 +33,5 @@ Base en `physics/`. Usar nombres ASCII y enlaces relativos. Cada simulacion nuev
 8. Red de difraccion y espectrometro.
 9. Puente de Wheatstone y medidas electricas.
 10. Resonancia mecanica forzada con amortiguamiento.
+
+- **Gas ideal** (`ideal-gas.html`): modelo cinetico molecular con particulas, elasticidad, potencial interparticular y lectura de presion/energia.
