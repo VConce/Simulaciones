@@ -1,27 +1,107 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Fluidos y Bernoulli | Physics</title><style>:root{--ink:#17202f;--muted:#607083;--paper:#f7f9fb;--panel:#fff;--line:#d9e2ec;--blue:#0b63ce;--teal:#087f8c;--gold:#d89818;--red:#d64545;--green:#14845f}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}header{padding:20px 24px;border-bottom:1px solid var(--line);background:#fff}h1{margin:0 0 6px;font-size:clamp(1.7rem,4vw,2.8rem);line-height:1}p{color:var(--muted)}main{display:grid;grid-template-columns:330px minmax(0,1fr);gap:16px;padding:16px}aside,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 26px rgba(15,23,42,.06)}aside{padding:14px;height:calc(100vh - 112px);overflow:auto}.stage{min-height:0}canvas{display:block;width:100%;height:auto;background:linear-gradient(#fbfdff,#eef4f8);border:1px solid var(--line);border-radius:12px;touch-action:none}label{display:grid;grid-template-columns:112px 1fr 72px;gap:7px;align-items:center;margin:8px 0;font-weight:750;font-size:.86rem}label input[type=range]{grid-column:2}label output{grid-column:3;text-align:right;color:var(--teal);font-weight:900}input[type=range]{width:100%;accent-color:var(--teal)}button,input[type=number]{font:inherit;border:1px solid #c9d4df;border-radius:8px;padding:8px 9px;background:#fff;color:var(--ink)}button{cursor:pointer;font-weight:850}.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.hint{font-size:.84rem;color:var(--muted);line-height:1.35;margin-top:10px}.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}.readout{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}.readout span{display:block;color:var(--muted);font-size:.76rem;font-weight:850;text-transform:uppercase;letter-spacing:.04em}.readout strong{display:block;margin-top:4px;font-size:1.05rem}.formula{margin-top:12px;padding:12px;border:1px solid #dbe7f2;border-radius:10px;background:#f8fbff;color:#364152}.toplinks{margin-top:8px}.toplinks a{color:var(--blue);font-weight:850;text-decoration:none}@media(max-width:900px){main{grid-template-columns:1fr}aside{height:auto}}</style></head>
-<body><header><h1>Fluidos y Bernoulli</h1><p>Tubo de Venturi: continuidad, presi&oacute;n est&aacute;tica, p&eacute;rdidas viscosas y flujo de izquierda a derecha.</p><div class="toplinks"><a href="./">Volver a Physics</a></div></header><main><aside><label>&Aacute;rea ancha<input id="A1" type="range" min="1" max="8" step="0.1" value="5"><output id="A1Out">5.0</output></label><label>&Aacute;rea estrecha<input id="A2" type="range" min="0.5" max="5" step="0.1" value="2"><output id="A2Out">2.0</output></label><label>Caudal Q<input id="Q" type="range" min="0.2" max="6" step="0.1" value="2"><output id="QOut">2.0</output></label><label>Densidad rho<input id="rho" type="range" min="500" max="1400" step="10" value="1000"><output id="rhoOut">1000</output></label><label>Viscosidad<input id="visc" type="range" min="0" max="1" step="0.01" value="0.15"><output id="viscOut">0.15</output></label><div class="row"><button id="reset" class="primary">Restablecer</button><button id="pause">Pausar flujo</button></div><p class="hint">Arrastra los tiradores azules del tubo para ampliar o reducir manualmente la secci&oacute;n ancha y la estrecha. Los deslizadores se actualizan a la vez.</p></aside><section class="stage"><canvas id="world" width="1400" height="820"></canvas><div class="readouts"><div class="readout"><span>Velocidad v1</span><strong id="v1Read"></strong></div><div class="readout"><span>Velocidad v2</span><strong id="v2Read"></strong></div><div class="readout"><span>Delta p ideal</span><strong id="dpRead"></strong></div><div class="readout"><span>Perdida viscosa</span><strong id="lossRead"></strong></div><div class="readout"><span>Delta p total</span><strong id="totalRead"></strong></div><div class="readout"><span>Continuidad</span><strong id="regimeRead"></strong></div></div><div class="panel formula">Continuidad: Q=A v. Bernoulli horizontal ideal: p1 + 1/2 rho v1^2 = p2 + 1/2 rho v2^2. Con viscosidad se representa una p&eacute;rdida adicional: p1 - p2 = Delta p ideal + Delta p viscosa.</div></section></main><script>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Fluidos y Bernoulli | Physics</title><style>:root{--ink:#17202f;--muted:#607083;--paper:#f7f9fb;--panel:#fff;--line:#d9e2ec;--blue:#0b63ce;--teal:#087f8c;--gold:#d89818;--red:#d64545;--green:#14845f}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}header{padding:20px 24px;border-bottom:1px solid var(--line);background:#fff}h1{margin:0 0 6px;font-size:clamp(1.7rem,4vw,2.8rem);line-height:1}p{color:var(--muted)}main{display:grid;grid-template-columns:350px minmax(0,1fr);gap:16px;padding:16px}aside,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 26px rgba(15,23,42,.06)}aside{padding:14px;height:calc(100vh - 112px);overflow:auto}.stage{min-height:0}canvas{display:block;width:100%;height:auto;background:linear-gradient(#fbfdff,#eef4f8);border:1px solid var(--line);border-radius:12px;touch-action:none}label{display:grid;grid-template-columns:112px 1fr 72px;gap:7px;align-items:center;margin:8px 0;font-weight:750;font-size:.86rem}label input[type=range]{grid-column:2}label output{grid-column:3;text-align:right;color:var(--teal);font-weight:900}input[type=range]{width:100%;accent-color:var(--teal)}button,input[type=number]{font:inherit;border:1px solid #c9d4df;border-radius:8px;padding:8px 9px;background:#fff;color:var(--ink)}button{cursor:pointer;font-weight:850}.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.hint{font-size:.84rem;color:var(--muted);line-height:1.35;margin-top:10px}.sectionTitle{margin:14px 0 6px;font-weight:900;color:var(--ink);font-size:.92rem}.sectionControls{display:grid;gap:3px;margin-bottom:8px}.sectionControls label{grid-template-columns:96px 1fr 64px;margin:5px 0;padding:6px 8px;border:1px solid #edf2f7;border-radius:8px;background:#fbfdff}.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}.readout{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}.readout span{display:block;color:var(--muted);font-size:.76rem;font-weight:850;text-transform:uppercase;letter-spacing:.04em}.readout strong{display:block;margin-top:4px;font-size:1.05rem}.formula{margin-top:12px;padding:12px;border:1px solid #dbe7f2;border-radius:10px;background:#f8fbff;color:#364152}.toplinks{margin-top:8px}.toplinks a{color:var(--blue);font-weight:850;text-decoration:none}@media(max-width:900px){main{grid-template-columns:1fr}aside{height:auto}}</style></head>
+<body><header><h1>Fluidos y Bernoulli</h1><p>Tubo de Venturi por secciones: continuidad, presi&oacute;n est&aacute;tica, p&eacute;rdidas viscosas y flujo de izquierda a derecha.</p><div class="toplinks"><a href="./">Volver a Physics</a></div></header><main><aside><label>Caudal Q<input id="Q" type="range" min="0.2" max="6" step="0.1" value="2"><output id="QOut">2.0</output></label><label>Densidad rho<input id="rho" type="range" min="500" max="1400" step="10" value="1000"><output id="rhoOut">1000</output></label><label>Viscosidad<input id="visc" type="range" min="0" max="1" step="0.01" value="0.15"><output id="viscOut">0.15</output></label><div class="sectionTitle">Secciones del tubo</div><div id="sectionControls" class="sectionControls"></div><div class="row"><button id="addSection" class="primary">A&ntilde;adir secci&oacute;n</button><button id="removeSection">Eliminar secci&oacute;n</button></div><div class="row"><button id="reset">Restablecer</button><button id="pause">Pausar flujo</button></div><p class="hint">Arrastra los tiradores azules de cualquier secci&oacute;n para ampliar o reducir manualmente el tubo. Cada etiqueta muestra v=Q/A en esa secci&oacute;n.</p></aside><section class="stage"><canvas id="world" width="1400" height="820"></canvas><div class="readouts"><div class="readout"><span>Velocidad minima</span><strong id="vMinRead"></strong></div><div class="readout"><span>Velocidad maxima</span><strong id="vMaxRead"></strong></div><div class="readout"><span>Delta p ideal</span><strong id="dpRead"></strong></div><div class="readout"><span>Perdida viscosa</span><strong id="lossRead"></strong></div><div class="readout"><span>Delta p total</span><strong id="totalRead"></strong></div><div class="readout"><span>Continuidad</span><strong id="regimeRead"></strong></div></div><div class="panel formula">Continuidad por secci&oacute;n: Q=A_i v_i. Bernoulli horizontal ideal entre entrada y salida: p1 + 1/2 rho v1^2 = pN + 1/2 rho vN^2. La viscosidad se representa como p&eacute;rdida acumulada al atravesar secciones sucesivas.</div></section></main><script>
 const $=s=>document.querySelector(s),canvas=$('#world'),ctx=canvas.getContext('2d');
-let running=true,dragHandle=null,last=performance.now();
-const particles=Array.from({length:95},(_,i)=>({u:i/95,y:(i*37%100)/100,phase:Math.random()}));
+let running=true,dragHandle=null,last=performance.now(),areas=[5,2,4];
+const particles=Array.from({length:115},(_,i)=>({u:i/115,y:(i*37%100)/100,phase:Math.random()}));
+const x0=110,x1=1290,cy=410,minArea=.5,maxArea=8;
 function clear(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#fbfdff';ctx.fillRect(0,0,canvas.width,canvas.height)}
 function grid(){ctx.strokeStyle='rgba(23,32,47,.08)';ctx.lineWidth=1;for(let x=0;x<canvas.width;x+=70){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke()}for(let y=0;y<canvas.height;y+=70){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke()}}
-function line(x1,y1,x2,y2,c='#17202f',w=2){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function line(a,b,c,d,col='#17202f',w=2){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(a,b);ctx.lineTo(c,d);ctx.stroke()}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-function areaToHalfHeight(a){return 42+24*a}
-function halfHeightToArea(h,min,max){return clamp((h-42)/24,min,max)}
-function halfHeightAtX(x,h1,h2){if(x<520)return h1;if(x<720)return h1+(h2-h1)*(x-520)/200;return h2}
-function areaAtX(x,a1,a2){if(x<520)return a1;if(x<720)return a1+(a2-a1)*(x-520)/200;return a2}
-function pathPoint(u,a1,a2){const x=110+1180*u,h=halfHeightAtX(x,areaToHalfHeight(a1),areaToHalfHeight(a2));return {x,h}}
+function areaToHalfHeight(a){return 34+24*a}
+function halfHeightToArea(h){return clamp((h-34)/24,minArea,maxArea)}
+function segW(){return (x1-x0)/areas.length}
+function sectionIndexAtX(x){return clamp(Math.floor((x-x0)/segW()),0,areas.length-1)}
+function areaAtX(x){return areas[sectionIndexAtX(x)]}
+function pathPoint(u){const x=x0+(x1-x0)*u,h=areaToHalfHeight(areaAtX(x));return{x,h}}
 function screenPoint(ev){const r=canvas.getBoundingClientRect();return{x:(ev.clientX-r.left)*canvas.width/r.width,y:(ev.clientY-r.top)*canvas.height/r.height}}
-function setAreaFromDrag(which,p){const y=410,dist=Math.abs(p.y-y);if(which==='wide'){A1.value=halfHeightToArea(dist,1,8).toFixed(1)}else{A2.value=halfHeightToArea(dist,.5,5).toFixed(1)}}
-function drawTube(a1,a2){const x0=110,x1=1290,y=410,h1=areaToHalfHeight(a1),h2=areaToHalfHeight(a2);ctx.fillStyle='#bfe7ff';ctx.beginPath();ctx.moveTo(x0,y-h1);ctx.lineTo(520,y-h1);ctx.lineTo(720,y-h2);ctx.lineTo(x1,y-h2);ctx.lineTo(x1,y+h2);ctx.lineTo(720,y+h2);ctx.lineTo(520,y+h1);ctx.lineTo(x0,y+h1);ctx.closePath();ctx.fill();ctx.strokeStyle='#0b63ce';ctx.lineWidth=4;ctx.stroke();ctx.fillStyle='rgba(11,99,206,.12)';ctx.fillRect(108,y-h1,414,h1*2);ctx.fillRect(718,y-h2,574,h2*2)}
-function drawParticles(dt,a1,a2,q,vis){const y=410;ctx.save();ctx.fillStyle='rgba(8,127,140,.82)';ctx.strokeStyle='rgba(8,127,140,.55)';for(const p of particles){if(running){const pt=pathPoint(p.u,a1,a2),a=areaAtX(pt.x,a1,a2),slow=1-.38*vis;p.u=(p.u+dt*(.035+.028*q/a)*slow)%1}const pt=pathPoint(p.u,a1,a2),h=pt.h-18,yy=y+(p.y*2-1)*h*.82,tail=16+32*q/areaAtX(pt.x,a1,a2);line(pt.x-tail,yy,pt.x+8,yy,'rgba(8,127,140,.38)',2);ctx.beginPath();ctx.arc(pt.x+8,yy,4,0,Math.PI*2);ctx.fill() }ctx.restore()}
-function drawHandles(a1,a2){const y=410,h1=areaToHalfHeight(a1),h2=areaToHalfHeight(a2);const handles=[{x:330,h:h1,label:'seccion ancha'},{x:840,h:h2,label:'seccion estrecha'}];for(const hd of handles){line(hd.x,y-hd.h,hd.x,y+hd.h,'rgba(23,32,47,.20)',2,[4,4]);ctx.fillStyle='#0b63ce';ctx.strokeStyle='#fff';ctx.lineWidth=3;for(const sy of [y-hd.h,y+hd.h]){ctx.beginPath();ctx.roundRect(hd.x-16,sy-10,32,20,7);ctx.fill();ctx.stroke()}ctx.fillStyle='#17202f';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(hd.label,hd.x,y+hd.h+30)}}
-function drawPressure(a1,a2,q,rhoV,vis){const v1=q/a1,v2=q/a2,dp=.5*rhoV*(v2*v2-v1*v1),loss=vis*rhoV*q*q*(.12/a1+.18/a2),total=dp+loss;const yBase=250,p1=clamp(190-total/38,40,230),p2=clamp(190,55,250);ctx.fillStyle='rgba(216,69,69,.14)';ctx.fillRect(210,yBase-p1,70,p1);ctx.fillRect(1010,yBase-p2,70,p2);ctx.strokeStyle='#d64545';ctx.strokeRect(210,yBase-p1,70,p1);ctx.strokeRect(1010,yBase-p2,70,p2);ctx.fillStyle='#17202f';ctx.textAlign='center';ctx.fillText('p1',245,yBase+20);ctx.fillText('p2',1045,yBase+20)}
-function draw(now){const dt=Math.min(.04,(now-last)/1000);last=now;clear();grid();const a1=+A1.value,a2=+A2.value,q=+Q.value,r=+rho.value,vis=+visc.value,v1=q/a1,v2=q/a2,dp=.5*r*(v2*v2-v1*v1),loss=vis*r*q*q*(.12/a1+.18/a2),total=dp+loss;A1Out.textContent=a1.toFixed(1);A2Out.textContent=a2.toFixed(1);QOut.textContent=q.toFixed(1);rhoOut.textContent=r.toFixed(0);viscOut.textContent=vis.toFixed(2);v1Read.textContent=v1.toFixed(2)+' m/s';v2Read.textContent=v2.toFixed(2)+' m/s';dpRead.textContent=dp.toFixed(0)+' Pa';lossRead.textContent=loss.toFixed(0)+' Pa';totalRead.textContent=total.toFixed(0)+' Pa';regimeRead.textContent='A1 v1 = A2 v2';drawTube(a1,a2);drawParticles(dt,a1,a2,q,vis);drawPressure(a1,a2,q,r,vis);drawHandles(a1,a2);ctx.fillStyle='#17202f';ctx.font='16px system-ui';ctx.fillText('flujo izquierda -> derecha',560,150);ctx.fillText('la seccion estrecha aumenta v y reduce p; la viscosidad a?ade perdida',430,180);requestAnimationFrame(draw)}
-canvas.addEventListener('pointerdown',e=>{const p=screenPoint(e),a1=+A1.value,a2=+A2.value,y=410,h1=areaToHalfHeight(a1),h2=areaToHalfHeight(a2);const nearWide=Math.abs(p.x-330)<36&&(Math.abs(p.y-(y-h1))<24||Math.abs(p.y-(y+h1))<24);const nearNarrow=Math.abs(p.x-840)<36&&(Math.abs(p.y-(y-h2))<24||Math.abs(p.y-(y+h2))<24);if(nearWide||nearNarrow){dragHandle=nearWide?'wide':'narrow';setAreaFromDrag(dragHandle,p);canvas.setPointerCapture(e.pointerId)}});
-canvas.addEventListener('pointermove',e=>{if(!dragHandle)return;setAreaFromDrag(dragHandle,screenPoint(e))});
+function renderSectionControls(){sectionControls.innerHTML='';areas.forEach((a,i)=>{const lab=document.createElement('label');lab.innerHTML='Seccion '+(i+1)+'<input data-i="'+i+'" type="range" min="0.5" max="8" step="0.1" value="'+a.toFixed(1)+'"><output id="areaOut'+i+'">'+a.toFixed(1)+'</output>';sectionControls.appendChild(lab)});sectionControls.querySelectorAll('input').forEach(input=>input.addEventListener('input',e=>{areas[+e.target.dataset.i]=+e.target.value;updateSectionOutputs()}));removeSection.disabled=areas.length<=1;addSection.disabled=areas.length>=8}
+function updateSectionOutputs(){sectionControls.querySelectorAll('input').forEach(input=>{input.value=areas[+input.dataset.i].toFixed(1);const out=$('#areaOut'+input.dataset.i);if(out)out.textContent=areas[+input.dataset.i].toFixed(1)})}
+function setAreaFromDrag(idx,p){areas[idx]=halfHeightToArea(Math.abs(p.y-cy));updateSectionOutputs()}
+function drawTube(){ctx.fillStyle='#bfe7ff';ctx.beginPath();ctx.moveTo(x0,cy-areaToHalfHeight(areas[0]));for(let i=0;i<areas.length;i++){const xs=x0+i*segW(),xe=x0+(i+1)*segW(),h=areaToHalfHeight(areas[i]);if(i>0){ctx.lineTo(xs,cy-h)}ctx.lineTo(xe,cy-h)}for(let i=areas.length-1;i>=0;i--){const xs=x0+i*segW(),xe=x0+(i+1)*segW(),h=areaToHalfHeight(areas[i]);ctx.lineTo(xe,cy+h);ctx.lineTo(xs,cy+h)}ctx.closePath();ctx.fill();ctx.strokeStyle='#0b63ce';ctx.lineWidth=4;ctx.stroke();for(let i=0;i<areas.length;i++){const xs=x0+i*segW(),h=areaToHalfHeight(areas[i]);ctx.fillStyle=i%2?'rgba(11,99,206,.08)':'rgba(11,99,206,.14)';ctx.fillRect(xs,cy-h,segW(),h*2)}}
+function drawParticles(dt,q,vis){ctx.save();ctx.fillStyle='rgba(8,127,140,.82)';for(const p of particles){if(running){const pt=pathPoint(p.u),a=areaAtX(pt.x),slow=1-.38*vis;p.u=(p.u+dt*(.032+.028*q/a)*slow)%1}const pt=pathPoint(p.u),h=pt.h-18,yy=cy+(p.y*2-1)*h*.82,tail=16+32*q/areaAtX(pt.x);line(pt.x-tail,yy,pt.x+8,yy,'rgba(8,127,140,.38)',2);ctx.beginPath();ctx.arc(pt.x+8,yy,4,0,Math.PI*2);ctx.fill()}ctx.restore()}
+function drawHandlesAndLabels(q){ctx.font='12px system-ui';ctx.textAlign='center';for(let i=0;i<areas.length;i++){const xs=x0+i*segW(),xc=xs+segW()/2,h=areaToHalfHeight(areas[i]),v=q/areas[i];line(xc,cy-h,xc,cy+h,'rgba(23,32,47,.22)',2);ctx.fillStyle='#0b63ce';ctx.strokeStyle='#fff';ctx.lineWidth=3;for(const sy of [cy-h,cy+h]){ctx.beginPath();ctx.roundRect(xc-15,sy-9,30,18,7);ctx.fill();ctx.stroke()}const text='v'+(i+1)+' = '+v.toFixed(2)+' m/s';ctx.font='800 13px system-ui';const tw=ctx.measureText(text).width+18;ctx.fillStyle='rgba(255,255,255,.92)';ctx.strokeStyle='rgba(8,127,140,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(xc-tw/2,cy-h-46,tw,28,8);ctx.fill();ctx.stroke();ctx.fillStyle='#087f8c';ctx.fillText(text,xc,cy-h-27);ctx.fillStyle='#17202f';ctx.font='12px system-ui';ctx.fillText('S'+(i+1),xc,cy+h+26)}}
+function drawPressure(q,rhoV,vis){const velocities=areas.map(a=>q/a),vIn=velocities[0],vOut=velocities[velocities.length-1],dp=.5*rhoV*(vOut*vOut-vIn*vIn),loss=vis*rhoV*q*q*areas.reduce((s,a)=>s+.08/(a*a),0),total=dp+loss;const yBase=248,pIn=clamp(190-total/38,40,230),pOut=clamp(190,55,250);ctx.fillStyle='rgba(216,69,69,.14)';ctx.fillRect(210,yBase-pIn,70,pIn);ctx.fillRect(1040,yBase-pOut,70,pOut);ctx.strokeStyle='#d64545';ctx.strokeRect(210,yBase-pIn,70,pIn);ctx.strokeRect(1040,yBase-pOut,70,pOut);ctx.fillStyle='#17202f';ctx.textAlign='center';ctx.font='13px system-ui';ctx.fillText('p entrada',245,yBase+20);ctx.fillText('p salida',1075,yBase+20);return{dp,loss,total,vMin:Math.min(...velocities),vMax:Math.max(...velocities)}}
+function draw(now){const dt=Math.min(.04,(now-last)/1000);last=now;clear();grid();const q=+Q.value,r=+rho.value,vis=+visc.value;QOut.textContent=q.toFixed(1);rhoOut.textContent=r.toFixed(0);viscOut.textContent=vis.toFixed(2);drawTube();drawParticles(dt,q,vis);const data=drawPressure(q,r,vis);drawHandlesAndLabels(q);vMinRead.textContent=data.vMin.toFixed(2)+' m/s';vMaxRead.textContent=data.vMax.toFixed(2)+' m/s';dpRead.textContent=data.dp.toFixed(0)+' Pa';lossRead.textContent=data.loss.toFixed(0)+' Pa';totalRead.textContent=data.total.toFixed(0)+' Pa';regimeRead.textContent=areas.length+' secciones: Q constante';ctx.fillStyle='#17202f';ctx.font='16px system-ui';ctx.textAlign='left';ctx.fillText('flujo izquierda -> derecha',560,148);ctx.fillText('cada seccion cumple v = Q / A',560,176);requestAnimationFrame(draw)}
+canvas.addEventListener('pointerdown',e=>{const p=screenPoint(e);let found=null;for(let i=0;i<areas.length;i++){const xc=x0+i*segW()+segW()/2,h=areaToHalfHeight(areas[i]);const near=Math.abs(p.x-xc)<34&&(Math.abs(p.y-(cy-h))<24||Math.abs(p.y-(cy+h))<24);if(near){found=i;break}}if(found!==null){dragHandle=found;setAreaFromDrag(found,p);canvas.setPointerCapture(e.pointerId)}});
+canvas.addEventListener('pointermove',e=>{if(dragHandle===null)return;setAreaFromDrag(dragHandle,screenPoint(e))});
 canvas.addEventListener('pointerup',()=>dragHandle=null);
-pause.onclick=()=>{running=!running;pause.textContent=running?'Pausar flujo':'Continuar flujo'};reset.onclick=()=>{A1.value=5;A2.value=2;Q.value=2;rho.value=1000;visc.value=.15};requestAnimationFrame(draw);
+addSection.onclick=()=>{if(areas.length<8){areas.push(areas[areas.length-1]);renderSectionControls()}};
+removeSection.onclick=()=>{if(areas.length>1){areas.pop();renderSectionControls()}};
+pause.onclick=()=>{running=!running;pause.textContent=running?'Pausar flujo':'Continuar flujo'};
+reset.onclick=()=>{areas=[5,2,4];Q.value=2;rho.value=1000;visc.value=.15;renderSectionControls()};
+renderSectionControls();requestAnimationFrame(draw);
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>

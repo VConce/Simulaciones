@@ -2,4 +2,76 @@
 
 const $=s=>document.querySelector(s),c=$('#c'),x=c.getContext('2d');let S={run:true,last:performance.now(),q:[],v:[],tr:[]};function val(){return{N:+N.value,m:+m.value,k:+k.value,d:+damp.value,A:+amp.value}}function ensure(q){while(S.q.length<q.N){S.q.push(0);S.v.push(0);S.tr.push([])}S.q.length=q.N;S.v.length=q.N;S.tr.length=q.N}function setMode(j){let q=val();ensure(q);for(let i=0;i<q.N;i++){S.q[i]=q.N===1?q.A:q.A*Math.sin((i+1)*j*Math.PI/(q.N+1));S.v[i]=0;S.tr[i]=[]}}function sync(q){No.textContent=q.N;mo.textContent=q.m.toFixed(2);ko.textContent=q.k.toFixed(2);dampo.textContent=q.d.toFixed(3);ampo.textContent=q.A+' px';Tr.textContent=(2*Math.PI*Math.sqrt(q.m/q.k)).toFixed(2)+' s';Rr.textContent=q.N===1?'masa-muelle simple':(q.N>30?'limite ondulatorio':'cadena discreta');Sr.textContent=S.run?'en marcha':'pausado'}function step(dt,q){ensure(q);let a=[];for(let i=0;i<q.N;i++){let L=i?S.q[i-1]:0,R=i<q.N-1?S.q[i+1]:0;if(q.N===1)a[i]=(-q.k*S.q[i]-q.d*S.v[i])/q.m;else a[i]=(q.k*(L-2*S.q[i]+R)-q.d*S.v[i])/q.m}for(let i=0;i<q.N;i++){S.v[i]+=a[i]*dt;S.q[i]+=S.v[i]*dt}}function geom(i,q){let left=110,right=1290,base=410,dx=q.N===1?0:(right-left)/(q.N+1);return{x:q.N===1?700:left+(i+1)*dx,y:base+S.q[i]}}function draw(q){x.clearRect(0,0,c.width,c.height);x.fillStyle='#fbfdff';x.fillRect(0,0,c.width,c.height);let base=410;x.strokeStyle='rgba(23,32,47,.32)';x.lineWidth=2;x.beginPath();x.moveTo(90,base);x.lineTo(1310,base);x.stroke();x.strokeStyle='#0b63ce';x.lineWidth=3;x.beginPath();for(let i=0;i<q.N;i++){let g=geom(i,q);if(i)x.lineTo(g.x,g.y);else x.moveTo(g.x,g.y)}if(q.N>1)x.stroke();let E=0;for(let i=0;i<q.N;i++){let g=geom(i,q);E+=.5*q.m*S.v[i]*S.v[i]+.5*q.k*S.q[i]*S.q[i]/Math.max(1,q.N);S.tr[i].push({x:g.x,y:g.y});if(S.tr[i].length>240)S.tr[i].shift();if(i%Math.max(1,Math.floor(q.N/10))===0){x.strokeStyle='rgba(216,152,24,.3)';x.beginPath();S.tr[i].forEach((p,j)=>j?x.lineTo(p.x,p.y):x.moveTo(p.x,p.y));x.stroke()}x.fillStyle='#0b63ce';x.beginPath();x.arc(g.x,g.y,Math.max(4,Math.min(22,300/Math.max(8,q.N))),0,7);x.fill()}Er.textContent=E.toFixed(1)}function loop(n){let q=val();sync(q);let dt=Math.min(.025,(n-S.last)/1000);S.last=n;if(S.run)for(let i=0;i<4;i++)step(dt/4,q);draw(q);requestAnimationFrame(loop)}mode1.onclick=()=>setMode(1);pulse.onclick=()=>{let q=val();ensure(q);S.q.fill(0);S.v.fill(0);S.q[Math.floor(q.N*.2)]=q.A};pause.onclick=()=>S.run=!S.run;clear.onclick=()=>S.tr.forEach(t=>t.length=0);setMode(1);requestAnimationFrame(loop);
 
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>

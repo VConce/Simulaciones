@@ -1,8 +1,96 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Efecto Doppler sonoro y luminoso | Physics</title><style>:root{--ink:#17202f;--muted:#607083;--paper:#f7f9fb;--panel:#fff;--line:#d9e2ec;--blue:#0b63ce;--teal:#087f8c;--gold:#d89818;--red:#d64545;--green:#14845f;--violet:#7c3aed}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}header{padding:18px 24px;border-bottom:1px solid var(--line);background:#fff}h1{margin:0 0 6px;font-size:clamp(1.65rem,4vw,2.7rem);line-height:1}p{color:var(--muted);margin:.35rem 0}.toplinks{margin-top:8px}.toplinks a{color:var(--blue);font-weight:850;text-decoration:none}main{display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;padding:16px}aside,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 26px rgba(15,23,42,.06)}aside{padding:14px;height:calc(100vh - 108px);overflow:auto}.stage{min-height:0}canvas{display:block;width:100%;height:auto;background:linear-gradient(#fbfdff,#eef4f8);border:1px solid var(--line);border-radius:12px;touch-action:none}label{display:grid;grid-template-columns:122px 1fr 78px;gap:8px;align-items:center;margin:8px 0;font-weight:800;font-size:.86rem}label output{grid-column:3;text-align:right;color:var(--teal);font-weight:950}input[type=range]{width:100%;accent-color:var(--teal)}select,button,input[type=color]{font:inherit;border:1px solid #c9d4df;border-radius:8px;padding:8px 9px;background:#fff;color:var(--ink)}button{cursor:pointer;font-weight:900}.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.switch{display:flex;align-items:center;gap:8px;margin:10px 0;font-weight:850;font-size:.9rem}.switch input{margin:0;accent-color:var(--teal)}.selectline{display:grid;grid-template-columns:122px 1fr;gap:8px;align-items:center;margin:8px 0;font-weight:850;font-size:.86rem}.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}.readout{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}.readout span{display:block;color:var(--muted);font-size:.76rem;font-weight:850;text-transform:uppercase;letter-spacing:.04em}.readout strong{display:block;margin-top:4px;font-size:1.03rem}.formula{margin-top:12px;padding:12px;border:1px solid #dbe7f2;border-radius:10px;background:#f8fbff;color:#364152;line-height:1.45}.hint{font-size:.82rem;color:var(--muted);line-height:1.35;margin:10px 0 0}@media(max-width:900px){main{grid-template-columns:1fr}aside{height:auto}}</style></head><body><header><h1>Efecto Doppler sonoro y luminoso</h1><p>Fuente movil, observador en reposo, comparacion de longitudes de onda/frecuencias y corrimiento al rojo.</p><div class="toplinks"><a href="./">Volver a Physics</a></div></header><main><aside><div class="selectline">Tipo<select id="mode"><option value="sound">sonido</option><option value="light">luz relativista</option></select></div><label>Vel. fuente<input id="vs" type="range" min="-0.8" max="0.8" step="0.01" value="0.35"><output id="vso"></output></label><label>Frecuencia<input id="f0" type="range" min="100" max="900" step="5" value="440"><output id="f0o"></output></label><label>Vel. onda<input id="cw" type="range" min="200" max="500" step="1" value="343"><output id="cwo"></output></label><label>Tiempo<input id="ts" type="range" min="0.1" max="3" step="0.05" value="1"><output id="tso"></output></label><div class="row"><button id="pause" class="primary">Pausar</button><button id="reset">Reiniciar</button></div><p class="hint">En luz, el deslizador de velocidad representa beta=v/c. Positivo: la fuente se acerca al observador de la derecha.</p></aside><section class="stage"><canvas id="c" width="1400" height="820"></canvas><div class="readouts"><div class="readout"><span>lambda fuente</span><strong id="ls"></strong></div><div class="readout"><span>lambda observador</span><strong id="lo"></strong></div><div class="readout"><span>f fuente</span><strong id="fs"></strong></div><div class="readout"><span>f observador</span><strong id="fo"></strong></div></div><div class="panel formula">Sonido: f'=f c/(c-vs). Luz: f'=f sqrt((1+beta)/(1-beta)) al acercarse; el color visualiza corrimiento al azul o al rojo.</div></section></main><script>
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Efecto Doppler sonoro y luminoso | Physics</title><style>:root{--ink:#17202f;--muted:#607083;--paper:#f7f9fb;--panel:#fff;--line:#d9e2ec;--blue:#0b63ce;--teal:#087f8c;--gold:#d89818;--red:#d64545;--green:#14845f;--violet:#7c3aed}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}header{padding:18px 24px;border-bottom:1px solid var(--line);background:#fff}h1{margin:0 0 6px;font-size:clamp(1.65rem,4vw,2.7rem);line-height:1}p{color:var(--muted);margin:.35rem 0}.toplinks{margin-top:8px}.toplinks a{color:var(--blue);font-weight:850;text-decoration:none}main{display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;padding:16px}aside,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 26px rgba(15,23,42,.06)}aside{padding:14px;height:calc(100vh - 108px);overflow:auto}.stage{min-height:0}canvas{display:block;width:100%;height:auto;background:linear-gradient(#fbfdff,#eef4f8);border:1px solid var(--line);border-radius:12px;touch-action:none}label{display:grid;grid-template-columns:122px 1fr 78px;gap:8px;align-items:center;margin:8px 0;font-weight:800;font-size:.86rem}label output{grid-column:3;text-align:right;color:var(--teal);font-weight:950}input[type=range]{width:100%;accent-color:var(--teal)}select,button,input[type=color]{font:inherit;border:1px solid #c9d4df;border-radius:8px;padding:8px 9px;background:#fff;color:var(--ink)}button{cursor:pointer;font-weight:900}.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.switch{display:flex;align-items:center;gap:8px;margin:10px 0;font-weight:850;font-size:.9rem}.switch input{margin:0;accent-color:var(--teal)}.selectline{display:grid;grid-template-columns:122px 1fr;gap:8px;align-items:center;margin:8px 0;font-weight:850;font-size:.86rem}.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}.readout{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}.readout span{display:block;color:var(--muted);font-size:.76rem;font-weight:850;text-transform:uppercase;letter-spacing:.04em}.readout strong{display:block;margin-top:4px;font-size:1.03rem}.formula{margin-top:12px;padding:12px;border:1px solid #dbe7f2;border-radius:10px;background:#f8fbff;color:#364152;line-height:1.45}.hint{font-size:.82rem;color:var(--muted);line-height:1.35;margin:10px 0 0}@media(max-width:900px){main{grid-template-columns:1fr}aside{height:auto}}</style></head><body><header><h1>Efecto Doppler sonoro y luminoso</h1><p>Fuente movil, observadores arrastrables, comparacion de longitudes de onda/frecuencias y corrimiento al rojo.</p><div class="toplinks"><a href="./">Volver a Physics</a></div></header><main><aside><div class="selectline">Tipo<select id="mode"><option value="sound">sonido</option><option value="light">luz relativista</option></select></div><label>Vel. fuente<input id="vs" type="range" min="-0.8" max="0.8" step="0.01" value="0.35"><output id="vso"></output></label><label>Frecuencia<input id="f0" type="range" min="100" max="900" step="5" value="440"><output id="f0o"></output></label><label>Vel. onda<input id="cw" type="range" min="200" max="500" step="1" value="343"><output id="cwo"></output></label><label>Tiempo<input id="ts" type="range" min="0.1" max="3" step="0.05" value="1"><output id="tso"></output></label><div class="row"><button id="pause" class="primary">Pausar</button><button id="reset">Reiniciar</button></div><p class="hint">En luz, el deslizador representa beta=v/c. Arrastra cualquier observador; la ventana superior derecha muestra el observador seleccionado.</p></aside><section class="stage"><canvas id="c" width="1400" height="820"></canvas><div class="readouts"><div class="readout"><span>lambda fuente</span><strong id="ls"></strong></div><div class="readout"><span>lambda observador sel.</span><strong id="lo"></strong></div><div class="readout"><span>f fuente</span><strong id="fs"></strong></div><div class="readout"><span>f observador sel.</span><strong id="fo"></strong></div></div><div class="panel formula">Sonido: f'=f c/(c-vs). Luz: f'=f sqrt((1+beta)/(1-beta)) al acercarse; el color visualiza corrimiento al azul o al rojo.</div></section></main><script>
 
-const $=s=>document.querySelector(s),c=$('#c'),x=c.getContext('2d');let S={run:true,t:0,waves:[],last:performance.now()};function v(){return{m:mode.value,b:+vs.value,f:+f0.value,c:+cw.value,ts:+ts.value}}
-function col(beta){let h=260-220*Math.max(-1,Math.min(1,beta));return 'hsl('+h+',85%,55%)'}function sync(q){vso.textContent=(q.m==='light'?q.b.toFixed(2)+' c':(q.b*q.c).toFixed(0)+' m/s');f0o.textContent=q.f+' Hz';cwo.textContent=q.c+' m/s';tso.textContent=q.ts.toFixed(2)+'x';let beta=q.b,foVal=q.m==='light'?q.f*Math.sqrt((1+beta)/(1-beta)):q.f*q.c/(q.c-q.b*q.c),loVal=(q.m==='light'?3e8:q.c)/foVal,lsVal=(q.m==='light'?3e8:q.c)/q.f;ls.textContent=lsVal.toExponential(2)+' m';lo.textContent=loVal.toExponential(2)+' m';fs.textContent=q.f.toFixed(1)+' Hz';fo.textContent=foVal.toFixed(1)+' Hz'}function emit(q){let sx=350+q.b*120*S.t;S.waves.push({x:sx,y:410,t:S.t})}
-function draw(q){x.clearRect(0,0,c.width,c.height);x.fillStyle='#fbfdff';x.fillRect(0,0,c.width,c.height);for(let i=0;i<c.width;i+=70){x.strokeStyle='rgba(0,0,0,.06)';x.beginPath();x.moveTo(i,0);x.lineTo(i,c.height);x.stroke()}let sx=350+q.b*120*S.t,obs=1040;x.strokeStyle=q.m==='light'?col(q.b):'#0b63ce';x.lineWidth=2;for(const w of S.waves){let r=(S.t-w.t)*90;x.globalAlpha=Math.max(.08,1-r/900);x.beginPath();x.arc(w.x,w.y,r,0,7);x.stroke()}x.globalAlpha=1;x.fillStyle=q.m==='light'?col(q.b):'#0b63ce';x.beginPath();x.arc(sx,410,22,0,7);x.fill();x.fillStyle='#17202f';x.fillText('fuente movil',sx-42,455);x.fillStyle='#14845f';x.beginPath();x.arc(obs,410,18,0,7);x.fill();x.fillText('observador quieto',obs-60,455);x.strokeStyle='#17202f';x.strokeRect(935,70,390,230);x.fillText('Ventana del observador quieto',960,100);let beta=q.b,foVal=q.m==='light'?q.f*Math.sqrt((1+beta)/(1-beta)):q.f*q.c/(q.c-q.b*q.c);let bars=Math.max(3,Math.min(18,Math.round(foVal/60)));for(let i=0;i<bars;i++){x.fillStyle=q.m==='light'?col(beta):'#087f8c';x.fillRect(970+i*18,150,8,80)}x.fillStyle='#17202f';x.fillText('f percibida: '+foVal.toFixed(1)+' Hz',960,260);let lam0=180,lamObs=lam0*q.f/foVal;x.strokeStyle='#d89818';x.lineWidth=6;x.beginPath();x.moveTo(120,690);x.lineTo(120+lam0,690);x.stroke();x.fillText('lambda en la fuente',120,720);x.strokeStyle='#9f1239';x.beginPath();x.moveTo(520,690);x.lineTo(520+lamObs,690);x.stroke();x.fillText('lambda vista por observador',520,720);if(q.m==='light'){x.fillStyle=beta>0?'#2563eb':'#dc2626';x.fillText(beta>0?'corrimiento al azul':'corrimiento al rojo',960,290)}}
-function loop(n){let q=v();sync(q);let dt=Math.min(.04,(n-S.last)/1000)*q.ts;S.last=n;if(S.run){S.t+=dt;if(S.waves.length===0||S.t-S.waves[S.waves.length-1].t>1/q.f*80)emit(q)}S.waves=S.waves.filter(w=>S.t-w.t<10);draw(q);requestAnimationFrame(loop)}pause.onclick=()=>{S.run=!S.run;pause.textContent=S.run?'Pausar':'Continuar'};reset.onclick=()=>{S.t=0;S.waves=[]};requestAnimationFrame(loop);
+const $=s=>document.querySelector(s),c=$('#c'),x=c.getContext('2d');
+let S={run:true,t:0,waves:[],last:performance.now(),drag:null,selected:0,observers:[{x:1040,y:410,name:'O1'},{x:235,y:410,name:'O2'}]};
+function v(){return{m:mode.value,b:+vs.value,f:+f0.value,c:+cw.value,ts:+ts.value}}
+function col(beta){let h=260-220*Math.max(-1,Math.min(1,beta));return 'hsl('+h+',85%,55%)'}
+function sourceX(q){return 350+q.b*120*S.t}
+function selectedObs(){return S.observers[Math.max(0,Math.min(S.selected,S.observers.length-1))]}
+function observed(q,obs){let sx=sourceX(q),dx=obs.x-sx,dy=obs.y-410,dist=Math.hypot(dx,dy)||1,cos=dx/dist,beta=q.b;let foVal;if(q.m==='light'){let b=Math.max(-.98,Math.min(.98,beta)),gamma=1/Math.sqrt(1-b*b);foVal=q.f/(gamma*(1-b*cos))}else{let vr=beta*q.c*cos,den=Math.max(1,q.c-vr);foVal=q.f*q.c/den}let waveSpeed=q.m==='light'?3e8:q.c;return{fo:foVal,lambda:waveSpeed/foVal,cos,dx,dy,dist}}
+function sync(q){let obs=selectedObs(),o=observed(q,obs);vso.textContent=(q.m==='light'?q.b.toFixed(2)+' c':(q.b*q.c).toFixed(0)+' m/s');f0o.textContent=q.f+' Hz';cwo.textContent=q.c+' m/s';tso.textContent=q.ts.toFixed(2)+'x';let lsVal=(q.m==='light'?3e8:q.c)/q.f;ls.textContent=lsVal.toExponential(2)+' m';lo.textContent=o.lambda.toExponential(2)+' m';fs.textContent=q.f.toFixed(1)+' Hz';fo.textContent=obs.name+': '+o.fo.toFixed(1)+' Hz'}
+function emit(q){S.waves.push({x:sourceX(q),y:410,t:S.t})}
+function clear(){x.clearRect(0,0,c.width,c.height);x.fillStyle='#fbfdff';x.fillRect(0,0,c.width,c.height)}
+function grid(){for(let i=0;i<c.width;i+=70){x.strokeStyle='rgba(0,0,0,.06)';x.beginPath();x.moveTo(i,0);x.lineTo(i,c.height);x.stroke()}for(let j=0;j<c.height;j+=70){x.strokeStyle='rgba(0,0,0,.06)';x.beginPath();x.moveTo(0,j);x.lineTo(c.width,j);x.stroke()}}
+function observerAt(p){let best=-1,bd=1e9;S.observers.forEach((o,i)=>{let d=Math.hypot(p.x-o.x,p.y-o.y);if(d<bd&&d<32){bd=d;best=i}});return best}
+function point(e){let r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}
+function drawObserver(obs,i,q){let o=observed(q,obs),sel=i===S.selected;x.fillStyle=sel?'#0f766e':'#14845f';x.beginPath();x.arc(obs.x,obs.y,sel?22:18,0,7);x.fill();x.strokeStyle=sel?'#17202f':'#fff';x.lineWidth=sel?3:2;x.stroke();x.fillStyle='#fff';x.font='900 12px system-ui';x.textAlign='center';x.fillText(obs.name,obs.x,obs.y+4);x.fillStyle='#17202f';x.font='800 13px system-ui';x.fillText(o.fo.toFixed(1)+' Hz',obs.x,obs.y+38);x.strokeStyle='rgba(20,132,95,.35)';x.setLineDash([5,6]);x.beginPath();x.moveTo(sourceX(q),410);x.lineTo(obs.x,obs.y);x.stroke();x.setLineDash([])}
+function draw(q){clear();grid();let sx=sourceX(q),obs=selectedObs(),obsData=observed(q,obs);x.strokeStyle=q.m==='light'?col(q.b):'#0b63ce';x.lineWidth=2;for(const w of S.waves){let r=(S.t-w.t)*90;x.globalAlpha=Math.max(.08,1-r/900);x.beginPath();x.arc(w.x,w.y,r,0,7);x.stroke()}x.globalAlpha=1;x.fillStyle=q.m==='light'?col(q.b):'#0b63ce';x.beginPath();x.arc(sx,410,22,0,7);x.fill();x.fillStyle='#17202f';x.font='800 14px system-ui';x.textAlign='left';x.fillText('fuente movil',sx-42,455);S.observers.forEach((o,i)=>drawObserver(o,i,q));x.strokeStyle='#17202f';x.lineWidth=2;x.strokeRect(935,70,390,230);x.fillStyle='#17202f';x.font='800 14px system-ui';x.fillText('Ventana del observador '+obs.name,960,100);let beta=q.b,foVal=obsData.fo;let bars=Math.max(3,Math.min(18,Math.round(foVal/60)));for(let i=0;i<bars;i++){x.fillStyle=q.m==='light'?col(beta*obsData.cos):'#087f8c';x.fillRect(970+i*18,150,8,80)}x.fillStyle='#17202f';x.fillText('f percibida: '+foVal.toFixed(1)+' Hz',960,260);x.fillText('arrastra O1/O2 para comparar',960,282);let lam0=180,lamObs=lam0*q.f/foVal;x.strokeStyle='#d89818';x.lineWidth=6;x.beginPath();x.moveTo(120,690);x.lineTo(120+lam0,690);x.stroke();x.fillStyle='#17202f';x.fillText('lambda en la fuente',120,720);x.strokeStyle='#9f1239';x.beginPath();x.moveTo(520,690);x.lineTo(520+lamObs,690);x.stroke();x.fillStyle='#17202f';x.fillText('lambda vista por '+obs.name,520,720);if(q.m==='light'){let shift=obsData.fo>q.f?'corrimiento al azul':'corrimiento al rojo';x.fillStyle=obsData.fo>q.f?'#2563eb':'#dc2626';x.fillText(shift,960,304)}}
+function loop(n){let q=v();sync(q);let dt=Math.min(.04,(n-S.last)/1000)*q.ts;S.last=n;if(S.run){S.t+=dt;if(S.waves.length===0||S.t-S.waves[S.waves.length-1].t>1/q.f*80)emit(q)}S.waves=S.waves.filter(w=>S.t-w.t<10);draw(q);requestAnimationFrame(loop)}
+c.onpointerdown=e=>{let p=point(e),idx=observerAt(p);if(idx>=0){S.selected=idx;S.drag={idx,dx:S.observers[idx].x-p.x,dy:S.observers[idx].y-p.y};c.setPointerCapture(e.pointerId)}};
+c.onpointermove=e=>{if(!S.drag)return;let p=point(e),o=S.observers[S.drag.idx];o.x=Math.max(60,Math.min(c.width-60,p.x+S.drag.dx));o.y=Math.max(80,Math.min(c.height-120,p.y+S.drag.dy))};
+c.onpointerup=()=>S.drag=null;c.onpointercancel=()=>S.drag=null;
+pause.onclick=()=>{S.run=!S.run;pause.textContent=S.run?'Pausar':'Continuar'};reset.onclick=()=>{S.t=0;S.waves=[];S.observers=[{x:1040,y:410,name:'O1'},{x:235,y:410,name:'O2'}];S.selected=0};requestAnimationFrame(loop);
 
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>

@@ -1,7 +1,92 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Colisiones 2D | Physics</title><style>:root{--ink:#17202f;--muted:#607083;--paper:#f7f9fb;--panel:#fff;--line:#d9e2ec;--blue:#0b63ce;--teal:#087f8c;--gold:#d89818;--red:#d64545;--green:#14845f;--violet:#7c3aed}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}header{padding:18px 24px;border-bottom:1px solid var(--line);background:#fff}h1{margin:0 0 6px;font-size:clamp(1.65rem,4vw,2.7rem);line-height:1}p{color:var(--muted);margin:.35rem 0}.toplinks{margin-top:8px}.toplinks a{color:var(--blue);font-weight:850;text-decoration:none}main{display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;padding:16px}aside,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 26px rgba(15,23,42,.06)}aside{padding:14px;height:calc(100vh - 108px);overflow:auto}.stage{min-height:0}canvas{display:block;width:100%;height:auto;background:linear-gradient(#fbfdff,#eef4f8);border:1px solid var(--line);border-radius:12px;touch-action:none}label{display:grid;grid-template-columns:122px 1fr 78px;gap:8px;align-items:center;margin:8px 0;font-weight:800;font-size:.86rem}label output{grid-column:3;text-align:right;color:var(--teal);font-weight:950}input[type=range]{width:100%;accent-color:var(--teal)}select,button,input[type=color]{font:inherit;border:1px solid #c9d4df;border-radius:8px;padding:8px 9px;background:#fff;color:var(--ink)}button{cursor:pointer;font-weight:900}.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.switch{display:flex;align-items:center;gap:8px;margin:10px 0;font-weight:850;font-size:.9rem}.switch input{margin:0;accent-color:var(--teal)}.selectline{display:grid;grid-template-columns:122px 1fr;gap:8px;align-items:center;margin:8px 0;font-weight:850;font-size:.86rem}.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}.readout{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}.readout span{display:block;color:var(--muted);font-size:.76rem;font-weight:850;text-transform:uppercase;letter-spacing:.04em}.readout strong{display:block;margin-top:4px;font-size:1.03rem}.formula{margin-top:12px;padding:12px;border:1px solid #dbe7f2;border-radius:10px;background:#f8fbff;color:#364152;line-height:1.45}.hint{font-size:.82rem;color:var(--muted);line-height:1.35;margin:10px 0 0}@media(max-width:900px){main{grid-template-columns:1fr}aside{height:auto}}</style></head><body><header><h1>Colisiones 2D</h1><p>Choques entre 2 a 4 bolas, elasticidad, lanzamiento manual, escala temporal y momento lineal.</p><div class="toplinks"><a href="./">Volver a Physics</a></div></header><main><aside><label>Bolas<input id="N" type="range" min="2" max="4" step="1" value="3"><output id="No"></output></label><label>Elasticidad<input id="e" type="range" min="0" max="1" step="0.01" value="1"><output id="eo"></output></label><label>Perdida pared<input id="wallLoss" type="range" min="0" max="0.5" step="0.01" value="0"><output id="wlo"></output></label><label>Escala tiempo<input id="ts" type="range" min="0.05" max="3" step="0.05" value="1"><output id="tso"></output></label><div class="switch"><input id="periodic" type="checkbox"><span>Paredes periodicas: momento total conservado</span></div><div class="row"><button id="reset" class="primary">Reiniciar</button><button id="stop">Parar</button></div><p class="hint">Arrastra una bola y sueltala con velocidad. Con paredes normales, las paredes ejercen impulso externo: el momento de las particulas cambia aunque el choque con la pared sea elastico.</p></aside><section class="stage"><canvas id="c" width="1400" height="820"></canvas><div class="readouts"><div class="readout"><span>p total</span><strong id="pt"></strong></div><div class="readout"><span>E cinetica</span><strong id="Er"></strong></div><div class="readout"><span>Tiempo</span><strong id="tr"></strong></div><div class="readout"><span>Nota</span><strong id="nr"></strong></div></div><div class="panel formula">En choques entre particulas aisladas, el momento lineal total se conserva. Si hay paredes, el sistema particulas no esta aislado salvo que se usen paredes periodicas.</div></section></main><script>
-
-const $=s=>document.querySelector(s),c=$('#c'),x=c.getContext('2d');let B=[],drag=null,last=performance.now(),time=0;const cols=['#0b63ce','#d64545','#14845f','#d89818'];function v(){return{N:+N.value,e:+e.value,wl:+wallLoss.value,ts:+ts.value,per:periodic.checked}}function init(){B=[];for(let i=0;i<+N.value;i++)B.push({x:240+i*170,y:250+Math.random()*180,vx:(i?Math.random()*120-60:170),vy:Math.random()*100-50,r:26,m:1+i*.25,c:cols[i]});time=0}function sync(q){No.textContent=q.N;eo.textContent=q.e.toFixed(2);wlo.textContent=q.wl.toFixed(2);tso.textContent=q.ts.toFixed(2)+'x'}function ensure(q){while(B.length<q.N)B.push({x:300+Math.random()*600,y:220+Math.random()*320,vx:Math.random()*120-60,vy:Math.random()*120-60,r:26,m:1+B.length*.25,c:cols[B.length]});B.length=q.N}
-function step(dt,q){ensure(q);time+=dt;for(const b of B){if(drag&&drag.b===b)continue;b.x+=b.vx*dt;b.y+=b.vy*dt;if(q.per){if(b.x<90)b.x=1310;if(b.x>1310)b.x=90;if(b.y<90)b.y=730;if(b.y>730)b.y=90}else{let ret=1-q.wl;if(b.x<b.r+80){b.x=b.r+80;b.vx=Math.abs(b.vx)*ret}if(b.x>1320-b.r){b.x=1320-b.r;b.vx=-Math.abs(b.vx)*ret}if(b.y<b.r+80){b.y=b.r+80;b.vy=Math.abs(b.vy)*ret}if(b.y>740-b.r){b.y=740-b.r;b.vy=-Math.abs(b.vy)*ret}}}for(let i=0;i<B.length;i++)for(let j=i+1;j<B.length;j++){let A=B[i],C=B[j],dx=C.x-A.x,dy=C.y-A.y,d=Math.hypot(dx,dy)||1,min=A.r+C.r;if(d<min){let nx=dx/d,ny=dy/d,rv=(C.vx-A.vx)*nx+(C.vy-A.vy)*ny;if(rv<0){let imp=-(1+q.e)*rv/(1/A.m+1/C.m);A.vx-=imp*nx/A.m;A.vy-=imp*ny/A.m;C.vx+=imp*nx/C.m;C.vy+=imp*ny/C.m}let ov=min-d;A.x-=nx*ov/2;A.y-=ny*ov/2;C.x+=nx*ov/2;C.y+=ny*ov/2}}}
-function draw(q){x.clearRect(0,0,c.width,c.height);x.fillStyle='#fbfdff';x.fillRect(0,0,c.width,c.height);x.strokeStyle=q.per?'#14845f':'#17202f';x.lineWidth=3;x.strokeRect(80,80,1240,660);let px=0,py=0,E=0;for(const b of B){px+=b.m*b.vx;py+=b.m*b.vy;E+=.5*b.m*(b.vx*b.vx+b.vy*b.vy);x.fillStyle=b.c;x.beginPath();x.arc(b.x,b.y,b.r,0,7);x.fill();x.fillStyle='#fff';x.font='900 16px system-ui';x.textAlign='center';x.fillText('m'+(B.indexOf(b)+1),b.x,b.y+5);x.strokeStyle=b.c;x.beginPath();x.moveTo(b.x,b.y);x.lineTo(b.x+b.vx*.35,b.y+b.vy*.35);x.stroke()}pt.textContent='('+px.toFixed(1)+', '+py.toFixed(1)+')';Er.textContent=E.toFixed(0);tr.textContent=time.toFixed(2)+' s';nr.textContent=q.per?'sistema aislado 2D':'paredes = impulso externo'}function near(p){let best=null,bd=1e9;for(const b of B){let d=Math.hypot(p.x-b.x,p.y-b.y);if(d<bd&&d<b.r+12){bd=d;best=b}}return best}function ptc(e){let r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}function loop(n){let q=v();sync(q);let dt=Math.min(.03,(n-last)/1000)*q.ts;last=n;if(!drag)step(dt,q);draw(q);requestAnimationFrame(loop)}c.onpointerdown=e=>{let p=ptc(e),b=near(p);if(b){drag={b,last:p,t:performance.now(),vx:0,vy:0};c.setPointerCapture(e.pointerId)}};c.onpointermove=e=>{if(!drag)return;let p=ptc(e),dt=Math.max(.02,(performance.now()-drag.t)/1000);drag.vx=(p.x-drag.last.x)/dt;drag.vy=(p.y-drag.last.y)/dt;drag.b.x=p.x;drag.b.y=p.y;drag.last=p;drag.t=performance.now()};c.onpointerup=()=>{if(drag){drag.b.vx=drag.vx;drag.b.vy=drag.vy;drag=null}};reset.onclick=init;stop.onclick=()=>B.forEach(b=>b.vx=b.vy=0);init();requestAnimationFrame(loop);
-
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Colisiones 2D | Physics</title><style>:root{--ink:#17202f;--muted:#607083;--paper:#f7f9fb;--panel:#fff;--line:#d9e2ec;--blue:#0b63ce;--teal:#087f8c;--gold:#d89818;--red:#d64545;--green:#14845f;--violet:#7c3aed}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--paper);color:var(--ink)}header{padding:18px 24px;border-bottom:1px solid var(--line);background:#fff}h1{margin:0 0 6px;font-size:clamp(1.65rem,4vw,2.7rem);line-height:1}p{color:var(--muted);margin:.35rem 0}.toplinks{margin-top:8px}.toplinks a{color:var(--blue);font-weight:850;text-decoration:none}main{display:grid;grid-template-columns:340px minmax(0,1fr);gap:16px;padding:16px}aside,.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 26px rgba(15,23,42,.06)}aside{padding:14px;height:calc(100vh - 108px);overflow:auto}.stage{min-height:0}canvas{display:block;width:100%;height:auto;background:linear-gradient(#fbfdff,#eef4f8);border:1px solid var(--line);border-radius:12px;touch-action:none}label{display:grid;grid-template-columns:122px 1fr 78px;gap:8px;align-items:center;margin:8px 0;font-weight:800;font-size:.86rem}label output{grid-column:3;text-align:right;color:var(--teal);font-weight:950}input[type=range]{width:100%;accent-color:var(--teal)}select,button,input[type=color]{font:inherit;border:1px solid #c9d4df;border-radius:8px;padding:8px 9px;background:#fff;color:var(--ink)}button{cursor:pointer;font-weight:900}.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:12px}.readout{border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}.readout span{display:block;color:var(--muted);font-size:.76rem;font-weight:850;text-transform:uppercase;letter-spacing:.04em}.readout strong{display:block;margin-top:4px;font-size:1.03rem}.formula{margin-top:12px;padding:12px;border:1px solid #dbe7f2;border-radius:10px;background:#f8fbff;color:#364152;line-height:1.45}.hint{font-size:.82rem;color:var(--muted);line-height:1.35;margin:10px 0 0}.momenta{margin-top:12px;padding:12px}.momenta h3{margin:0 0 8px;font-size:1rem}.momentumGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px}.momentumItem{border:1px solid var(--line);border-radius:9px;padding:9px;background:#fbfdff}.momentumItem b{display:block;margin-bottom:4px}.momentumItem span{display:block;color:var(--muted);font-size:.9rem}@media(max-width:900px){main{grid-template-columns:1fr}aside{height:auto}}</style></head><body><header><h1>Colisiones 2D</h1><p>Choques entre 2 a 4 bolas, elasticidad, lanzamiento manual, escala temporal y momento lineal de cada part&iacute;cula.</p><div class="toplinks"><a href="./">Volver a Physics</a></div></header><main><aside><label>Bolas<input id="N" type="range" min="2" max="4" step="1" value="3"><output id="No"></output></label><label>Elasticidad<input id="e" type="range" min="0" max="1" step="0.01" value="1"><output id="eo"></output></label><label>P&eacute;rdida pared<input id="wallLoss" type="range" min="0" max="0.5" step="0.01" value="0"><output id="wlo"></output></label><label>Escala tiempo<input id="ts" type="range" min="0.05" max="3" step="0.05" value="1"><output id="tso"></output></label><div class="row"><button id="reset" class="primary">Reiniciar</button><button id="stop">Parar</button></div><p class="hint">Arrastra una bola y su&eacute;ltala con velocidad. Los vectores dibujados son momentos lineales: p=m v. Las paredes ejercen impulso externo, por eso el momento total de las part&iacute;culas no tiene por qu&eacute; conservarse.</p></aside><section class="stage"><canvas id="c" width="1400" height="820"></canvas><div class="readouts"><div class="readout"><span>p total vector</span><strong id="pt"></strong></div><div class="readout"><span>|p total|</span><strong id="ptMod"></strong></div><div class="readout"><span>E cin&eacute;tica</span><strong id="Er"></strong></div><div class="readout"><span>Tiempo</span><strong id="tr"></strong></div></div><div id="momenta" class="panel momenta"></div><div class="panel formula">En choques entre part&iacute;culas aisladas, el momento lineal se conserva si el choque es el&aacute;stico. En esta caja, las paredes aplican impulsos externos al sistema formado solo por las part&iacute;culas.</div></section></main><script>
+const $=s=>document.querySelector(s),c=$('#c'),x=c.getContext('2d');
+let B=[],drag=null,last=performance.now(),time=0;
+const cols=['#0b63ce','#d64545','#14845f','#d89818'];
+function v(){return{N:+N.value,e:+e.value,wl:+wallLoss.value,ts:+ts.value}}
+function init(){B=[];for(let i=0;i<+N.value;i++)B.push({x:240+i*170,y:250+Math.random()*180,vx:(i?Math.random()*120-60:170),vy:Math.random()*100-50,r:26,m:1+i*.25,c:cols[i]});time=0}
+function sync(q){No.textContent=q.N;eo.textContent=q.e.toFixed(2);wlo.textContent=q.wl.toFixed(2);tso.textContent=q.ts.toFixed(2)+'x'}
+function ensure(q){while(B.length<q.N)B.push({x:300+Math.random()*600,y:220+Math.random()*320,vx:Math.random()*120-60,vy:Math.random()*120-60,r:26,m:1+B.length*.25,c:cols[B.length]});B.length=q.N}
+function step(dt,q){ensure(q);time+=dt;for(const b of B){if(drag&&drag.b===b)continue;b.x+=b.vx*dt;b.y+=b.vy*dt;const ret=1-q.wl;if(b.x<b.r+80){b.x=b.r+80;b.vx=Math.abs(b.vx)*ret}if(b.x>1320-b.r){b.x=1320-b.r;b.vx=-Math.abs(b.vx)*ret}if(b.y<b.r+80){b.y=b.r+80;b.vy=Math.abs(b.vy)*ret}if(b.y>740-b.r){b.y=740-b.r;b.vy=-Math.abs(b.vy)*ret}}for(let i=0;i<B.length;i++)for(let j=i+1;j<B.length;j++){let A=B[i],C=B[j],dx=C.x-A.x,dy=C.y-A.y,d=Math.hypot(dx,dy)||1,min=A.r+C.r;if(d<min){let nx=dx/d,ny=dy/d,rv=(C.vx-A.vx)*nx+(C.vy-A.vy)*ny;if(rv<0){let imp=-(1+q.e)*rv/(1/A.m+1/C.m);A.vx-=imp*nx/A.m;A.vy-=imp*ny/A.m;C.vx+=imp*nx/C.m;C.vy+=imp*ny/C.m}let ov=min-d;A.x-=nx*ov/2;A.y-=ny*ov/2;C.x+=nx*ov/2;C.y+=ny*ov/2}}}
+function arrow(x0,y0,dx,dy,col,w){let L=Math.hypot(dx,dy);if(L<1)return;x.strokeStyle=col;x.fillStyle=col;x.lineWidth=w||3;x.beginPath();x.moveTo(x0,y0);x.lineTo(x0+dx,y0+dy);x.stroke();let a=Math.atan2(dy,dx),s=11;x.beginPath();x.moveTo(x0+dx,y0+dy);x.lineTo(x0+dx-Math.cos(a-.55)*s,y0+dy-Math.sin(a-.55)*s);x.lineTo(x0+dx-Math.cos(a+.55)*s,y0+dy-Math.sin(a+.55)*s);x.closePath();x.fill()}
+function momentumPanel(data,total){let html='<h3>Momentos lineales</h3><div class="momentumGrid">';data.forEach((p,i)=>{html+='<div class="momentumItem"><b style="color:'+p.c+'">Partícula '+(i+1)+' · m='+p.m.toFixed(2)+'</b><span>p = ('+p.px.toFixed(1)+', '+p.py.toFixed(1)+')</span><span>|p| = '+p.mod.toFixed(1)+'</span></div>'});html+='<div class="momentumItem"><b>Momento total</b><span>pT = ('+total.x.toFixed(1)+', '+total.y.toFixed(1)+')</span><span>|pT| = '+Math.hypot(total.x,total.y).toFixed(1)+'</span></div></div>';momenta.innerHTML=html}
+function draw(q){x.clearRect(0,0,c.width,c.height);x.fillStyle='#fbfdff';x.fillRect(0,0,c.width,c.height);x.strokeStyle='#17202f';x.lineWidth=3;x.strokeRect(80,80,1240,660);let px=0,py=0,E=0,data=[];for(let i=0;i<B.length;i++){const b=B[i],pix=b.m*b.vx,piy=b.m*b.vy,pm=Math.hypot(pix,piy);px+=pix;py+=piy;E+=.5*b.m*(b.vx*b.vx+b.vy*b.vy);data.push({px:pix,py:piy,mod:pm,m:b.m,c:b.c});x.fillStyle=b.c;x.beginPath();x.arc(b.x,b.y,b.r,0,7);x.fill();x.fillStyle='#fff';x.font='900 16px system-ui';x.textAlign='center';x.fillText('m'+(i+1),b.x,b.y+5);arrow(b.x,b.y,pix*.22,piy*.22,b.c,3);x.fillStyle='#17202f';x.font='800 12px system-ui';x.fillText('|p|='+pm.toFixed(0),b.x,b.y-b.r-12)}arrow(1120,705,px*.10,py*.10,'#17202f',4);x.fillStyle='#17202f';x.font='900 13px system-ui';x.fillText('p total',1120,735);pt.textContent='('+px.toFixed(1)+', '+py.toFixed(1)+')';ptMod.textContent=Math.hypot(px,py).toFixed(1);Er.textContent=E.toFixed(0);tr.textContent=time.toFixed(2)+' s';momentumPanel(data,{x:px,y:py})}
+function near(p){let best=null,bd=1e9;for(const b of B){let d=Math.hypot(p.x-b.x,p.y-b.y);if(d<bd&&d<b.r+12){bd=d;best=b}}return best}
+function ptc(e){let r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}
+function loop(n){let q=v();sync(q);let dt=Math.min(.03,(n-last)/1000)*q.ts;last=n;if(!drag)step(dt,q);draw(q);requestAnimationFrame(loop)}
+c.onpointerdown=e=>{let p=ptc(e),b=near(p);if(b){drag={b,last:p,t:performance.now(),vx:0,vy:0};c.setPointerCapture(e.pointerId)}};
+c.onpointermove=e=>{if(!drag)return;let p=ptc(e),dt=Math.max(.02,(performance.now()-drag.t)/1000);drag.vx=(p.x-drag.last.x)/dt;drag.vy=(p.y-drag.last.y)/dt;drag.b.x=p.x;drag.b.y=p.y;drag.last=p;drag.t=performance.now()};
+c.onpointerup=()=>{if(drag){drag.b.vx=drag.vx;drag.b.vy=drag.vy;drag=null}};
+reset.onclick=init;stop.onclick=()=>B.forEach(b=>b.vx=b.vy=0);init();requestAnimationFrame(loop);
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>

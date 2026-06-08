@@ -8,4 +8,76 @@ function line(x1,y1,x2,y2,c='#17202f',w=2){ctx.strokeStyle=c;ctx.lineWidth=w;ctx
 function circle(x,y,r,c,w=2,fill=null){ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);if(fill){ctx.fillStyle=fill;ctx.fill()}ctx.strokeStyle=c;ctx.lineWidth=w;ctx.stroke()}
 
 let t=0,last=performance.now();function draw(now){const dt=Math.min(.04,(now-last)/1000);last=now;t+=dt;clear();grid();const Rv=+R.value,Lv=+L.value,Cv=+C.value/1e6,f=+freq.value,V=+V0.value,w=2*Math.PI*f,XL=w*Lv,XC=1/(w*Cv),X=XL-XC,Z=Math.hypot(Rv,X),I=V/Z,phi=Math.atan2(X,Rv),f0=1/(2*Math.PI*Math.sqrt(Lv*Cv));ROut.textContent=Rv;LOut.textContent=Lv.toFixed(2);COut.textContent=(+C.value).toFixed(0);freqOut.textContent=f;V0Out.textContent=V.toFixed(1);zRead.textContent=Z.toFixed(1)+' ohm';iRead.textContent=I.toFixed(3)+' A';phiRead.textContent=(phi*180/Math.PI).toFixed(1)+' deg';frRead.textContent=f0.toFixed(1)+' Hz';line(120,250,1280,250,'#17202f',4);line(120,560,1280,560,'#17202f',4);ctx.strokeStyle='#0b63ce';ctx.lineWidth=3;ctx.beginPath();for(let x=120;x<=1280;x++){const u=(x-120)/1160*4*Math.PI,y=420-120*Math.sin(u+w*t);if(x===120)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();ctx.strokeStyle='#d64545';ctx.beginPath();for(let x=120;x<=1280;x++){const u=(x-120)/1160*4*Math.PI,y=420-120*Math.sin(u+w*t-phi);if(x===120)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();ctx.fillStyle='#0b63ce';ctx.fillText('V(t)',1180,285);ctx.fillStyle='#d64545';ctx.fillText('I(t)',1180,315);circle(380,250,34,'#087f8c',4);ctx.fillStyle='#17202f';ctx.fillText('R',372,255);line(580,250,640,250,'#17202f',4);for(let i=0;i<6;i++)circle(665+i*26,250,13,'#17202f',3);ctx.fillText('L',740,220);line(920,218,920,282,'#17202f',5);line(955,218,955,282,'#17202f',5);ctx.fillText('C',930,205);requestAnimationFrame(draw)}requestAnimationFrame(draw);
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>

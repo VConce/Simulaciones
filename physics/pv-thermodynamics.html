@@ -2,4 +2,76 @@
 
 const $=s=>document.querySelector(s),c=$('#c'),x=c.getContext('2d');const cs={hielo:2100,agua:4180,aluminio:900,cobre:385,hierro:450,vidrio:840,parafina:2500,chocolate:1800,madera:1700,aceite:2000};let S={in:false,t:0,obj:{x:310,y:250},drag:false,liqT:45,objT:-5,hist:[]};function v(){return{cl:+cl.value,co:+co.value,Tl:+Tl.value,To:+To.value,ml:+ml.value,mo:+mo.value}}mat.onchange=()=>{co.value=cs[mat.value]||1000};function eq(q){return(q.ml*q.cl*q.Tl+q.mo*q.co*q.To)/(q.ml*q.cl+q.mo*q.co)}function sync(q){clo.textContent=q.cl;coo.textContent=q.co;Tlo.textContent=q.Tl+'°C';Too.textContent=q.To+'°C';mlo.textContent=q.ml.toFixed(2)+' kg';moo.textContent=q.mo.toFixed(2)+' kg';Te.textContent=eq(q).toFixed(1)+' °C'}function step(q){if(S.in){let T=eq(q);S.liqT+=(T-S.liqT)*.018;S.objT+=(T-S.objT)*.018;S.t+=.016;S.hist.push({t:S.t,L:S.liqT,O:S.objT});if(S.hist.length>360)S.hist.shift()}else{S.liqT=q.Tl;S.objT=q.To}}function draw(q){x.clearRect(0,0,c.width,c.height);x.fillStyle='#fbfdff';x.fillRect(0,0,c.width,c.height);x.fillStyle='#94a3b8';x.beginPath();x.roundRect(720,180,260,430,38);x.fill();x.fillStyle='#dbeafe';x.fillRect(750,320,200,250);x.fillStyle='#17202f';x.font='900 18px system-ui';x.fillText('termo',820,160);let ob=S.in?{x:850,y:360}:S.obj;x.fillStyle=mat.value==='hielo'?'#bfdbfe':'#d89818';x.beginPath();x.roundRect(ob.x-55,ob.y-38,110,76,12);x.fill();x.fillStyle='#17202f';x.fillText(mat.value,ob.x-30,ob.y+5);let gX=80,gY=670,w=520,h=230;x.strokeStyle='#17202f';x.strokeRect(gX,gY-h,w,h);x.fillText('Temperatura-tiempo',gX,gY-h-14);if(S.hist.length>1){x.strokeStyle='#0b63ce';x.beginPath();S.hist.forEach((p,i)=>{let X=gX+i*w/360,Y=gY-(p.L+20)/120*h;if(i)x.lineTo(X,Y);else x.moveTo(X,Y)});x.stroke();x.strokeStyle='#d64545';x.beginPath();S.hist.forEach((p,i)=>{let X=gX+i*w/360,Y=gY-(p.O+20)/120*h;if(i)x.lineTo(X,Y);else x.moveTo(X,Y)});x.stroke()}let E1=q.ml*q.cl*(S.liqT-q.Tl),E2=q.mo*q.co*(S.objT-q.To);El.textContent=(E1/1000).toFixed(2)+' kJ';Eo.textContent=(E2/1000).toFixed(2)+' kJ';St.textContent=S.in?'intercambiando calor':'objeto fuera'}function pt(e){let r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}function loop(){let q=v();sync(q);step(q);draw(q);requestAnimationFrame(loop)}c.onpointerdown=e=>{let p=pt(e);if(Math.abs(p.x-S.obj.x)<70&&Math.abs(p.y-S.obj.y)<55&&!S.in){S.drag=true;c.setPointerCapture(e.pointerId)}};c.onpointermove=e=>{if(S.drag)S.obj=pt(e)};c.onpointerup=()=>{S.drag=false;if(S.obj.x>720&&S.obj.x<980&&S.obj.y>180&&S.obj.y<610){S.in=true;S.hist=[];S.t=0}};drop.onclick=()=>{S.in=true;S.hist=[]};reset.onclick=()=>{S.in=false;S.obj={x:310,y:250};S.hist=[]};requestAnimationFrame(loop);
 
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>

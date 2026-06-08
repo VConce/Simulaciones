@@ -11,8 +11,80 @@ function emit(q){let y=sample(q),ys=slitYs(q),sy=ys[Math.floor(Math.random()*ys.
 function sync(q){NOut.textContent=q.N;lambdaOut.textContent=q.lam+' nm';aOut.textContent=q.a+' um';dOut.textContent=q.d+' um';DOut.textContent=q.D.toFixed(1)+' m';rateOut.textContent=q.rate+'/s';hits.textContent=S.hits.length;view.textContent=S.view3d?'3D':'2D';regime.textContent=q.which?'detector activo: sin interferencia':(q.N===1?'difraccion simple':'coherente');central.textContent='I/I0 = '+I(0,q).toFixed(2);view3d.textContent=S.view3d?'Vista 2D':'Vista 3D';run.textContent=S.run?'Pausar haz':'Enviar haz'}
 function clear(){x.clearRect(0,0,c.width,c.height);x.fillStyle='#fbfdff';x.fillRect(0,0,c.width,c.height)}function line(a,b,d,e,col,w){x.strokeStyle=col;x.lineWidth=w||2;x.beginPath();x.moveTo(a,b);x.lineTo(d,e);x.stroke()}
 function draw2(q){clear();for(let i=0;i<c.width;i+=70)line(i,0,i,c.height,'rgba(0,0,0,.06)',1);for(let i=0;i<c.height;i+=70)line(0,i,c.width,i,'rgba(0,0,0,.06)',1);let col=q.kind==='light'?color(q.lam):'#2f80ed';x.fillStyle=col;x.shadowColor=col;x.shadowBlur=18;x.beginPath();x.arc(110,410,22,0,7);x.fill();x.shadowBlur=0;x.fillStyle='#243447';x.fillRect(416,130,28,560);for(const sy of slitYs(q)){let yy=ySlit(sy,q),h=Math.max(18,14+q.a*.24);x.clearRect(412,yy-h/2,36,h);x.fillStyle='#e9fbff';x.fillRect(412,yy-h/2,36,h);x.strokeStyle='#087f8c';x.strokeRect(412,yy-h/2,36,h);if(q.lamp){x.fillStyle='#facc15';x.beginPath();x.arc(500,yy,12,0,7);x.fill();line(500,yy,448,yy,'rgba(250,204,21,.5)',4)}}x.fillStyle='#e8eef5';x.fillRect(1140,110,34,600);for(let yy=110;yy<710;yy+=2){let yyphys=(410-yy)/280*range(q),ii=I(yyphys,q),a=.08+.78*ii;x.fillStyle=q.kind==='light'?col.replace('rgb','rgba').replace(')',','+a+')'):'rgba(56,189,248,'+a+')';x.fillRect(1142,yy,30,2)}for(const h of S.hits){x.globalAlpha=.2;x.fillStyle=h.col;x.beginPath();x.arc(1157,yScreen(h.y,q),h.kind==='light'?2:3,0,7);x.fill();x.globalAlpha=1}for(const r of S.parts){let u=Math.min(1,r.t/r.life),sx=110,sy0=410,slx=430,sly=ySlit(r.sy,q),ex=1157,ey=yScreen(r.y,q),px,py;if(u<.48){let t=u/.48;px=sx+(slx-sx)*t;py=sy0+(sly-sy0)*t}else{let t=(u-.48)/.52;px=slx+(ex-slx)*t;py=sly+(ey-sly)*t}x.fillStyle=r.col;x.beginPath();x.arc(px,py,r.kind==='light'?5:4,0,7);x.fill()}x.fillStyle=q.which?'#9f1239':'#166534';x.font='900 16px system-ui';x.fillText(q.which?'Detector activo: patron destruido':'Patron coherente',42,44)}
-function proj(P){let cy=Math.cos(S.cam.yaw),sy=Math.sin(S.cam.yaw),cp=Math.cos(S.cam.pitch),sp=Math.sin(S.cam.pitch),X=cy*P.x-sy*P.z,Z=sy*P.x+cy*P.z,Y=cp*P.y-sp*Z,Z2=sp*P.y+cp*Z,sc=S.cam.zoom*560/(7.5-Z2);return{x:c.width/2+X*sc,y:c.height/2-Y*sc,s:sc}}function dot(P,r,col,a){let Q=proj(P);x.globalAlpha=a||1;x.fillStyle=col;x.beginPath();x.arc(Q.x,Q.y,Math.max(1.5,r*Q.s/90),0,7);x.fill();x.globalAlpha=1}function l3(A,B,col,w){let a=proj(A),b=proj(B);line(a.x,a.y,b.x,b.y,col,w)}function draw3(q){clear();for(let gx=-5;gx<5;gx++)l3({x:gx,y:-2.6,z:-1.4},{x:gx,y:-2.6,z:1.4},'rgba(0,0,0,.08)',1);for(let gz=-1.5;gz<=1.5;gz+=.5)l3({x:-5,y:-2.6,z:gz},{x:4.5,y:-2.6,z:gz},'rgba(0,0,0,.08)',1);for(const sy of slitYs(q))l3({x:-1.4,y:sy*105,z:-1.3},{x:-1.4,y:sy*105,z:1.3},'#087f8c',8);l3({x:3.7,y:-2.5,z:-1.3},{x:3.7,y:2.5,z:-1.3},'#526273',3);l3({x:3.7,y:-2.5,z:1.3},{x:3.7,y:2.5,z:1.3},'#526273',3);let col=q.kind==='light'?color(q.lam):'#2f80ed';dot({x:-4.2,y:0,z:0},14,col,1);for(const h of S.hits)dot({x:3.72,y:h.y*105,z:h.z},2,h.col,.25);for(const r of S.parts){let u=Math.min(1,r.t/r.life),P;if(u<.48){let t=u/.48;P={x:-4.2+(-1.4+4.2)*t,y:r.sy*105*t,z:0}}else{let t=(u-.48)/.52;P={x:-1.4+(3.7+1.4)*t,y:r.sy*105+(r.y*105-r.sy*105)*t,z:r.z*t}}dot(P,r.kind==='light'?5:4,r.col,.95)}x.fillStyle='#17202f';x.font='900 16px system-ui';x.fillText('3D: particulas hacia la pantalla',36,44)}
+function proj(P){let cy=Math.cos(S.cam.yaw),sy=Math.sin(S.cam.yaw),cp=Math.cos(S.cam.pitch),sp=Math.sin(S.cam.pitch),X=cy*P.x-sy*P.z,Z=sy*P.x+cy*P.z,Y=cp*P.y-sp*Z,Z2=sp*P.y+cp*Z,sc=S.cam.zoom*560/(7.5-Z2);return{x:c.width/2+X*sc,y:c.height/2-Y*sc,s:sc,d:Z2}}function poly3(points,fill,stroke,w){const pp=points.map(proj);x.beginPath();x.moveTo(pp[0].x,pp[0].y);for(let i=1;i<pp.length;i++)x.lineTo(pp[i].x,pp[i].y);x.closePath();x.fillStyle=fill;x.fill();if(stroke){x.strokeStyle=stroke;x.lineWidth=w||1;x.stroke()}}function rect3(y1,y2,z1,z2,fill,stroke){poly3([{x:-1.4,y:y1,z:z1},{x:-1.4,y:y2,z:z1},{x:-1.4,y:y2,z:z2},{x:-1.4,y:y1,z:z2}],fill,stroke||'rgba(23,32,47,.45)',1.5)}function dot(P,r,col,a){let Q=proj(P);x.globalAlpha=a||1;x.fillStyle=col;x.beginPath();x.arc(Q.x,Q.y,Math.max(1.5,r*Q.s/90),0,7);x.fill();x.globalAlpha=1}function l3(A,B,col,w){let a=proj(A),b=proj(B);line(a.x,a.y,b.x,b.y,col,w)}function drawSlitBarrier3(q){const ys=slitYs(q).map(v=>v*105).sort((a,b)=>a-b),z1=-1.3,z2=1.3,Y=-2.45,Y2=2.45,slitH=Math.max(.28,Math.min(.9,.18+q.a*.0032));let cursor=Y;for(const cy of ys){const a=clamp(cy-slitH/2,Y,Y2),b=clamp(cy+slitH/2,Y,Y2);if(a>cursor)rect3(cursor,a,z1,z2,'rgba(38,50,65,.78)');rect3(a,b,z1,-1.02,'rgba(38,50,65,.78)');rect3(a,b,1.02,z2,'rgba(38,50,65,.78)');rect3(a,b,-1.02,1.02,'rgba(233,251,255,.86)','#087f8c');cursor=b}if(cursor<Y2)rect3(cursor,Y2,z1,z2,'rgba(38,50,65,.78)');poly3([{x:-1.405,y:Y,z:z1},{x:-1.405,y:Y2,z:z1},{x:-1.405,y:Y2,z:z2},{x:-1.405,y:Y,z:z2}],'rgba(0,0,0,0)','rgba(15,23,42,.55)',2)}function drawScreen3(q){poly3([{x:3.7,y:-2.5,z:-1.35},{x:3.7,y:2.5,z:-1.35},{x:3.7,y:2.5,z:1.35},{x:3.7,y:-2.5,z:1.35}],'rgba(232,238,245,.88)','rgba(82,98,115,.7)',2);const R=range(q),col=q.kind==='light'?color(q.lam):'#38bdf8';for(let i=0;i<80;i++){let yy=-R+2*R*i/79,ii=I(yy,q),Y=yy*105;l3({x:3.72,y:Y,z:-1.35},{x:3.72,y:Y,z:1.35},q.kind==='light'?col:'rgba(56,189,248,'+(.1+.65*ii)+')',Math.max(1,6*ii))}}function draw3(q){clear();for(let gx=-5;gx<5;gx++)l3({x:gx,y:-2.6,z:-1.4},{x:gx,y:-2.6,z:1.4},'rgba(0,0,0,.08)',1);for(let gz=-1.5;gz<=1.5;gz+=.5)l3({x:-5,y:-2.6,z:gz},{x:4.5,y:-2.6,z:gz},'rgba(0,0,0,.08)',1);drawSlitBarrier3(q);drawScreen3(q);if(q.lamp){for(const sy of slitYs(q)){dot({x:-.72,y:sy*105,z:-1.15},7,'#facc15',.95);l3({x:-.72,y:sy*105,z:-1.15},{x:-1.4,y:sy*105,z:0},'rgba(250,204,21,.45)',3)}}let col=q.kind==='light'?color(q.lam):'#2f80ed';dot({x:-4.2,y:0,z:0},14,col,1);for(const h of S.hits)dot({x:3.72,y:h.y*105,z:h.z},2,h.col,.25);for(const r of S.parts){let u=Math.min(1,r.t/r.life),P;if(u<.48){let t=u/.48;P={x:-4.2+(-1.4+4.2)*t,y:r.sy*105*t,z:0}}else{let t=(u-.48)/.52;P={x:-1.4+(3.7+1.4)*t,y:r.sy*105+(r.y*105-r.sy*105)*t,z:r.z*t}}dot(P,r.kind==='light'?5:4,r.col,.95)}x.fillStyle='#17202f';x.font='900 16px system-ui';x.fillText('3D: placa con rendijas verticales y pantalla detectora',36,44)}
 function loop(now){let q=p();sync(q);let dt=Math.min(.045,(now-S.last)/1000);S.last=now;if(S.run){S.acc+=q.rate*dt;while(S.acc>=1){emit(q);S.acc--}}for(const r of S.parts)r.t+=dt;S.parts=S.parts.filter(r=>r.t<r.life);S.view3d?draw3(q):draw2(q);requestAnimationFrame(loop)}
 [N,lambda,a,d,D,kind,lamp].forEach(e=>e.oninput=()=>{S.hits.length=0});run.onclick=()=>S.run=!S.run;clearHits.onclick=()=>{S.hits.length=0;S.parts.length=0};view3d.onclick=()=>S.view3d=!S.view3d;cam.onclick=()=>S.cam={yaw:-.65,pitch:.45,zoom:1};c.onpointerdown=e=>{if(S.view3d){S.drag={x:e.clientX,y:e.clientY,yaw:S.cam.yaw,pitch:S.cam.pitch};c.setPointerCapture(e.pointerId)}};c.onpointermove=e=>{if(S.drag){S.cam.yaw=S.drag.yaw+(e.clientX-S.drag.x)*.006;S.cam.pitch=Math.max(-1.3,Math.min(1.3,S.drag.pitch+(e.clientY-S.drag.y)*.006))}};c.onpointerup=()=>S.drag=null;c.onwheel=e=>{if(S.view3d){e.preventDefault();S.cam.zoom=Math.max(.45,Math.min(2.5,S.cam.zoom*Math.exp(-e.deltaY*.0012)))}};requestAnimationFrame(loop);
 
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>

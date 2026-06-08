@@ -2,4 +2,76 @@
 
 const $=s=>document.querySelector(s),c=$('#c'),x=c.getContext('2d');let t=0,last=performance.now(),pluck=1,fret=0,audio=null;const notes=['C/do','C#/do#','D/re','D#/re#','E/mi','F/fa','F#/fa#','G/sol','G#/sol#','A/la','A#/la#','B/si'];for(let i=0;i<=12;i++){let b=document.createElement('button');b.textContent=i;b.onclick=()=>{fret=i;play()};frets.appendChild(b)}function noteName(f){let n=Math.round(12*Math.log2(f/440))+57;return notes[(n%12+12)%12]}function val(){let base=+freq.value*Math.pow(2,fret/12);return{f:base,L:+len.value,T:+T.value,m:+mode.value}}function sync(q){fo.textContent=(+freq.value)+' Hz';lo.textContent=(+len.value).toFixed(2)+' m';To.textContent=(+T.value)+' N';mo.textContent=q.m;Fr.textContent=q.f.toFixed(1)+' Hz';Nr.textContent=noteName(q.f)+' (traste '+fret+')';Nodes.textContent=(q.m+1);Vr.textContent=(2*q.L*q.f/q.m).toFixed(1)+' m/s'}function play(){if(!sound.checked)return;audio=audio||new (window.AudioContext||window.webkitAudioContext)();let q=val(),o=audio.createOscillator(),g=audio.createGain();o.frequency.value=q.f;o.type='triangle';g.gain.setValueAtTime(.12,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.8);o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.85)}function draw(q){x.clearRect(0,0,c.width,c.height);x.fillStyle='#fbfdff';x.fillRect(0,0,c.width,c.height);let Lpx=1040,x0=180,y0=410,A=70*pluck;pluck*=.996;x.strokeStyle='#17202f';x.lineWidth=4;x.beginPath();x.moveTo(x0,y0);x.lineTo(x0+Lpx,y0);x.stroke();if(guitar.checked){for(let i=0;i<=12;i++){let fx=x0+Lpx*(1-1/Math.pow(2,i/12));x.strokeStyle=i===fret?'#d64545':'rgba(23,32,47,.25)';x.beginPath();x.moveTo(fx,y0-120);x.lineTo(fx,y0+120);x.stroke()}}function y(xn,sgn){return A*Math.sin(q.m*Math.PI*xn)*Math.sin(2*Math.PI*q.f*t*sgn)}if(inc.checked){x.strokeStyle='rgba(11,99,206,.45)';x.beginPath();for(let i=0;i<=500;i++){let u=i/500,yy=y0+A*Math.sin(2*Math.PI*(q.m*u-q.f*t));i?x.lineTo(x0+u*Lpx,yy):x.moveTo(x0+u*Lpx,yy)}x.stroke()}if(ref.checked){x.strokeStyle='rgba(214,69,69,.45)';x.beginPath();for(let i=0;i<=500;i++){let u=i/500,yy=y0+A*Math.sin(2*Math.PI*(q.m*u+q.f*t));i?x.lineTo(x0+u*Lpx,yy):x.moveTo(x0+u*Lpx,yy)}x.stroke()}x.strokeStyle='#087f8c';x.lineWidth=4;x.beginPath();for(let i=0;i<=500;i++){let u=i/500,yy=y0+y(u,1);i?x.lineTo(x0+u*Lpx,yy):x.moveTo(x0+u*Lpx,yy)}x.stroke();for(let n=0;n<=q.m;n++){x.fillStyle='#17202f';x.beginPath();x.arc(x0+n*Lpx/q.m,y0,5,0,7);x.fill()}}function loop(n){let q=val();sync(q);let dt=Math.min(.04,(n-last)/1000);last=n;t+=dt;draw(q);requestAnimationFrame(loop)}c.onclick=()=>{pluck=1;play()};requestAnimationFrame(loop);
 
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>

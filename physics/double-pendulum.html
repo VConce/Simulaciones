@@ -24,4 +24,76 @@ canvas.onpointermove=e=>{if(!P.drag)return;const p=point(e),g0=geom(y),now=perfo
 canvas.onpointerup=()=>{if(P.drag){if(P.drag.hit===1)y[1]=P.drag.vel;else y[3]=P.drag.vel;yg=[y[0]+(+eps.value)*Math.PI/180,y[1],y[2],y[3]];P.drag=null;P.run=true}};
 function loop(now){readParams();const dt=Math.min(.03,(now-P.last)/1000);P.last=now;if(P.run&&!P.drag)step(dt);const g1=geom(y);P.trail.push({x:g1.x2,y:g1.y2});if(P.showGhost){const g2=geom(yg);P.ghostTrail.push({x:g2.x2,y:g2.y2})}const max=P.fixed?3000:180;if(P.trail.length>max)P.trail.shift();if(P.ghostTrail.length>max)P.ghostTrail.shift();draw();requestAnimationFrame(loop)}
 [l1,l2,m1,m2,g,d,t1,t2,w1,w2,eps].forEach(el=>el.oninput=readParams);apply.onclick=setInitial;reset.onclick=()=>{t1.value=120;t2.value=-10;w1.value=0;w2.value=0;eps.value=.2;P.showGhost=false;toggleCopy.textContent='Mostrar copia';setInitial()};pause.onclick=()=>{P.run=!P.run;pause.textContent=P.run?'Pausar':'Continuar'};toggleCopy.onclick=()=>{P.showGhost=!P.showGhost;toggleCopy.textContent=P.showGhost?'Ocultar copia':'Mostrar copia';if(P.showGhost){yg=[y[0]+(+eps.value)*Math.PI/180,y[1],y[2],y[3]];P.ghostTrail=[]}};modesBtn.onclick=()=>{const r=canvas.getBoundingClientRect();openModeMenuAt(r.left+24,r.top+24)};clear.onclick=()=>{P.trail=[];P.ghostTrail=[]};fixed.onchange=e=>P.fixed=e.target.checked;setInitial();requestAnimationFrame(loop);
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>

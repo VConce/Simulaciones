@@ -2,4 +2,76 @@
 
 const $=s=>document.querySelector(s),c=$('#c'),x=c.getContext('2d');let S={t:0,last:performance.now(),run:true,phone:{x:850,y:360},drag:false};function v(){return{B:+B0.value,f:+freq.value,N:+turns.value,R:+R.value,ts:+ts.value}}function sync(q){B0o.textContent=q.B+' mT';freqo.textContent=q.f+' Hz';turnso.textContent=q.N;Ro.textContent=q.R.toFixed(1)+' ohm';tso.textContent=q.ts.toFixed(2)+'x'}function fieldAt(px,py,q){let dx=px-520,dy=py-410,d2=dx*dx+dy*dy,align=Math.exp(-d2/65000);return q.B*Math.sin(S.t*q.f*2*Math.PI)*align}function draw(q){x.clearRect(0,0,c.width,c.height);x.fillStyle='#fbfdff';x.fillRect(0,0,c.width,c.height);let phase=Math.sin(S.t*q.f*2*Math.PI);for(let r=70;r<360;r+=45){x.strokeStyle='rgba(20,132,95,'+(0.12+0.15*Math.abs(phase))+')';x.lineWidth=3;x.beginPath();x.ellipse(520,410,r,r*.42,0,0,7);x.stroke()}x.fillStyle='#111827';x.beginPath();x.roundRect(360,270,320,280,42);x.fill();x.fillStyle='#e5e7eb';x.beginPath();x.arc(520,410,112,0,7);x.fill();x.strokeStyle='#14845f';x.lineWidth=8;x.beginPath();x.arc(520,410,78,0,7);x.stroke();x.fillStyle='#111827';x.font='900 28px system-ui';x.textAlign='center';x.fillText('MagSafe',520,418);let ph=S.phone;x.fillStyle='#1f2937';x.beginPath();x.roundRect(ph.x-105,ph.y-180,210,360,26);x.fill();x.fillStyle='#0f172a';x.beginPath();x.roundRect(ph.x-88,ph.y-154,176,308,18);x.fill();let F=fieldAt(ph.x,ph.y,q),fem=-q.N*q.f*q.B*Math.cos(S.t*q.f*2*Math.PI)*Math.exp(-((ph.x-520)**2+(ph.y-410)**2)/65000)/90,I=fem/q.R;for(let i=0;i<q.N;i++){x.strokeStyle='rgba(56,189,248,.65)';x.lineWidth=2;x.beginPath();x.ellipse(ph.x,ph.y,58+i*2,34+i,0,0,7);x.stroke()}for(let i=0;i<10;i++){let a=S.t*5*Math.sign(I||1)+i*.63;x.fillStyle='#38bdf8';x.beginPath();x.arc(ph.x+Math.cos(a)*70,ph.y+Math.sin(a)*42,5,0,7);x.fill()}x.fillStyle='#fff';x.font='800 16px system-ui';x.fillText('iPhone receptor',ph.x,ph.y+132);Fr.textContent=F.toFixed(2)+' arb.';Vr.textContent=fem.toFixed(2)+' V';Ir.textContent=I.toFixed(2)+' A';Ar.textContent=(Math.exp(-((ph.x-520)**2+(ph.y-410)**2)/65000)*100).toFixed(0)+' %'}function pt(e){let r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}function loop(n){let q=v();sync(q);let dt=Math.min(.04,(n-S.last)/1000)*q.ts;S.last=n;if(S.run)S.t+=dt;draw(q);requestAnimationFrame(loop)}c.onpointerdown=e=>{let p=pt(e);if(Math.abs(p.x-S.phone.x)<120&&Math.abs(p.y-S.phone.y)<190){S.drag=true;c.setPointerCapture(e.pointerId)}};c.onpointermove=e=>{if(S.drag)S.phone=pt(e)};c.onpointerup=()=>S.drag=false;center.onclick=()=>S.phone={x:520,y:410};pause.onclick=()=>S.run=!S.run;requestAnimationFrame(loop);
 
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>

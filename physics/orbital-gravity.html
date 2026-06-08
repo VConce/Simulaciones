@@ -2,4 +2,76 @@
 
 const $=s=>document.querySelector(s),c=$('#c'),x=c.getContext('2d');let sun={x:700,y:410},pl={x:970,y:410,vx:0,vy:-250},trail=[],drag=null,last=performance.now();const presets={mercury:[120,.206,1.6],venus:[180,.007,1.18],earth:[240,.017,1],mars:[320,.093,.8],jupiter:[410,.049,.44],saturn:[470,.057,.32],uranus:[510,.046,.23],neptune:[545,.011,.18]};function val(){return{GM:+GM.value,r:+r0.value,v:+vv.value,e:+ecc.value,ts:+ts.value}}function sync(q){GMo.textContent=q.GM;r0o.textContent=q.r+' px';vvo.textContent=q.v+' px/s';ecco.textContent=q.e.toFixed(2);tso.textContent=q.ts.toFixed(2)+'x'}function applyOrbit(){let q=val();pl.x=sun.x+q.r*(1-q.e);pl.y=sun.y;pl.vx=0;pl.vy=-q.v;trail=[]}preset.onchange=()=>{if(preset.value!=='custom'){let p=presets[preset.value];r0.value=p[0];ecc.value=p[1];vv.value=Math.round(250*p[2]);applyOrbit()}};function step(dt,q){let dx=pl.x-sun.x,dy=pl.y-sun.y,r=Math.hypot(dx,dy)||1,a=-q.GM/(r*r*r);pl.vx+=a*dx*dt;pl.vy+=a*dy*dt;pl.x+=pl.vx*dt;pl.y+=pl.vy*dt;trail.push({x:pl.x,y:pl.y});if(trail.length>1600)trail.shift()}function draw(q){x.clearRect(0,0,c.width,c.height);x.fillStyle='#050b16';x.fillRect(0,0,c.width,c.height);x.strokeStyle='rgba(255,255,255,.18)';x.beginPath();trail.forEach((p,i)=>i?x.lineTo(p.x,p.y):x.moveTo(p.x,p.y));x.stroke();x.fillStyle='#facc15';x.shadowColor='#facc15';x.shadowBlur=22;x.beginPath();x.arc(sun.x,sun.y,28,0,7);x.fill();x.shadowBlur=0;x.fillStyle='#38bdf8';x.beginPath();x.arc(pl.x,pl.y,14,0,7);x.fill();x.strokeStyle='#38bdf8';x.beginPath();x.moveTo(pl.x,pl.y);x.lineTo(pl.x+pl.vx*.18,pl.y+pl.vy*.18);x.stroke();let dx=pl.x-sun.x,dy=pl.y-sun.y,r=Math.hypot(dx,dy),v2=pl.vx*pl.vx+pl.vy*pl.vy;Er.textContent=(.5*v2-q.GM/r).toFixed(1);Lr.textContent=(dx*pl.vy-dy*pl.vx).toFixed(0);Dr.textContent=r.toFixed(1)+' px';Sr.textContent=r<35?'colision':(Er.textContent<0?'orbita ligada':'escape')}function pt(e){let r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}}function loop(n){let q=val();sync(q);let dt=Math.min(.025,(n-last)/1000)*q.ts;last=n;if(!drag)for(let i=0;i<3;i++)step(dt/3,q);draw(q);requestAnimationFrame(loop)}c.onpointerdown=e=>{let p=pt(e);if(Math.hypot(p.x-sun.x,p.y-sun.y)<40)drag={obj:sun,last:p,t:performance.now()};else if(Math.hypot(p.x-pl.x,p.y-pl.y)<35)drag={obj:pl,last:p,t:performance.now(),vx:0,vy:0};if(drag)c.setPointerCapture(e.pointerId)};c.onpointermove=e=>{if(!drag)return;let p=pt(e),dt=Math.max(.02,(performance.now()-drag.t)/1000);drag.vx=(p.x-drag.last.x)/dt;drag.vy=(p.y-drag.last.y)/dt;drag.obj.x=p.x;drag.obj.y=p.y;drag.last=p;drag.t=performance.now()};c.onpointerup=()=>{if(drag&&drag.obj===pl){pl.vx=drag.vx;pl.vy=drag.vy}drag=null};apply.onclick=applyOrbit;clear.onclick=()=>trail=[];applyOrbit();requestAnimationFrame(loop);
 
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>

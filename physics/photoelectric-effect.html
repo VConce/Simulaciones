@@ -4,4 +4,76 @@ const $=s=>document.querySelector(s),c=$('#c'),x=c.getContext('2d');let S={run:t
 function sync(q){freqo.textContent=q.f.toFixed(1)+'e14 Hz';intenso.textContent=q.I+'/s';worko.textContent=q.W.toFixed(1)+' eV';stopVo.textContent=q.V.toFixed(2)+' V';tso.textContent=q.ts.toFixed(2)+'x';let E=.414*q.f,K=Math.max(0,E-q.W);Er.textContent=E.toFixed(2)+' eV';Kr.textContent=K.toFixed(2)+' eV';Ir.textContent=Math.max(0,K-q.V).toFixed(2)+' arb.';Rr.textContent=K<=0?'no emite':(K-q.V>0?'electrones llegan':'frenados')}function gamma(x0,y0,r){x.strokeStyle='#facc15';x.lineWidth=3;x.fillStyle='rgba(250,204,21,.16)';x.beginPath();x.arc(x0,y0,r,0,7);x.fill();x.stroke();x.fillStyle='#7c4a00';x.font='900 '+r+'px system-ui';x.textAlign='center';x.fillText('γ',x0,y0+r*.35)}function electron(x0,y0,r){x.strokeStyle='#38bdf8';x.lineWidth=3;x.fillStyle='rgba(56,189,248,.16)';x.beginPath();x.arc(x0,y0,r,0,7);x.fill();x.stroke();x.fillStyle='#0b4a6f';x.font='900 '+(r*.75)+'px system-ui';x.textAlign='center';x.fillText('e⁻',x0,y0+r*.25)}function emit(q){S.phot.push({x:80,y:170+Math.random()*430,v:260+q.f*20})}
 function step(dt,q){if(S.run){S.acc+=q.I*dt;while(S.acc>1){emit(q);S.acc--}}let E=.414*q.f,K=Math.max(0,E-q.W);for(const p of S.phot){p.x+=p.v*dt;if(p.x>520&&!p.hit){p.hit=true;if(K>0)S.ele.push({x:535,y:p.y,vx:120+K*90,vy:(Math.random()-.5)*90,E:K})}}for(const e of S.ele){e.vx-=q.V*75*dt;e.x+=e.vx*dt;e.y+=e.vy*dt;if(e.x>1115&&e.vx>0){S.count++;e.dead=true}if(e.x<520)e.dead=true}S.phot=S.phot.filter(p=>p.x<540&&!p.hit);S.ele=S.ele.filter(e=>!e.dead&&e.x<1220)}function draw(q){x.clearRect(0,0,c.width,c.height);x.fillStyle='#fbfdff';x.fillRect(0,0,c.width,c.height);x.fillStyle='#9ca3af';x.fillRect(500,130,32,560);x.fillStyle='#334155';x.fillText('metal',485,110);x.fillStyle='#e2e8f0';x.fillRect(1120,130,28,560);x.fillText('colector',1088,110);for(let yy=160;yy<670;yy+=38){x.strokeStyle='rgba(220,38,38,.35)';x.beginPath();x.moveTo(1060,yy);x.lineTo(580,yy);x.stroke()}x.fillStyle='#dc2626';x.fillText('campo de frenado',720,105);for(const p of S.phot)gamma(p.x,p.y,14);for(const e of S.ele)electron(e.x,e.y,12);x.fillStyle='#17202f';x.fillText('electrones recogidos: '+S.count,950,735)}function loop(n){let q=v();sync(q);let dt=Math.min(.04,(n-S.last)/1000)*q.ts;S.last=n;step(dt,q);draw(q);requestAnimationFrame(loop)}pause.onclick=()=>{S.run=!S.run;pause.textContent=S.run?'Pausar':'Continuar'};clear.onclick=()=>{S.phot=[];S.ele=[];S.count=0};requestAnimationFrame(loop);
 
+</script><script data-range-output-editor>
+(function(){
+  if (window.__rangeOutputEditorInstalled) return;
+  window.__rangeOutputEditorInstalled = true;
+  function firstNumber(text, fallback){
+    const m = String(text || '').replace(',', '.').match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/i);
+    return m ? m[0] : String(fallback ?? '0');
+  }
+  function clampToRange(value, range){
+    let v = Number(value);
+    const min = range.min !== '' ? Number(range.min) : -Infinity;
+    const max = range.max !== '' ? Number(range.max) : Infinity;
+    if (Number.isFinite(min)) v = Math.max(min, v);
+    if (Number.isFinite(max)) v = Math.min(max, v);
+    return v;
+  }
+  document.addEventListener('click', function(ev){
+    const out = ev.target.closest && ev.target.closest('output');
+    if (!out || out.dataset.editing === '1') return;
+    const label = out.closest('label');
+    const range = label ? label.querySelector('input[type="range"]') : null;
+    if (!range) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    const editor = document.createElement('input');
+    editor.type = 'number';
+    editor.value = firstNumber(out.textContent, range.value);
+    if (range.min !== '') editor.min = range.min;
+    if (range.max !== '') editor.max = range.max;
+    editor.step = range.step && range.step !== 'any' ? range.step : 'any';
+    editor.style.width = '82px';
+    editor.style.maxWidth = '100%';
+    editor.style.padding = '5px 6px';
+    editor.style.border = '1px solid #0b63ce';
+    editor.style.borderRadius = '7px';
+    editor.style.font = 'inherit';
+    editor.style.fontWeight = '900';
+    editor.style.color = '#087f8c';
+    editor.style.textAlign = 'right';
+    let finished = false;
+    function restore(){
+      if (editor.isConnected) editor.replaceWith(out);
+      out.dataset.editing = '0';
+    }
+    function commit(){
+      if (finished) return;
+      finished = true;
+      const raw = editor.value.trim().replace(',', '.');
+      const value = Number(raw);
+      if (Number.isFinite(value)) {
+        range.value = String(clampToRange(value, range));
+        range.dispatchEvent(new Event('input', {bubbles:true}));
+        range.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+      restore();
+    }
+    function cancel(){
+      if (finished) return;
+      finished = true;
+      restore();
+    }
+    out.dataset.editing = '1';
+    out.replaceWith(editor);
+    editor.focus();
+    editor.select();
+    editor.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') commit();
+      if (e.key === 'Escape') cancel();
+    });
+    editor.addEventListener('blur', commit);
+  }, true);
+})();
 </script></body></html>
