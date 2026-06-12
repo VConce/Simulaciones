@@ -4,7 +4,6 @@ Base en `physics/`. Usar nombres ASCII y enlaces relativos. Cada simulacion nuev
 
 ## Generadas
 
-- `pendulums.html`: cadena serial de pendulos, hasta 5 bobs, modos normales linealizados, condiciones iniciales, arrastre y rastro.
 - `double-pendulum.html`: doble pendulo, caos, divergencia de condiciones iniciales, rastro y arrastre.
 - `shm-spring.html`: oscilador masa-muelle.
 - `coupled-springs.html`: cadena de osciladores masa-muelle, modos normales, impulso local y rastros.
@@ -13,7 +12,6 @@ Base en `physics/`. Usar nombres ASCII y enlaces relativos. Cada simulacion nuev
 - `standing-waves-string.html`: cuerda vibrante con modos estacionarios.
 - `diffraction-slits.html`: difraccion e interferencia por rendijas.
 - `rlc-circuit.html`: circuito RLC serie en corriente alterna.
-- `orbital-gravity.html`: orbitas gravitatorias con energia ligada/escape.
 - `collisions-2d.html`: colisiones 2D con coeficiente de restitucion.
 - `bernoulli-fluids.html`: tubo de Venturi y ecuacion de Bernoulli.
 - `pv-thermodynamics.html`: ciclos termodinamicos en diagrama P-V.

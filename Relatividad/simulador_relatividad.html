@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Simulador de Relatividad</title>
+<title>Simulador de Relatividad</title><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317202f%22%2F%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2230%22%20r%3D%229%22%20fill%3D%22%23fbbf24%22%2F%3E%3Cpath%20d%3D%22M8%2048c12-10%2036-10%2048%200M12%2038c10-8%2030-8%2040%200%22%20fill%3D%22none%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E">
 <style>
 :root{--bg:#0a0e1a;--panel:#111827;--card:#1a2236;--border:#2a3454;--accent:#3b82f6;--accent2:#6366f1;--text:#e2e8f0;--muted:#94a3b8;--green:#22c55e;--red:#ef4444;--gold:#f59e0b;--radius:12px;--shadow:0 8px 32px rgba(0,0,0,.4)}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -54,8 +54,8 @@ footer button{background:var(--card);border:1px solid var(--border);color:var(--
 .page{display:none}
 .page.active{display:grid}
 @media(max-width:900px){.app{grid-template-columns:1fr}aside{display:none}}
-</style>
-</head><body>
+.vconceLogo{position:fixed;left:14px;top:14px;width:54px;height:54px;object-fit:contain;z-index:10000;pointer-events:none}@media(max-width:900px){.vconceLogo{width:42px;height:42px;left:10px;top:10px}}/* vconce header clearance */body>header{padding-left:max(88px,env(safe-area-inset-left))!important}@media(max-width:900px){body>header{padding-left:64px!important}}</style>
+</head><body><img class="vconceLogo" src="../electromagnetism/assets/electric/vconce.png" alt="VConce">
 <div class="app">
 <header>
 <div class="logo"><i>⚡</i><div>Relatividad<small>Interactiva</small></div></div>
