@@ -14,7 +14,7 @@
 <div class="layout">
 <aside class="side">
 <div class="title">Controles</div>
-<div class="row"><button id="toggle" class="primary">Pausar</button><button id="reset">Reiniciar</button></div><button id="exportExcel" style="width:100%;margin-top:8px">Exportar a Excel</button><label class="slider">Exportar cada <select id="exportDt"><option value="1">1 s</option><option value="0.1">0,1 s</option><option value="0.001">0,001 s</option></select><output></output></label>
+<div class="row"><button id="toggle" class="primary">Pausar</button><button id="reset">Reiniciar</button></div><button id="exportExcel" style="width:100%;margin-top:8px">Exportar a XLSX</button><label class="slider">Exportar cada <select id="exportDt"><option value="1">1 s</option><option value="0.1">0,1 s</option><option value="0.001">0,001 s</option></select><output></output></label>
 <label class="slider">Tiempo <input id="timeScale" type="range" min="0.1" max="4" step="0.1" value="1"><output id="timeScaleOut"></output></label>
 <label class="slider">Fotos <input id="photoDt" type="range" min="0.1" max="2" step="0.1" value="0.5"><output id="photoDtOut"></output></label>
 <label class="slider">Altura <input id="height" type="range" min="20" max="200" step="1" value="90"><output id="heightOut"></output></label>
@@ -67,7 +67,47 @@ function fmtMassValue(m){return m<0.01?(m*1000).toFixed(2)+' g':m.toFixed(3)+' k
 function updateOutputs(){out.timeScale.textContent=val('timeScale').toFixed(1)+'x';out.photoDt.textContent=val('photoDt').toFixed(1)+' s';out.height.textContent=val('height').toFixed(0)+' m';out.gravity.textContent=val('gravity').toFixed(1);out.rho.textContent=val('rho').toFixed(2);out.mCork.textContent=fmtMassValue(val('mCork'));out.rCork.textContent=(val('rCork')*100).toFixed(1)+' cm';out.cdCork.textContent=val('cdCork').toFixed(2);out.mSteel.textContent=fmtMassValue(val('mSteel'));out.rSteel.textContent=(val('rSteel')*100).toFixed(1)+' cm';out.cdSteel.textContent=val('cdSteel').toFixed(2);let c=vt('cork'),s=vt('steel');$('vtCork').textContent=Number.isFinite(c)?c.toFixed(2)+' m/s':'sin limite';$('vtSteel').textContent=Number.isFinite(s)?s.toFixed(2)+' m/s':'sin limite';$('tRead').textContent=st.t.toFixed(2)+' s';$('vCRead').textContent=st.cork.v.toFixed(2)+' m/s';$('vSRead').textContent=st.steel.v.toFixed(2)+' m/s'}
 function loop(now){resize();let dt=Math.min(.035,(now-last)/1000);last=now;update(dt);updateOutputs();drawScene();requestAnimationFrame(loop)}
 ids.forEach(id=>{ui[id].addEventListener('input',()=>{if(['height','gravity','rho','mCork','rCork','cdCork','mSteel','rSteel','cdSteel'].includes(id))reset()});out[id].onclick=()=>{let raw=prompt('Nuevo valor',ui[id].value);if(raw===null)return;let n=Number(String(raw).replace(',','.'));if(!Number.isFinite(n))return;ui[id].value=String(Math.max(+ui[id].min,Math.min(+ui[id].max,n)));ui[id].dispatchEvent(new Event('input',{bubbles:true}))}});
-function sampleHist(hist,t){if(!hist.length)return {y:'',v:''};let best=hist[0],bd=Math.abs(hist[0].t-t);for(const p of hist){let d=Math.abs(p.t-t);if(d<bd){best=p;bd=d}}return {y:best.y.toFixed(5),v:best.v.toFixed(5)}}function exportExcel(){let dt=+$('exportDt').value||1,end=Math.max(st.cork.history.at(-1)?.t||0,st.steel.history.at(-1)?.t||0,st.t),rows=['<table><tr><th>t/s</th><th>y corcho/m</th><th>v corcho/(m/s)</th><th>y acero/m</th><th>v acero/(m/s)</th></tr>'];for(let t=0;t<=end+1e-9;t+=dt){let c=sampleHist(st.cork.history,t),s=sampleHist(st.steel.history,t);rows.push('<tr><td>'+t.toFixed(3)+'</td><td>'+c.y+'</td><td>'+c.v+'</td><td>'+s.y+'</td><td>'+s.v+'</td></tr>')}rows.push('</table>');let blob=new Blob(['<html><meta charset="utf-8">'+rows.join('')+'</html>'],{type:'application/vnd.ms-excel'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='velocidad_terminal.xls';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}$('toggle').onclick=()=>{paused=!paused;$('toggle').textContent=paused?'Continuar':'Pausar'};$('reset').onclick=()=>{paused=false;reset()};$('exportExcel').onclick=exportExcel;
+function sampleHist(hist,t){if(!hist.length)return {y:'',v:''};let best=hist[0],bd=Math.abs(hist[0].t-t);for(const p of hist){let d=Math.abs(p.t-t);if(d<bd){best=p;bd=d}}return {y:best.y,v:best.v}}
+function decComma(v,d=5){if(v===''||v===null||v===undefined)return '';return Number(v).toFixed(d).replace('.',',')}
+function xmlEsc(s){return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[ch]))}
+function colName(n){let s='';while(n>0){let m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26)}return s}
+function sheetXml(rows){
+  const body=rows.map((row,r)=>'<row r="'+(r+1)+'">'+row.map((cell,c)=>'<c r="'+colName(c+1)+(r+1)+'" t="inlineStr"><is><t>'+xmlEsc(cell)+'</t></is></c>').join('')+'</row>').join('');
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols><col min="1" max="5" width="18" customWidth="1"/></cols><sheetData>'+body+'</sheetData></worksheet>';
+}
+function crc32(bytes){let table=crc32.table||(crc32.table=Array.from({length:256},(_,n)=>{let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;return c>>>0}));let c=0xffffffff;for(const b of bytes)c=table[(c^b)&255]^(c>>>8);return (c^0xffffffff)>>>0}
+function u16(n){return [n&255,(n>>>8)&255]}function u32(n){return [n&255,(n>>>8)&255,(n>>>16)&255,(n>>>24)&255]}
+function zipStore(files){
+  const enc=new TextEncoder(),local=[],central=[];let offset=0;
+  for(const f of files){
+    const name=enc.encode(f.name),data=enc.encode(f.text),crc=crc32(data);
+    const head=[...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...name];
+    local.push(new Uint8Array(head),data);
+    const cent=[...u32(0x02014b50),...u16(20),...u16(20),...u16(0),...u16(0),...u16(0),...u16(0),...u32(crc),...u32(data.length),...u32(data.length),...u16(name.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset),...name];
+    central.push(new Uint8Array(cent));offset+=head.length+data.length;
+  }
+  const cSize=central.reduce((a,b)=>a+b.length,0),cOffset=offset;
+  const end=new Uint8Array([...u32(0x06054b50),...u16(0),...u16(0),...u16(files.length),...u16(files.length),...u32(cSize),...u32(cOffset),...u16(0)]);
+  const total=[...local,...central,end],len=total.reduce((a,b)=>a+b.length,0),out=new Uint8Array(len);let p=0;for(const part of total){out.set(part,p);p+=part.length}return out;
+}
+function exportExcel(){
+  const dt=+$('exportDt').value||1,end=Math.max(st.cork.history.at(-1)?.t||0,st.steel.history.at(-1)?.t||0,st.t);
+  const rows=[['t/s','y corcho/m','v corcho/(m/s)','y acero/m','v acero/(m/s)']];
+  for(let t=0;t<=end+1e-9;t+=dt){
+    const c=sampleHist(st.cork.history,t),s=sampleHist(st.steel.history,t);
+    rows.push([decComma(t,3),decComma(c.y),decComma(c.v),decComma(s.y),decComma(s.v)]);
+  }
+  const files=[
+    {name:'[Content_Types].xml',text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'},
+    {name:'_rels/.rels',text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+    {name:'xl/workbook.xml',text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Velocidad terminal" sheetId="1" r:id="rId1"/></sheets></workbook>'},
+    {name:'xl/_rels/workbook.xml.rels',text:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>'},
+    {name:'xl/worksheets/sheet1.xml',text:sheetXml(rows)}
+  ];
+  const blob=new Blob([zipStore(files)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='velocidad_terminal.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+$('toggle').onclick=()=>{paused=!paused;$('toggle').textContent=paused?'Continuar':'Pausar'};$('reset').onclick=()=>{paused=false;reset()};$('exportExcel').onclick=exportExcel;
 reset();requestAnimationFrame(loop);
 </script>
 </body>
