@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio de muelles | Physics</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Cpath d='M18 10v10c0 7 28 7 28 14s-28 7-28 14v6' fill='none' stroke='%236ee7b7' stroke-width='5' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='52' r='8' fill='%23f59e0b'/%3E%3C/svg%3E">
+<script>
+window.MathJax={tex:{inlineMath:[['\\(','\\)'],['$','$']],displayMath:[['\\[','\\]']]}};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+:root{--ink:#17202f;--muted:#64748b;--paper:#f5f7fb;--panel:#fff;--line:#d9e2ec;--blue:#0b63ce;--teal:#087f8c;--amber:#d97706;--red:#dc2626;--green:#12805c}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+.vconceLogo{position:fixed;left:14px;top:14px;width:54px;height:54px;object-fit:contain;z-index:10000;pointer-events:none}
+header{padding:16px 22px 12px 88px;background:#fff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+h1{margin:0;font-size:clamp(1.75rem,4vw,2.85rem);line-height:.95}.sub{margin:6px 0 0;color:var(--muted)}.back{color:var(--blue);font-weight:850;text-decoration:none;white-space:nowrap}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:7px 16px;background:#fff;border-bottom:1px solid var(--line)}
+.tab{display:grid;grid-template-columns:58px minmax(0,1fr);gap:8px;align-items:center;min-height:58px;border:1px solid var(--line);border-radius:10px;background:#fbfdff;padding:6px 8px;cursor:pointer;text-align:left;font-weight:900;color:var(--ink)}
+.tab.active{border-color:var(--teal);box-shadow:0 0 0 2px rgba(8,127,140,.13);background:#f1fbfc}.tab b{font-size:.93rem;line-height:1.05}.tab span{display:block;color:var(--muted);font-weight:750;font-size:.72rem;margin-top:2px;line-height:1.08}.mini{display:block;width:54px;height:44px;border-radius:8px;background:#eef6fb;box-shadow:inset 0 0 0 1px rgba(15,23,42,.08)}
+.layout{display:grid;grid-template-columns:310px minmax(0,1fr) 320px;gap:12px;padding:12px 16px}.side,.read,.theory{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 8px 24px rgba(15,23,42,.05)}
+.stage{position:relative;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-height:620px}canvas{display:block;width:100%;height:620px;background:linear-gradient(#f9fcff,#edf7fb)}
+.title{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#6b7b90;font-weight:950;margin:12px 0 8px;border-top:1px solid var(--line);padding-top:10px}.title:first-child{border-top:0;margin-top:0;padding-top:0}
+label.slider{display:grid;grid-template-columns:82px minmax(70px,1fr) 64px;gap:7px;align-items:center;margin:8px 0;font-size:.8rem;font-weight:850}label.slider input{width:100%;accent-color:var(--teal);padding:0}output{color:var(--teal);font-weight:950;text-align:right;cursor:pointer}
+button,select,input{font:inherit;border:1px solid #c9d4df;border-radius:8px;padding:8px 9px;background:#fff;color:var(--ink)}button{cursor:pointer;font-weight:900}.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.danger{border-color:#fecaca;background:#fff5f5;color:#b91c1c}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.stack{display:grid;gap:8px}.hidden{display:none!important}.check{display:flex;align-items:center;gap:8px;font-weight:850;font-size:.84rem;margin:8px 0}.check input{accent-color:var(--teal);width:16px;height:16px}
+.badge{border:1px solid var(--line);border-radius:10px;background:#fbfdff;padding:9px;margin:8px 0}.badge span{display:block;color:#64748b;text-transform:uppercase;letter-spacing:.04em;font-size:.67rem;font-weight:900}.badge strong{display:block;margin-top:4px;font-size:1.05rem}.springItem{display:grid;grid-template-columns:26px 1fr 76px;gap:8px;align-items:center;border:1px solid #dbe4ee;border-radius:9px;padding:7px;margin:6px 0;background:#fbfdff;font-size:.84rem;font-weight:850}.springItem b{width:20px;height:20px;border-radius:50%;display:inline-grid;place-items:center;background:#e0f2fe;color:#075985}.springItem.first b{background:#ffe4e6;color:#be123c}.formula{background:#f8fbff;border:1px solid #dce9f7;border-radius:10px;padding:12px;margin:8px 0;color:#25344a;line-height:1.45}.theory{margin:0 16px 24px}.theory details{border:1px solid var(--line);border-radius:10px;padding:10px;margin:8px 0;background:#fff}.theory summary{font-weight:950;cursor:pointer}.theory p{color:#405066;line-height:1.45}.note{font-size:.78rem;color:var(--muted);line-height:1.35}.pill{display:inline-block;border:1px solid #cbd8e3;border-radius:999px;padding:3px 8px;background:#fff;font-size:.75rem;font-weight:900;color:#475569}.massMenu{position:fixed;z-index:40;display:none;background:#fff;border:1px solid #cbd8e3;border-radius:10px;box-shadow:0 14px 36px rgba(15,23,42,.22);padding:8px}.massMenu button{display:block;width:190px;text-align:left}
+@media(max-width:1100px){.layout{grid-template-columns:290px 1fr}.read{grid-column:1/-1}.tabs{grid-template-columns:1fr}.tab{grid-template-columns:76px 1fr}}@media(max-width:780px){header{padding-left:70px;flex-direction:column}.layout{display:block}.side,.stage,.read{margin-bottom:12px}canvas{height:540px}.vconceLogo{width:42px;height:42px}}
+</style>
+</head>
+<body>
+<img class="vconceLogo" src="../electromagnetism/assets/electric/vconce.png" alt="VConce">
+<header><div><h1>Laboratorio de muelles</h1><p class="sub">Periodo, energía elástica y combinación de muelles en serie/paralelo.</p></div><a class="back" href="./">Volver a Physics</a></header>
+<nav class="tabs" aria-label="Experimentos de muelles">
+  <button class="tab active" data-mode="0"><canvas class="mini" width="108" height="88" data-sprite="suspension"></canvas><span><b>Muelle en suspensión</b><span>Periodo, equilibrio y medida experimental de \(k\).</span></span></button>
+  <button class="tab" data-mode="1"><canvas class="mini" width="108" height="88" data-sprite="launcher"></canvas><span><b>Muelle lanzador</b><span>Energía almacenada y altura máxima.</span></span></button>
+  <button class="tab" data-mode="2"><canvas class="mini" width="108" height="88" data-sprite="coupled"></canvas><span><b>Muelles acoplados</b><span>Serie, paralelo, corte y unión.</span></span></button>
+</nav>
+<main class="layout">
+<aside class="side">
+  <section class="controls controls0">
+    <div class="title">Muelle suspendido</div>
+    <label class="slider">Masa <input id="m1" type="range" min="0.02" max="1" step="0.01" value="0.25"><output id="m1o"></output></label>
+    <label class="slider krow1">k <input id="k1" type="range" min="5" max="180" step="1" value="98"><output id="k1o"></output></label>
+    <select id="mat1" style="width:100%"></select>
+    <button id="hideK" style="width:100%;margin-top:8px">Ocultar k</button><button id="toggleGuides" style="width:100%;margin-top:8px">Mostrar líneas de referencia</button>
+    <div class="title">Instrumentos</div>
+    <p class="note">Arrastra la masa naranja al muelle y suéltala. También puedes mover la regla o el temporizador.</p>
+    <div class="row"><button id="reset1">Reiniciar</button><button id="eq1">Llevar a equilibrio</button></div>
+  </section>
+  <section class="controls controls1 hidden">
+    <div class="title">Muelle lanzador</div>
+    <label class="slider">Masa <input id="m2" type="range" min="0.02" max="1" step="0.01" value="0.18"><output id="m2o"></output></label>
+    <label class="slider">k <input id="k2" type="range" min="5" max="220" step="1" value="70"><output id="k2o"></output></label>
+    <select id="mat2" style="width:100%"></select>
+    <p class="note">Arrastra la bola hacia abajo para comprimir el muelle. Al soltarla se transforma \(E_e\) en energía cinética y potencial.</p>
+    <div class="row"><button id="reset2">Reiniciar</button><button id="ready2">Colocar bola</button></div>
+  </section>
+  <section class="controls controls2 hidden">
+    <div class="title">Red de muelles</div>
+    <label class="slider">k nuevo <input id="k3" type="range" min="2" max="220" step="1" value="40"><output id="k3o"></output></label>
+    <select id="mat3" style="width:100%"></select>
+    <div class="row"><button id="addSeries" class="primary">Añadir serie</button><button id="addParallel">Añadir paralelo</button></div>
+    <div class="row"><button id="cutSpring">Cortar</button><button id="joinSpring">Unir</button></div>
+    <div class="row"><button id="clear3" class="danger">Vaciar</button><button id="auto3">Ordenar</button></div>
+    <p class="note">Arrastra cualquier muelle para colocarlo. El primer muelle queda marcado como circuito principal.</p>
+  </section>
+</aside>
+<section class="stage"><canvas id="lab" width="1100" height="620"></canvas></section>
+<aside class="read">
+  <div class="title">Lecturas</div>
+  <div id="read0">
+    <div class="badge"><span>Elongación de equilibrio</span><strong id="xEqRead">--</strong></div>
+    <div class="badge"><span>Periodo teórico</span><strong id="T1Read">--</strong></div>
+    <div class="badge"><span>Temporizador</span><strong id="timer1Read">0,00 s</strong></div>
+    <div class="badge"><span>Longitud actual</span><strong id="len1Read">--</strong></div>
+  </div>
+  <div id="read1" class="hidden">
+    <div class="badge"><span>Compresión</span><strong id="compRead">--</strong></div>
+    <div class="badge"><span>Energía elástica</span><strong id="ERead">--</strong></div>
+    <div class="badge"><span>Tiempo hasta altura máxima</span><strong id="timer2Read">--</strong></div>
+    <div class="badge"><span>Altura máxima</span><strong id="hmaxRead">--</strong></div>
+  </div>
+  <div id="read2" class="hidden">
+    <div class="badge"><span>k equivalente</span><strong id="keqRead">--</strong></div>
+    <div class="badge"><span>Modelo</span><strong id="model3Read">serie + ramas paralelas</strong></div>
+    <div id="springList"></div>
+  </div>
+</aside>
+</main>
+<div id="massMenu" class="massMenu"><button id="massAttachBtn">Desenganchar masa</button></div>
+<section class="theory">
+  <details open><summary>Muelle en suspensión y periodo</summary>
+    <p>En equilibrio, el peso queda compensado por la fuerza elástica. Si el muelle cumple la ley de Hooke:</p>
+    <div class="formula">\[F_e=kx,\qquad mg=kx_{eq},\qquad x_{eq}=\frac{mg}{k}\]</div>
+    <p>Si se desplaza la masa alrededor de la posición de equilibrio, el movimiento ideal es armónico simple:</p>
+    <div class="formula">\[T=2\pi\sqrt{\frac{m}{k}},\qquad k=\frac{4\pi^2m}{T^2}\]</div>
+  </details>
+  <details><summary>Muelle lanzador y energía</summary>
+    <p>Al comprimir el muelle una distancia \(x\), se almacena energía potencial elástica. Si se desprecia el rozamiento, esa energía se transforma en energía cinética y después en energía potencial gravitatoria.</p>
+    <div class="formula">\[E_e=\frac12kx^2,\qquad \frac12kx^2=\frac12mv_0^2,\qquad h_{max}=\frac{v_0^2}{2g}\]</div>
+  </details>
+  <details><summary>Muelles en serie, paralelo y corte</summary>
+    <p>En serie, todos soportan la misma fuerza y las elongaciones se suman. En paralelo, todos se estiran lo mismo y las fuerzas se suman.</p>
+    <div class="formula">\[\frac1{k_{serie}}=\sum_i\frac1{k_i},\qquad k_{paralelo}=\sum_i k_i\]</div>
+    <p>Si un muelle uniforme se corta por la mitad, cada mitad tiene constante doble: \(\,k_{mitad}=2k\,\).</p>
+  </details>
+</section>
+<script>
+const canvas=document.getElementById('lab'),ctx=canvas.getContext('2d');
+const $=id=>document.getElementById(id), tabs=[...document.querySelectorAll('.tab')];
+const materials=[
+  ['Muelle blando de laboratorio',18,'#22c55e'],['Goma elástica',28,'#f97316'],['Acero fino',45,'#0891b2'],['Muelle escolar 25 mm con 250 g',98,'#0f766e'],['Acero rígido',120,'#334155'],['Titanio experimental',145,'#7c3aed']
+];
+let mode=0,W=1100,H=620,last=performance.now(),drag=null,hideK=false,showGuides=false,selectedSpring=0;
+const g=9.81,pxM=520,pxPerMm=pxM/1000;
+const s1={attached:false,x:550,anchorY:78,natural:210,y:410,v:0,releaseY:null,lastY:null,t:0,timer:{x:760,y:90,running:false,start:0,elapsed:0,last:0},ruler:{x:86,y:96,len:330,drag:false}};
+const s2={x:555,baseY:490,restTop:340,comp:0,ballY:292,v:0,h:0,state:'ready',t:0,timer:0,apex:null,camY:0,camZoom:1};
+let springs=[];let nextId=1;
+function fmt(n,d=2){return Number(n).toFixed(d).replace('.',',')}function val(id){return +$(id).value}
+function tabSpringPath(g,x,y1,y2,amp=12,turns=8){g.beginPath();g.moveTo(x,y1);let step=(y2-y1)/(turns*2);for(let i=1;i<turns*2;i++)g.lineTo(x+(i%2?amp:-amp),y1+i*step);g.lineTo(x,y2);g.stroke()}
+function tabSpringPathH(g,x1,x2,y,amp=8,turns=8){g.beginPath();g.moveTo(x1,y);let step=(x2-x1)/(turns*2);for(let i=1;i<turns*2;i++)g.lineTo(x1+i*step,y+(i%2?amp:-amp));g.lineTo(x2,y);g.stroke()}
+function roundedMiniRect(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.fill()}
+function drawTabSprites(){document.querySelectorAll('canvas.mini').forEach(cv=>{let g=cv.getContext('2d'),w=cv.width,h=cv.height,type=cv.dataset.sprite,sky=g.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#eef8ff');sky.addColorStop(1,'#ffffff');g.clearRect(0,0,w,h);g.fillStyle=sky;g.fillRect(0,0,w,h);g.strokeStyle='rgba(15,23,42,.08)';for(let x=0;x<w;x+=18){g.beginPath();g.moveTo(x,0);g.lineTo(x,h);g.stroke()}for(let y=0;y<h;y+=18){g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke()}if(type==='suspension'){g.fillStyle='#334155';g.fillRect(34,10,40,8);g.strokeStyle='#087f8c';g.lineWidth=5;tabSpringPath(g,54,18,58,11,7);let rg=g.createLinearGradient(38,58,70,82);rg.addColorStop(0,'#fbbf24');rg.addColorStop(1,'#d97706');g.fillStyle=rg;roundedMiniRect(g,34,58,40,22,7)}else if(type==='launcher'){g.fillStyle='#334155';g.fillRect(27,72,54,7);g.strokeStyle='#087f8c';g.lineWidth=5;tabSpringPath(g,54,45,72,13,5);let rg=g.createRadialGradient(46,30,4,54,34,18);rg.addColorStop(0,'#fff7ed');rg.addColorStop(.45,'#fb923c');rg.addColorStop(1,'#9a3412');g.fillStyle=rg;g.beginPath();g.arc(54,32,17,0,7);g.fill()}else{g.strokeStyle='#e11d48';g.lineWidth=5;tabSpringPathH(g,13,93,31,8,9);g.strokeStyle='#0b63ce';tabSpringPathH(g,18,88,53,8,8);g.fillStyle='#334155';g.fillRect(10,24,5,38);g.fillRect(93,24,5,38)}})}
+
+function fillMaterials(){['mat1','mat2','mat3'].forEach(id=>{const el=$(id);el.innerHTML='<option value="">Elegir material...</option>'+materials.map((m,i)=>'<option value="'+i+'">'+m[0]+' · k='+m[1]+' N/m</option>').join('')})}
+function setMode(n){mode=n;tabs.forEach(t=>t.classList.toggle('active',+t.dataset.mode===n));[0,1,2].forEach(i=>{document.querySelector('.controls'+i).classList.toggle('hidden',i!==n);$('read'+i).classList.toggle('hidden',i!==n)})}
+function springPath(x,y1,y2,amp=22,turns=12){ctx.beginPath();ctx.moveTo(x,y1);let len=y2-y1,step=len/(turns*2);for(let i=1;i<turns*2;i++){ctx.lineTo(x+(i%2?amp:-amp),y1+i*step)}ctx.lineTo(x,y2)}
+function springPathH(x1,x2,y,amp=18,turns=10){ctx.beginPath();ctx.moveTo(x1,y);let len=x2-x1,step=len/(turns*2);for(let i=1;i<turns*2;i++){ctx.lineTo(x1+i*step,y+(i%2?amp:-amp))}ctx.lineTo(x2,y)}
+function massHit(p){return Math.abs(p.x-s1.x)<55&&Math.abs(p.y-s1.y)<35}
+function timerHit(p){return p.x>s1.timer.x&&p.x<s1.timer.x+132&&p.y>s1.timer.y&&p.y<s1.timer.y+62}
+function rulerHandle(p){let r=s1.ruler;if(Math.abs(p.x-r.x-10)<18&&Math.abs(p.y-r.y+r.len/2)<22)return 'left';if(Math.abs(p.x-r.x-10)<18&&Math.abs(p.y-r.y-r.len-r.len*.03)<22)return 'right';return null}
+function rulerHit(p){let r=s1.ruler;return p.x>r.x&&p.x<r.x+72&&p.y>r.y-10&&p.y<r.y+r.len+10}
+function update1(dt){if(!s1.attached||drag?.type==='mass1')return;let m=val('m1'),k=val('k1'),natural=s1.anchorY+s1.natural,xm=(s1.y-natural)/pxM,a=g-k*xm/m-.45*s1.v;s1.v+=a*dt;s1.y+=s1.v*pxM*dt;s1.t+=dt;if(s1.timer.running){s1.timer.elapsed=(performance.now()/1000)-s1.timer.start;if(s1.timer.elapsed>.18&&s1.releaseY!==null&&s1.lastY!==null){let crossed=(s1.lastY-s1.releaseY)*(s1.y-s1.releaseY)<=0;if(crossed&&Math.abs(s1.y-s1.releaseY)<10){s1.timer.running=false;s1.timer.last=s1.timer.elapsed}}}s1.lastY=s1.y}
+function update2(dt){if(s2.state!=='flying')return;s2.t+=dt;s2.v-=g*dt;s2.h+=s2.v*dt;if(s2.v<=0&&s2.apex===null){s2.apex={t:s2.t,h:Math.max(0,s2.h)}}if(s2.apex&&s2.h<=0&&s2.v<0){s2.h=0;s2.v=0;s2.comp=0;s2.state='ready'}}
+function drawBackground(){ctx.clearRect(0,0,W,H);let grd=ctx.createLinearGradient(0,0,0,H);grd.addColorStop(0,'#fbfdff');grd.addColorStop(1,'#eef7fb');ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);ctx.strokeStyle='rgba(15,23,42,.06)';ctx.lineWidth=1;for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}}
+function drawSuspension(){drawBackground();let k=val('k1'),m=val('m1'),natural=s1.anchorY+s1.natural,eq=natural+m*g/k*pxM,springEnd=s1.attached?s1.y-26:natural;ctx.fillStyle='#334155';ctx.fillRect(550-98,s1.anchorY-18,196,18);ctx.fillStyle='#64748b';ctx.fillRect(550-12,s1.anchorY-2,24,12);ctx.strokeStyle='#087f8c';ctx.lineWidth=4;springPath(550,s1.anchorY+8,springEnd,24,13);ctx.stroke();if(showGuides){ctx.setLineDash([7,7]);ctx.strokeStyle='#f97316';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(550-145,natural);ctx.lineTo(550+145,natural);ctx.stroke();ctx.strokeStyle='#22c55e';ctx.beginPath();ctx.moveTo(550-145,eq);ctx.lineTo(550+145,eq);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#475569';ctx.font='800 13px system-ui';ctx.fillText('longitud natural',550+155,natural+4);ctx.fillText('equilibrio',550+155,eq+4)}drawMass1();drawRuler();drawTimer1();ctx.fillStyle='#0f172a';ctx.font='900 18px system-ui';ctx.fillText('Arrastra la masa al muelle, suéltala y mide el periodo',26,34)}
+function drawMass1(){ctx.save();ctx.shadowColor='rgba(15,23,42,.22)';ctx.shadowBlur=12;ctx.fillStyle='#f59e0b';round(s1.x-48,s1.y-28,96,56,12,true);ctx.restore();ctx.fillStyle='#7c2d12';ctx.font='900 16px system-ui';ctx.textAlign='center';ctx.fillText(fmt(val('m1'),2)+' kg',s1.x,s1.y+5);ctx.textAlign='left'}
+function drawRuler(){let r=s1.ruler;ctx.save();ctx.translate(r.x,r.y);ctx.fillStyle='rgba(255,255,255,.92)';ctx.strokeStyle='#334155';round(0,0,68,r.len,7,true,true);ctx.strokeStyle='#0f172a';ctx.lineWidth=1;let maxMm=Math.floor(r.len/pxPerMm);for(let mm=0;mm<=maxMm;mm+=5){let y=mm*pxPerMm,long=mm%50===0?48:mm%10===0?34:18;ctx.beginPath();ctx.moveTo(68,y);ctx.lineTo(68-long,y);ctx.stroke();if(mm%50===0){ctx.fillStyle='#0f172a';ctx.font='800 10px system-ui';ctx.fillText(String(mm),6,y+4)}}ctx.fillStyle='#0b63ce';ctx.beginPath();ctx.moveTo(24,-20);ctx.lineTo(10,-5);ctx.lineTo(38,-5);ctx.fill();ctx.beginPath();ctx.moveTo(24,r.len+20);ctx.lineTo(10,r.len+5);ctx.lineTo(38,r.len+5);ctx.fill();ctx.restore()}
+function drawTimer1(){let t=s1.timer;ctx.fillStyle='#111827';round(t.x,t.y,132,62,10,true);ctx.fillStyle='#ef4444';ctx.font='900 25px ui-monospace,monospace';ctx.textAlign='center';ctx.fillText(fmt(t.running?t.elapsed:t.last,2)+' s',t.x+66,t.y+39);ctx.textAlign='left';ctx.fillStyle='#64748b';ctx.font='800 11px system-ui';ctx.fillText('temporizador',t.x+18,t.y+76)}
+function drawLauncher(){drawBackground();let base=s2.baseY,top=s2.restTop+s2.comp,ballY=s2.state==='ready'?top-34:s2.restTop-34-s2.h*pxM;let active=s2.state==='flying'||s2.apex,targetZoom=active?1.16:1,targetCam=active?H*.42-targetZoom*ballY:0;s2.camZoom+=(targetZoom-s2.camZoom)*.08;s2.camY+=(targetCam-s2.camY)*.08;ctx.save();ctx.setTransform(s2.camZoom,0,0,s2.camZoom,W/2*(1-s2.camZoom),s2.camY);ctx.fillStyle='#334155';ctx.fillRect(s2.x-95,base+48,190,18);ctx.fillStyle='#64748b';ctx.fillRect(s2.x-65,base-4,130,56);ctx.strokeStyle='#087f8c';ctx.lineWidth=5;springPath(s2.x,top,base,28,10);ctx.stroke();ctx.strokeStyle='#dc2626';ctx.setLineDash([8,6]);ctx.beginPath();ctx.moveTo(s2.x-170,s2.restTop);ctx.lineTo(s2.x+170,s2.restTop);ctx.stroke();ctx.setLineDash([]);drawBall(s2.x,ballY,32);ctx.restore();ctx.fillStyle='#0f172a';ctx.font='900 18px system-ui';ctx.fillText('Comprime el muelle tirando de la bola hacia abajo',26,34);ctx.fillStyle='#111827';round(W-340,80,150,62,10,true);ctx.fillStyle='#ef4444';ctx.font='900 24px ui-monospace,monospace';ctx.textAlign='center';ctx.fillText(fmt(s2.apex?.t??(s2.state==='flying'?s2.t:0),2)+' s',W-265,119);ctx.fillStyle='#111827';round(W-340,165,150,62,10,true);ctx.fillStyle='#ef4444';ctx.fillText(fmt(s2.apex?.h??Math.max(0,s2.h),2)+' m',W-265,204);ctx.textAlign='left';ctx.fillStyle='#64748b';ctx.font='800 12px system-ui';ctx.fillText('tiempo a h máx.',W-324,155);ctx.fillText('altura máxima',W-320,240)}
+function drawBall(x,y,r){let g=ctx.createRadialGradient(x-r*.4,y-r*.45,3,x,y,r);g.addColorStop(0,'#fff7ed');g.addColorStop(.45,'#fb923c');g.addColorStop(1,'#9a3412');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke()}
+function drawNetwork(){drawBackground();ctx.fillStyle='#334155';ctx.fillRect(110,150,18,330);ctx.fillRect(970,150,18,330);ctx.fillStyle='#64748b';ctx.font='900 13px system-ui';ctx.fillText('terminal A',82,136);ctx.fillText('terminal B',942,136);springs.forEach((sp,i)=>{ctx.strokeStyle=i===0?'#e11d48':sp.kind==='parallel'?'#0b63ce':'#087f8c';ctx.lineWidth=i===selectedSpring?6:4;springPathH(sp.x1,sp.x2,sp.y,18,12);ctx.stroke();ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(sp.x1,sp.y,7,0,7);ctx.arc(sp.x2,sp.y,7,0,7);ctx.fill();ctx.fillStyle='#0f172a';ctx.font='900 13px system-ui';ctx.fillText('k'+sp.id+'='+fmt(sp.k,0)+' N/m',Math.min(sp.x1,sp.x2)+10,sp.y-28);if(i===0){ctx.fillStyle='#be123c';ctx.fillText('principal',sp.x1+20,sp.y+34)}});ctx.fillStyle='#0f172a';ctx.font='900 18px system-ui';ctx.fillText('Arrastra los muelles. Añade ramas en serie o paralelo, corta y une.',26,34)}
+function draw(){if(mode===0)drawSuspension();else if(mode===1)drawLauncher();else drawNetwork()}
+function round(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);if(fill)ctx.fill();if(stroke)ctx.stroke()}
+function updateReads(){let k1=val('k1'),m1=val('m1'),xeq=m1*g/k1,T=2*Math.PI*Math.sqrt(m1/k1);$('m1o').textContent=fmt(m1,2)+' kg';$('k1o').textContent=hideK?'oculto':fmt(k1,0)+' N/m';$('xEqRead').textContent=fmt(xeq*1000,1)+' mm';$('T1Read').textContent=fmt(T,2)+' s';$('timer1Read').textContent=fmt(s1.timer.running?s1.timer.elapsed:s1.timer.last,2)+' s';$('len1Read').textContent=fmt((s1.y-s1.anchorY)/pxM,3)+' m';let k2=val('k2'),m2=val('m2'),x=s2.comp/pxM,E=.5*k2*x*x;$('m2o').textContent=fmt(m2,2)+' kg';$('k2o').textContent=fmt(k2,0)+' N/m';$('compRead').textContent=fmt(x*100,1)+' cm';$('ERead').textContent=fmt(E,3)+' J';$('timer2Read').textContent=s2.apex?fmt(s2.apex.t,2)+' s':'--';$('hmaxRead').textContent=s2.apex?fmt(s2.apex.h,2)+' m':fmt(Math.max(0,s2.h),2)+' m';$('k3o').textContent=fmt(val('k3'),0)+' N/m';let eq=keq();$('keqRead').textContent=eq?fmt(eq,2)+' N/m':'--';renderSpringList()}
+function keq(){let ser=springs.filter(s=>s.kind==='series'),par=springs.filter(s=>s.kind==='parallel');let ks=ser.length?1/ser.reduce((a,s)=>a+1/s.k,0):0;return ks+par.reduce((a,s)=>a+s.k,0)}
+function renderSpringList(){let el=$('springList');if(mode!==2)return;el.innerHTML=springs.map((s,i)=>'<div class="springItem '+(i===0?'first':'')+'"><b>'+s.id+'</b><span>'+(s.kind==='series'?'serie':'paralelo')+(i===selectedSpring?' · seleccionado':'')+'</span><strong>'+fmt(s.k,1)+'</strong></div>').join('')||'<p class="note">No hay muelles en la red.</p>'}
+function resizeCanvas(){let r=canvas.getBoundingClientRect(),nw=Math.max(760,Math.round(r.width)),nh=Math.max(520,Math.round(r.height));if(canvas.width!==nw||canvas.height!==nh){canvas.width=W=nw;canvas.height=H=nh}}function loop(now){resizeCanvas();let dt=Math.min(.033,(now-last)/1000);last=now;if(mode===0)update1(dt);if(mode===1)update2(dt);updateReads();draw();requestAnimationFrame(loop)}
+function pt(e){let r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+canvas.onpointerdown=e=>{let p=pt(e);if(mode===0){let h=rulerHandle(p);if(h){drag={type:'rulerResize',handle:h,dy:p.y};return}if(timerHit(p)){drag={type:'timer',dx:p.x-s1.timer.x,dy:p.y-s1.timer.y};return}if(rulerHit(p)){drag={type:'ruler',dx:p.x-s1.ruler.x,dy:p.y-s1.ruler.y};return}if(massHit(p)){drag={type:'mass1'};canvas.setPointerCapture(e.pointerId);return}}if(mode===1){let ballY=s2.state==='ready'?s2.restTop+s2.comp-34:s2.restTop-34-s2.h*pxM;if(Math.hypot(p.x-s2.x,p.y-ballY)<42&&s2.state!=='flying'){drag={type:'ball2'};s2.state='ready';s2.apex=null;return}}if(mode===2){let idx=hitSpring(p);if(idx>=0){selectedSpring=idx;drag={type:'spring',i:idx,dx:p.x-springs[idx].x1,dy:p.y-springs[idx].y};return}}}
+canvas.onpointermove=e=>{if(!drag)return;let p=pt(e);if(drag.type==='mass1'){s1.x=Math.max(180,Math.min(W-180,p.x));s1.y=Math.max(120,Math.min(H-70,p.y));s1.v=0;if(Math.abs(s1.x-550)<90){s1.x=550;s1.attached=true}}else if(drag.type==='timer'){s1.timer.x=Math.max(10,Math.min(W-150,p.x-drag.dx));s1.timer.y=Math.max(10,Math.min(H-90,p.y-drag.dy))}else if(drag.type==='ruler'){s1.ruler.x=Math.max(8,Math.min(W-90,p.x-drag.dx));s1.ruler.y=Math.max(20,Math.min(H-s1.ruler.len-30,p.y-drag.dy))}else if(drag.type==='rulerResize'){let r=s1.ruler;r.len=Math.max(120,Math.min(560,p.y-r.y))}else if(drag.type==='ball2'){let top=s2.restTop;s2.comp=Math.max(0,Math.min(155,p.y-(top-34)));s2.h=0;s2.v=0;s2.t=0}else if(drag.type==='spring'){let sp=springs[drag.i],len=sp.x2-sp.x1;sp.x1=Math.max(128,Math.min(948,p.x-drag.dx));sp.x2=sp.x1+len;sp.y=Math.max(90,Math.min(540,p.y-drag.dy))}}
+canvas.onpointerup=e=>{if(drag?.type==='mass1'&&s1.attached){s1.releaseY=s1.y;s1.lastY=s1.y;s1.timer.running=true;s1.timer.start=performance.now()/1000;s1.timer.elapsed=0;s1.timer.last=0}if(drag?.type==='ball2'){let x=s2.comp/pxM,m=val('m2'),k=val('k2');s2.v=Math.sqrt(k*x*x/m);s2.comp=0;s2.state='flying';s2.t=0;s2.h=0;s2.apex=null}drag=null}
+canvas.oncontextmenu=e=>{let p=pt(e);if(mode===0&&massHit(p)){e.preventDefault();showMassMenu(e.clientX,e.clientY)}else hideMassMenu()};
+function showMassMenu(x,y){let menu=$('massMenu'),btn=$('massAttachBtn');btn.textContent=s1.attached?'Desenganchar masa':'Enganchar masa al muelle';menu.style.display='block';let w=210,h=48,left=Math.min(window.innerWidth-w-12,x+12),top=Math.min(window.innerHeight-h-12,y+12);menu.style.left=Math.max(12,left)+'px';menu.style.top=Math.max(12,top)+'px'}
+function hideMassMenu(){$('massMenu').style.display='none'}
+$('massAttachBtn').onclick=()=>{if(s1.attached){s1.attached=false;s1.v=0;s1.x=690;s1.y=410;s1.timer.running=false}else{s1.attached=true;s1.x=550;s1.y=s1.anchorY+s1.natural+val('m1')*g/val('k1')*pxM;s1.v=0}s1.releaseY=null;s1.lastY=null;hideMassMenu()};
+document.addEventListener('pointerdown',e=>{if($('massMenu')&&!$('massMenu').contains(e.target))hideMassMenu()});
+function hitSpring(p){for(let i=springs.length-1;i>=0;i--){let s=springs[i];if(p.x>Math.min(s.x1,s.x2)-20&&p.x<Math.max(s.x1,s.x2)+20&&Math.abs(p.y-s.y)<34)return i}return -1}
+function arrange(){let ser=springs.filter(s=>s.kind==='series'),par=springs.filter(s=>s.kind==='parallel');let start=140,end=960,y=310;if(ser.length){let step=(end-start)/ser.length;ser.forEach((s,i)=>{s.x1=start+i*step;s.x2=start+(i+1)*step-8;s.y=y})}par.forEach((s,i)=>{s.x1=start;s.x2=end;s.y=210+i*72})}
+function addSpring(kind){let k=val('k3');springs.push({id:nextId++,kind,k,x1:180,x2:430,y:260+springs.length*42});selectedSpring=springs.length-1;arrange()}
+function cutSelected(){let s=springs[selectedSpring];if(!s)return;springs.splice(selectedSpring,1,{id:nextId++,kind:s.kind,k:s.k*2,x1:s.x1,x2:(s.x1+s.x2)/2-8,y:s.y},{id:nextId++,kind:s.kind,k:s.k*2,x1:(s.x1+s.x2)/2+8,x2:s.x2,y:s.y});selectedSpring=Math.min(selectedSpring,springs.length-1)}
+function joinSelected(){let s=springs[selectedSpring],n=springs[selectedSpring+1];if(!s||!n||s.kind!==n.kind)return;let k=s.kind==='series'?1/(1/s.k+1/n.k):s.k+n.k;springs.splice(selectedSpring,2,{id:nextId++,kind:s.kind,k,x1:Math.min(s.x1,n.x1),x2:Math.max(s.x2,n.x2),y:(s.y+n.y)/2})}
+function reset1(){Object.assign(s1,{attached:false,x:690,y:410,v:0,releaseY:null,lastY:null,t:0});s1.timer.running=false;s1.timer.last=0}
+function reset2(){Object.assign(s2,{comp:0,ballY:292,v:0,h:0,state:'ready',t:0,timer:0,apex:null,camY:0,camZoom:1})}
+function initEvents(){tabs.forEach(t=>t.onclick=()=>setMode(+t.dataset.mode));fillMaterials();$('mat1').onchange=()=>{if($('mat1').value!=='')$('k1').value=materials[+$('mat1').value][1]};$('mat2').onchange=()=>{if($('mat2').value!=='')$('k2').value=materials[+$('mat2').value][1]};$('mat3').onchange=()=>{if($('mat3').value!=='')$('k3').value=materials[+$('mat3').value][1]};$('hideK').onclick=()=>{hideK=!hideK;$('hideK').textContent=hideK?'Mostrar k':'Ocultar k';document.querySelector('.krow1').style.opacity=hideK?.42:1};$('toggleGuides').onclick=()=>{showGuides=!showGuides;$('toggleGuides').textContent=showGuides?'Ocultar líneas de referencia':'Mostrar líneas de referencia'};$('reset1').onclick=reset1;$('eq1').onclick=()=>{s1.attached=true;s1.x=550;s1.y=s1.anchorY+s1.natural+val('m1')*g/val('k1')*pxM;s1.v=0};$('reset2').onclick=reset2;$('ready2').onclick=reset2;$('addSeries').onclick=()=>addSpring('series');$('addParallel').onclick=()=>addSpring('parallel');$('cutSpring').onclick=cutSelected;$('joinSpring').onclick=joinSelected;$('clear3').onclick=()=>{springs=[];nextId=1;selectedSpring=0};$('auto3').onclick=arrange;document.querySelectorAll('input[type=range]').forEach(el=>el.addEventListener('input',()=>{}));}
+document.addEventListener('click',ev=>{const out=ev.target.closest&&ev.target.closest('output');if(!out)return;const label=out.closest('label'),range=label&&label.querySelector('input[type=range]');if(!range)return;let raw=prompt('Nuevo valor',range.value);if(raw===null)return;let n=Number(String(raw).replace(',','.'));if(!Number.isFinite(n))return;range.value=Math.max(+range.min,Math.min(+range.max,n));range.dispatchEvent(new Event('input',{bubbles:true}))});
+drawTabSprites();initEvents();addSpring('series');addSpring('series');addSpring('parallel');requestAnimationFrame(loop);
+</script>
+</body>
+</html>
