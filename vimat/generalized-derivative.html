@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Derivada generalizada (r,s) | Vimat</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%230f172a'/%3E%3Cpath d='M8 48c12-2 12-31 24-31s10 27 24 29' fill='none' stroke='%2338bdf8' stroke-width='5'/%3E%3Ccircle cx='32' cy='17' r='5' fill='%23fb7185'/%3E%3Cpath d='M17 39l31-16' stroke='%23fbbf24' stroke-width='3'/%3E%3C/svg%3E">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},chtml:{scale:.94}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+:root{--ink:#17202f;--muted:#64748b;--paper:#f4f7fb;--panel:#fff;--line:#d8e2ec;--blue:#0b63ce;--teal:#087f8c;--red:#dc2626;--violet:#7c3aed;--gold:#d97706}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.logo{position:fixed;left:14px;top:12px;width:50px;height:50px;object-fit:contain;z-index:20;pointer-events:none}
+header{height:74px;padding:11px 22px 10px 82px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:18px}
+h1{font-size:clamp(1.45rem,3vw,2.25rem);line-height:1;margin:0}.sub{margin:5px 0 0;color:var(--muted);font-size:.9rem}.back{color:var(--blue);font-weight:850;text-decoration:none;white-space:nowrap}
+.workspace{display:grid;grid-template-columns:292px minmax(0,1fr) 286px;gap:10px;padding:10px;min-height:calc(100vh - 74px)}
+.panel,.stage,.theory{background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 20px rgba(15,23,42,.05)}
+.panel{padding:12px;overflow:auto;max-height:calc(100vh - 94px)}.stage{position:relative;overflow:hidden;min-height:650px}
+canvas#plot{display:block;width:100%;height:650px;touch-action:none;cursor:crosshair;background:#fff}
+.stagebar{position:absolute;left:10px;right:10px;top:10px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.stagebar>*{pointer-events:auto}.hint{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:#475569;font-size:.76rem;font-weight:800}
+.viewbuttons{display:flex;gap:5px}.icon{width:34px;height:34px;padding:0;font-size:1.05rem}
+.section{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:950;margin:13px 0 7px;border-top:1px solid var(--line);padding-top:10px}.section:first-child{margin-top:0;border-top:0;padding-top:0}
+label.compact{display:grid;grid-template-columns:74px minmax(68px,1fr) 66px;gap:6px;align-items:center;margin:7px 0;font-size:.77rem;font-weight:850}.aControl{grid-template-columns:18px 64px minmax(0,1fr)!important}.aControl output{text-align:left}.inlineValue{width:64px;min-width:0;padding:4px 5px;border:1px solid var(--teal);border-radius:6px;color:var(--teal);font-weight:950;background:#fff}.generalizedValue{margin-top:8px;padding:9px;border:1px solid #cfe0f3;border-radius:8px;background:#f7fbff;color:#24364f;overflow:auto;font-size:.82rem}.generalizedValue .approx{border-top:1px solid #dce7f2;margin-top:5px;padding-top:6px;color:#526176;font-weight:800}
+label.compact input[type=range]{width:100%;accent-color:var(--teal)}output{color:var(--teal);font-weight:950;text-align:right;cursor:pointer}
+select,input[type=number],button{font:inherit;border:1px solid #cbd7e3;border-radius:8px;background:#fff;color:var(--ink);padding:7px 8px}
+select{width:100%}button{cursor:pointer;font-weight:900}.primary{background:#17202f;color:#fff;border-color:#17202f}.secondary{background:#eef6ff;color:#174b87}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:7px 0}.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:7px 0}.row button,.row3 button{padding:7px 5px;font-size:.75rem}
+.check{display:flex;align-items:center;gap:7px;font-size:.78rem;font-weight:850;margin:7px 0}.check input{accent-color:var(--teal)}
+.formula{background:#f7fbff;border:1px solid #dce9f7;border-radius:9px;padding:9px;color:#29384e;overflow:auto;font-size:.9rem}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:7px}.stat{border:1px solid var(--line);border-radius:8px;padding:8px;background:#fbfdff}.stat span{display:block;color:#64748b;font-size:.63rem;text-transform:uppercase;font-weight:900;letter-spacing:.035em}.stat strong{display:block;margin-top:3px;font-size:.94rem;overflow-wrap:anywhere}
+.diagnosis{margin-top:8px;padding:9px;border-left:4px solid var(--teal);border-radius:7px;background:#ecfdf5;color:#155e54;font-size:.78rem;line-height:1.38}.diagnosis.warn{border-color:#ef4444;background:#fff1f2;color:#881337}
+.tablewrap{max-height:240px;overflow:auto;border:1px solid var(--line);border-radius:8px;margin-top:8px}table{width:100%;border-collapse:collapse;font-size:.72rem;font-variant-numeric:tabular-nums}th,td{padding:6px 7px;border-bottom:1px solid #edf1f5;text-align:right}th{position:sticky;top:0;background:#f7fafc;color:#64748b;text-transform:uppercase;font-size:.62rem}th:first-child,td:first-child{text-align:left}
+.theory{margin:0 10px 18px;padding:12px}.theory details{border:1px solid var(--line);border-radius:8px;padding:9px;margin:7px 0}.theory summary{cursor:pointer;font-weight:950}.theory p{color:#445269;line-height:1.48;font-size:.9rem}
+@media(max-width:1120px){.workspace{grid-template-columns:270px minmax(0,1fr)}.right{grid-column:1/-1;max-height:none}.stage{min-height:600px}canvas#plot{height:600px}}
+@media(max-width:760px){header{height:auto;min-height:70px;align-items:flex-start;flex-direction:column}.workspace{display:block}.panel,.stage{margin-bottom:10px;max-height:none}.stage{min-height:520px}canvas#plot{height:520px}.logo{width:42px;height:42px}}
+</style>
+</head>
+<body>
+<img class="logo" src="../electromagnetism/assets/electric/vconce.png" alt="VConce">
+<header><div><h1>Derivada generalizada \((r,s)\)</h1><p class="sub">Secantes móviles, convergencia y puntos no derivables.</p></div></header>
+<main class="workspace">
+<aside class="panel">
+  <div class="section">Función y punto</div>
+  <select id="func">
+    <option value="x2">\(f(x)=x^2\)</option><option value="cubic">\(f(x)=x^3-x\)</option>
+    <option value="sin">\(f(x)=\sin x\)</option><option value="cos">\(f(x)=\cos x\)</option>
+    <option value="exp">\(f(x)=e^{0.6x}\)</option><option value="rat">\(f(x)=1/(1+x^2)\)</option>
+    <option value="abs">\(f(x)=|x|\)</option><option value="root">\(f(x)=\sqrt[3]{x}\)</option>
+    <option value="relu">\(f(x)=\max(0,x)\)</option>
+  </select>
+  <label class="compact aControl">\(a\)<output id="ao"></output><input id="a" type="range" min="-8" max="8" step=".01" value=".5"></label>
+  <div class="row"><button id="fit" class="secondary">Ajustar gráfica</button><button id="centerA">Centrar en \(a\)</button></div>
+  <div class="section">Parámetros</div>
+  <label class="compact">\(r\)<input id="r" type="range" min="-5" max="5" step=".01" value="1"><output id="ro"></output></label>
+  <label class="compact">\(s\)<input id="s" type="range" min="-5" max="5" step=".01" value="-1"><output id="so"></output></label>
+  <label class="compact">\(|h|\)<input id="logh" type="range" min="-5" max=".3" step=".01" value="-1"><output id="ho"></output></label>
+  <label class="compact">Signo \(h\)<select id="hsign"><option value="1">positivo</option><option value="-1">negativo</option></select><output></output></label>
+  <div class="row3"><button class="preset" data-r="1" data-s="0">Adelante</button><button class="preset" data-r="0" data-s="-1">Atrás</button><button class="preset" data-r="1" data-s="-1">Central</button></div>
+  <div class="row"><button id="animate" class="primary">Animar \(h\to0\)</button><button id="reset">Reiniciar</button></div>
+  <div class="section">Visualización</div>
+  <label class="check"><input id="showTangent" type="checkbox" checked>Mostrar tangente</label>
+  <label class="check"><input id="showLabels" type="checkbox" checked>Mostrar etiquetas</label>
+  <div class="formula">\[
+  f^{(r,s)}(a)=\lim_{h\to0}\frac{f(a+rh)-f(a+sh)}{(r-s)h},\quad r\ne s
+  \]</div>
+</aside>
+<section class="stage">
+  <canvas id="plot"></canvas>
+  <div class="stagebar"><div class="hint">Arrastra el punto rojo o haz clic para elegir \(a\). Arrastra el fondo para mover; rueda para zoom.</div><div class="viewbuttons"><button id="zoomOut" class="icon" title="Alejar">−</button><button id="zoomIn" class="icon" title="Acercar">+</button><button id="home" class="icon" title="Reiniciar vista">⌂</button></div></div>
+</section>
+<aside class="panel right">
+  <div class="section">Lecturas</div>
+  <div class="stats">
+    <div class="stat"><span>\(x_s=a+sh\)</span><strong id="xs">—</strong></div>
+    <div class="stat"><span>\(x_r=a+rh\)</span><strong id="xr">—</strong></div>
+    <div class="stat"><span>Cociente</span><strong id="q">—</strong></div>
+    <div class="stat"><span>\(f'(a)\)</span><strong id="der">—</strong></div>
+    <div class="stat"><span>Error</span><strong id="err">—</strong></div>
+    <div class="stat"><span>Separación</span><strong id="sep">—</strong></div>
+  </div>
+  <div id="generalizedValue" class="generalizedValue"></div>
+  <div id="diagnosis" class="diagnosis"></div>
+  <div class="section">Convergencia</div>
+  <div class="tablewrap"><table><thead><tr><th>\(h\)</th><th>Cociente</th><th>Error</th></tr></thead><tbody id="conv"></tbody></table></div>
+</aside>
+</main>
+<section class="theory">
+<details open><summary>Interpretación geométrica</summary><p>El denominador es exactamente la separación horizontal entre los puntos \(x_s=a+sh\) y \(x_r=a+rh\). Por tanto, el cociente es la pendiente de la secante que une \((x_s,f(x_s))\) con \((x_r,f(x_r))\).</p><div class="formula">\[(r-s)h=(a+rh)-(a+sh)\]</div></details>
+<details><summary>Relación con la derivada ordinaria</summary><p>Si \(f\) es derivable en \(a\), ambos puntos se acercan a \(a\) cuando \(h\to0\), y la pendiente de la secante converge a la pendiente de la tangente. Para funciones suaves, el límite es independiente del par fijo \(r\ne s\).</p><div class="formula">\[f^{(r,s)}(a)=f'(a)\]</div></details>
+<details><summary>Qué ocurre en puntos singulares</summary><p>En una esquina, cúspide o tangente vertical, el resultado puede depender de \(r,s\) o no converger a un número finito. Prueba \(f(x)=|x|\) en \(a=0\) con los esquemas adelante, atrás y central.</p></details>
+</section>
+<script>
+(()=>{
+const $=id=>document.getElementById(id),canvas=$('plot'),ctx=canvas.getContext('2d');
+const ui={func:$('func'),a:$('a'),r:$('r'),s:$('s'),logh:$('logh'),hsign:$('hsign')};
+let W=900,H=650,view={cx:.5,cy:0,sx:90,sy:80},drag=null,moved=false,anim=null;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),finite=Number.isFinite;
+const fmt=(v,d=5)=>{if(!finite(v))return '—';let av=Math.abs(v);return av&&av<1e-4?v.toExponential(3):v.toFixed(d).replace('.',',')};
+function f(x){switch(ui.func.value){case'x2':return x*x;case'cubic':return x*x*x-x;case'sin':return Math.sin(x);case'cos':return Math.cos(x);case'exp':return Math.exp(.6*x);case'rat':return 1/(1+x*x);case'abs':return Math.abs(x);case'root':return Math.sign(x)*Math.cbrt(Math.abs(x));case'relu':return Math.max(0,x)}}
+function derivative(a){let e=1e-8;switch(ui.func.value){case'x2':return{ok:true,v:2*a};case'cubic':return{ok:true,v:3*a*a-1};case'sin':return{ok:true,v:Math.cos(a)};case'cos':return{ok:true,v:-Math.sin(a)};case'exp':return{ok:true,v:.6*Math.exp(.6*a)};case'rat':return{ok:true,v:-2*a/(1+a*a)**2};case'abs':return Math.abs(a)<e?{ok:false,v:NaN}:{ok:true,v:Math.sign(a)};case'relu':return Math.abs(a)<e?{ok:false,v:NaN}:{ok:true,v:a>0?1:0};case'root':return Math.abs(a)<e?{ok:false,v:Infinity}:{ok:true,v:1/(3*Math.abs(a)**(2/3))}}}
+function state(){let r=+ui.r.value,s=+ui.s.value;if(Math.abs(r-s)<.02){s=r-.02;ui.s.value=s}return{a:+ui.a.value,r,s,h:+ui.hsign.value*10**(+ui.logh.value)}}
+function quotient(a,r,s,h){let d=(r-s)*h;return Math.abs(d)<1e-15?NaN:(f(a+r*h)-f(a+s*h))/d}
+function resize(){let b=canvas.getBoundingClientRect(),w=Math.max(560,Math.round(b.width)),h=Math.max(480,Math.round(b.height));if(w!==W||h!==H){canvas.width=W=w;canvas.height=H=h}}
+const X=x=>(x-view.cx)*view.sx+W/2,Y=y=>H/2-(y-view.cy)*view.sy;
+const wx=x=>(x-W/2)/view.sx+view.cx,wy=y=>(H/2-y)/view.sy+view.cy;
+function niceStep(span,target=10){let raw=span/target,p=10**Math.floor(Math.log10(raw)),u=raw/p;return(u<1.5?1:u<3.5?2:u<7.5?5:10)*p}
+function grid(){ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);let xmin=wx(0),xmax=wx(W),ymin=wy(H),ymax=wy(0),xs=niceStep(xmax-xmin),ys=niceStep(ymax-ymin);ctx.font='11px system-ui';ctx.lineWidth=1;for(let x=Math.ceil(xmin/xs)*xs;x<=xmax;x+=xs){let px=X(x);ctx.strokeStyle=Math.abs(x)<xs/100?'#64748b':'#e8eef5';ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,H);ctx.stroke();ctx.fillStyle='#64748b';ctx.fillText(Math.abs(x)<1e-10?'0':Number(x.toPrecision(6)),px+3,H-8)}for(let y=Math.ceil(ymin/ys)*ys;y<=ymax;y+=ys){let py=Y(y);ctx.strokeStyle=Math.abs(y)<ys/100?'#64748b':'#e8eef5';ctx.beginPath();ctx.moveTo(0,py);ctx.lineTo(W,py);ctx.stroke();if(Math.abs(y)>ys/100){ctx.fillStyle='#64748b';ctx.fillText(Number(y.toPrecision(6)),5,py-3)}}}
+function lineWorld(m,b,color,dash=[],width=2){let x1=wx(0),x2=wx(W),y1=m*x1+b,y2=m*x2+b;ctx.save();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(X(x1),Y(y1));ctx.lineTo(X(x2),Y(y2));ctx.stroke();ctx.restore()}
+function curve(){let xmin=wx(0),xmax=wx(W),last=null;ctx.strokeStyle='#17202f';ctx.lineWidth=3;ctx.beginPath();for(let i=0;i<=W;i++){let x=xmin+(xmax-xmin)*i/W,y=f(x),py=Y(y);if(!finite(y)||Math.abs(py)>H*5){last=null;continue}if(last===null)ctx.moveTo(i,py);else ctx.lineTo(i,py);last=py}ctx.stroke()}
+function point(x,y,r,fill,stroke){ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(X(x),Y(y),r,0,Math.PI*2);ctx.fill();ctx.stroke()}
+function draw(){resize();grid();curve();let {a,r,s,h}=state(),xs=a+s*h,xr=a+r*h,ys=f(xs),yr=f(xr),ya=f(a),q=quotient(a,r,s,h),d=derivative(a);if(finite(q))lineWorld(q,ys-q*xs,'#0b63ce',[9,6],2.7);if($('showTangent').checked&&d.ok&&finite(d.v))lineWorld(d.v,ya-d.v*a,'#7c3aed',[4,5],2.2);ctx.save();ctx.setLineDash([5,5]);ctx.lineWidth=1.2;for(const [x,c] of [[xs,'#087f8c'],[xr,'#0b63ce'],[a,'#dc2626']]){ctx.strokeStyle=c;ctx.beginPath();ctx.moveTo(X(x),0);ctx.lineTo(X(x),H);ctx.stroke()}ctx.restore();point(xs,ys,6,'#d1fae5','#087f8c');point(xr,yr,6,'#dbeafe','#0b63ce');point(a,ya,8,'#fee2e2','#dc2626');if($('showLabels').checked){ctx.font='900 14px system-ui';ctx.fillStyle='#087f8c';ctx.fillText('xₛ',X(xs)+8,Y(ys)-9);ctx.fillStyle='#0b63ce';ctx.fillText('xᵣ',X(xr)+8,Y(yr)-9);ctx.fillStyle='#dc2626';ctx.fillText('a',X(a)+10,Y(ya)-12)}updateReadings(a,r,s,h,xs,xr,q,d)}
+let formulaKey='',formulaTimer=null;
+function generalizedLimit(a,r,s){let eps=1e-7*Math.max(1,Math.abs(a)),qp=quotient(a,r,s,eps),qm=quotient(a,r,s,-eps),tol=2e-4*(1+Math.max(Math.abs(qp||0),Math.abs(qm||0)));return finite(qp)&&finite(qm)&&Math.abs(qp-qm)<=tol?{ok:true,v:(qp+qm)/2,plus:qp,minus:qm}:{ok:false,v:NaN,plus:qp,minus:qm}}
+function texNum(v,d=3){if(!finite(v))return '\\text{no finito}';let z=Math.abs(v)<1e-12?0:v;return Number(z.toFixed(d)).toString()}
+function signedTerm(v){let t=texNum(v);return v<0?'('+t+')':t}
+function updateGeneralizedValue(a,r,s,h,q){let lim=generalizedLimit(a,r,s),key=[a,r,s,h,q,lim.ok,lim.v].map(v=>String(v)).join('|');if(key===formulaKey)return;formulaKey=key;let result=lim.ok?texNum(lim.v,6):'\\text{no existe como límite bilateral}',box=$('generalizedValue');box.innerHTML='\\[f^{('+texNum(r)+','+texNum(s)+')}('+texNum(a)+')=\\lim_{h\\to0}\\frac{f('+texNum(a)+'+'+signedTerm(r)+'h)-f('+texNum(a)+'+'+signedTerm(s)+'h)}{('+texNum(r)+'-'+signedTerm(s)+')h}='+result+'\\]<div class="approx">Con \\(h='+texNum(h,6)+'\\): cociente = <b>'+fmt(q)+'</b></div>';clearTimeout(formulaTimer);formulaTimer=setTimeout(()=>{if(window.MathJax?.typesetPromise){window.MathJax.typesetClear?.([box]);window.MathJax.typesetPromise([box]).catch(()=>{})}},70)}
+function updateReadings(a,r,s,h,xs,xr,q,d){$('ao').textContent=fmt(a,2);$('ro').textContent=fmt(r,2);$('so').textContent=fmt(s,2);$('ho').textContent=fmt(h,5);$('xs').textContent=fmt(xs);$('xr').textContent=fmt(xr);$('q').textContent=fmt(q);$('der').textContent=d.ok?fmt(d.v):'no existe';$('err').textContent=d.ok&&finite(d.v)?fmt(Math.abs(q-d.v)):'—';$('sep').textContent=fmt(xr-xs);updateGeneralizedValue(a,r,s,h,q);let box=$('diagnosis');box.classList.toggle('warn',!d.ok);box.innerHTML=d.ok?`La función es derivable en <b>a=${fmt(a,2)}</b>. El error actual respecto de \\(f'(a)\\) es <b>${fmt(Math.abs(q-d.v))}</b>.`:`En este punto no existe una derivada ordinaria finita. Cambia \\(r,s\\) y el signo de \\(h\\) para comparar aproximaciones.`;let rows='',sign=Math.sign(h)||1;for(const z of [1,.5,.2,.1,.05,.01,.005,.001,.0001]){let hh=sign*z,qq=quotient(a,r,s,hh),er=d.ok&&finite(d.v)?Math.abs(qq-d.v):NaN;rows+=`<tr><td>${fmt(hh,4)}</td><td><b>${fmt(qq)}</b></td><td>${fmt(er)}</td></tr>`}$('conv').innerHTML=rows}
+function fit(){let a=+ui.a.value,xmin=a-4,xmax=a+4,min=Infinity,max=-Infinity;for(let i=0;i<=400;i++){let y=f(xmin+(xmax-xmin)*i/400);if(finite(y)&&Math.abs(y)<1e5){min=Math.min(min,y);max=Math.max(max,y)}}if(!finite(min)||max===min){min=-2;max=2}view.cx=a;view.cy=(min+max)/2;view.sx=W/8;view.sy=(H-90)/(max-min||4)}
+function zoomAt(px,py,factor){let beforeX=wx(px),beforeY=wy(py);view.sx=clamp(view.sx*factor,18,700);view.sy=clamp(view.sy*factor,18,700);view.cx=beforeX-(px-W/2)/view.sx;view.cy=beforeY-(H/2-py)/view.sy}
+canvas.addEventListener('wheel',e=>{e.preventDefault();let b=canvas.getBoundingClientRect(),px=(e.clientX-b.left)*W/b.width,py=(e.clientY-b.top)*H/b.height;zoomAt(px,py,Math.exp(-e.deltaY*.001));draw()},{passive:false});
+canvas.addEventListener('pointerdown',e=>{let b=canvas.getBoundingClientRect(),px=(e.clientX-b.left)*W/b.width,py=(e.clientY-b.top)*H/b.height,{a}=state(),dist=Math.hypot(px-X(a),py-Y(f(a)));drag={type:dist<22?'a':'pan',px,py,cx:view.cx,cy:view.cy};moved=false;canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointermove',e=>{if(!drag)return;let b=canvas.getBoundingClientRect(),px=(e.clientX-b.left)*W/b.width,py=(e.clientY-b.top)*H/b.height;if(Math.hypot(px-drag.px,py-drag.py)>3)moved=true;if(drag.type==='a'){ui.a.value=clamp(wx(px),+ui.a.min,+ui.a.max)}else{view.cx=drag.cx-(px-drag.px)/view.sx;view.cy=drag.cy+(py-drag.py)/view.sy}draw()});
+canvas.addEventListener('pointerup',e=>{if(drag&&drag.type==='pan'&&!moved){let b=canvas.getBoundingClientRect(),px=(e.clientX-b.left)*W/b.width;ui.a.value=clamp(wx(px),+ui.a.min,+ui.a.max)}drag=null;draw()});
+canvas.addEventListener('dblclick',()=>{fit();draw()});
+Object.values(ui).forEach(el=>el.addEventListener('input',()=>{if(el===ui.func)fit();draw()}));$('showTangent').onchange=draw;$('showLabels').onchange=draw;
+document.querySelectorAll('.preset').forEach(b=>b.onclick=()=>{ui.r.value=b.dataset.r;ui.s.value=b.dataset.s;draw()});
+$('fit').onclick=()=>{fit();draw()};$('centerA').onclick=()=>{view.cx=+ui.a.value;view.cy=f(view.cx);draw()};$('home').onclick=()=>{fit();draw()};$('zoomIn').onclick=()=>{zoomAt(W/2,H/2,1.25);draw()};$('zoomOut').onclick=()=>{zoomAt(W/2,H/2,.8);draw()};
+$('reset').onclick=()=>{ui.func.value='x2';ui.a.value=.5;ui.r.value=1;ui.s.value=-1;ui.logh.value=-1;ui.hsign.value=1;fit();draw()};
+$('animate').onclick=()=>{clearInterval(anim);let seq=[0,-.3,-.6,-1,-1.5,-2,-2.5,-3,-3.5,-4,-5],i=0;anim=setInterval(()=>{ui.logh.value=seq[i++];draw();if(i>=seq.length)clearInterval(anim)},380)};
+document.addEventListener('click',e=>{let out=e.target.closest('output');if(!out||out.dataset.editing==='1')return;let label=out.closest('label'),range=label?.querySelector('input[type=range]');if(!range)return;e.preventDefault();let input=document.createElement('input');input.type='number';input.className='inlineValue';input.min=range.min;input.max=range.max;input.step=range.step||'any';input.value=range.value;out.dataset.editing='1';out.replaceWith(input);input.focus();input.select();let done=false;function finish(save){if(done)return;done=true;if(save){let n=Number(String(input.value).replace(',','.'));if(finite(n)){range.value=clamp(n,+range.min,+range.max);range.dispatchEvent(new Event('input',{bubbles:true}))}}input.replaceWith(out);out.dataset.editing='0'}input.onkeydown=ev=>{if(ev.key==='Enter')finish(true);if(ev.key==='Escape')finish(false)};input.onblur=()=>finish(true)});
+window.addEventListener('resize',draw);resize();fit();draw();
+})();
+</script>
+</body></html>
