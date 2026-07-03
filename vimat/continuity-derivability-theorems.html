@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teoremas de continuidad y derivabilidad | Vimat</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%230f172a'/%3E%3Cpath d='M7 47c9-34 18 12 28-20 7-23 13 17 22-9' fill='none' stroke='%2338bdf8' stroke-width='5' stroke-linecap='round'/%3E%3Ccircle cx='35' cy='27' r='5' fill='%23fb7185'/%3E%3Cpath d='M22 38h27' stroke='%23fbbf24' stroke-width='3'/%3E%3C/svg%3E">
+<script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},chtml:{scale:.93}};</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+:root{--ink:#17202f;--muted:#64748b;--paper:#f4f7fb;--panel:#fff;--line:#d8e2ec;--blue:#0b63ce;--teal:#087f8c;--red:#dc2626;--violet:#7c3aed;--gold:#d97706;--green:#15803d}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.logo{position:fixed;left:14px;top:12px;width:50px;height:50px;object-fit:contain;z-index:30;pointer-events:none}
+header{min-height:74px;padding:11px 22px 10px 82px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px}
+h1{font-size:clamp(1.35rem,3vw,2.15rem);line-height:1;margin:0}.sub{margin:5px 0 0;color:var(--muted);font-size:.88rem}
+.theoremHead{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:14px;align-items:center;padding:10px 14px;background:#fff;border-bottom:1px solid var(--line)}
+.theoremText h2{margin:0 0 5px;font-size:1.22rem}.statement{font-family:Georgia,"Times New Roman",serif;font-size:1.03rem;line-height:1.42;color:#26354b}
+.portraitWrap{justify-self:end;display:flex;align-items:center;gap:9px}.portrait{width:78px;height:78px;object-fit:cover;border-radius:7px;border:1px solid #cbd7e3;filter:grayscale(.12);background:#e5e7eb}.portraitMeta{font-size:.68rem;color:#64748b;line-height:1.25;max-width:78px}
+.workspace{display:grid;grid-template-columns:292px minmax(0,1fr) 282px;gap:10px;padding:10px;min-height:650px}
+.panel,.stage,.theory{background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 6px 20px rgba(15,23,42,.05)}.panel{padding:12px;overflow:auto;max-height:690px}
+.stage{position:relative;overflow:hidden;min-height:650px}canvas#plot{display:block;width:100%;height:650px;touch-action:none;cursor:grab;background:#fff}canvas#plot.dragging{cursor:grabbing}
+.stagebar{position:absolute;left:9px;right:9px;top:9px;display:flex;justify-content:space-between;gap:8px;pointer-events:none}.stagebar>*{pointer-events:auto}.hint{max-width:480px;background:rgba(255,255,255,.93);border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:#475569;font-size:.74rem;font-weight:800}.viewbuttons{display:flex;gap:5px}.icon{width:34px;height:34px;padding:0;font-size:1.05rem}
+.section{font-size:.69rem;text-transform:uppercase;letter-spacing:.08em;color:#64748b;font-weight:950;margin:13px 0 7px;border-top:1px solid var(--line);padding-top:10px}.section:first-child{margin-top:0;border-top:0;padding-top:0}
+label.compact{display:grid;grid-template-columns:56px 61px minmax(0,1fr);gap:6px;align-items:center;margin:7px 0;font-size:.78rem;font-weight:850}label.compact input[type=range]{width:100%;accent-color:var(--teal)}output{color:var(--teal);font-weight:950;text-align:right;cursor:pointer}.inlineValue{width:61px;min-width:0;padding:4px 5px;border:1px solid var(--teal);border-radius:6px;color:var(--teal);font-weight:950;background:#fff;text-align:right}
+select,button,input{font:inherit;border:1px solid #cbd7e3;border-radius:8px;background:#fff;color:var(--ink);padding:7px 8px}select{width:100%}button{cursor:pointer;font-weight:900}.primary{background:#17202f;color:#fff;border-color:#17202f}.secondary{background:#eef6ff;color:#174b87}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:7px 0}.row button{font-size:.75rem;padding:7px 5px}.check{display:flex;align-items:center;gap:7px;font-size:.78rem;font-weight:850;margin:7px 0}.check input{accent-color:var(--teal)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:7px}.stat{border:1px solid var(--line);border-radius:8px;padding:8px;background:#fbfdff}.stat span{display:block;color:#64748b;font-size:.61rem;text-transform:uppercase;font-weight:900}.stat strong{display:block;margin-top:3px;font-size:.9rem;overflow-wrap:anywhere}
+.condition{padding:9px;border-left:4px solid var(--green);border-radius:7px;background:#f0fdf4;color:#166534;font-size:.78rem;line-height:1.4}.condition.fail{border-color:#dc2626;background:#fff1f2;color:#881337}
+.formula{background:#f7fbff;border:1px solid #dce9f7;border-radius:9px;padding:9px;color:#29384e;overflow:auto;font-size:.86rem}.explain{color:#475569;font-size:.8rem;line-height:1.43}
+.legend{display:grid;gap:6px;margin-top:8px;font-size:.73rem;color:#526176}.legend span{display:flex;align-items:center;gap:6px}.sw{width:13px;height:4px;border-radius:5px;display:inline-block}
+.theory{margin:0 10px 18px;padding:12px}.theory details{border:1px solid var(--line);border-radius:8px;padding:9px;margin:7px 0}.theory summary{cursor:pointer;font-weight:950}.theory p{color:#445269;line-height:1.48;font-size:.9rem}
+@media(max-width:1120px){.workspace{grid-template-columns:270px minmax(0,1fr)}.right{grid-column:1/-1;max-height:none}.stage{min-height:590px}canvas#plot{height:590px}}
+@media(max-width:760px){header{padding-left:70px}.theoremHead{grid-template-columns:1fr}.portraitWrap{justify-self:start}.workspace{display:block}.panel,.stage{margin-bottom:10px;max-height:none}.stage{min-height:520px}canvas#plot{height:520px}.logo{width:42px;height:42px}}
+</style>
+</head>
+<body>
+<img class="logo" src="../electromagnetism/assets/electric/vconce.png" alt="VConce">
+<header><div><h1>Teoremas de continuidad y derivabilidad</h1><p class="sub">Hipótesis, conclusión y lectura geométrica interactiva.</p></div></header>
+<section class="theoremHead">
+  <div class="theoremText"><h2 id="theoremTitle"></h2><div id="statement" class="statement"></div></div>
+  <div class="portraitWrap"><div id="portraitMeta" class="portraitMeta"></div><img id="portrait" class="portrait" alt=""></div>
+</section>
+<main class="workspace">
+<aside class="panel">
+  <div class="section">Teorema</div>
+  <select id="theorem">
+    <option value="bolzano">Teorema de Bolzano</option>
+    <option value="ivt">Teorema del valor intermedio</option>
+    <option value="weierstrass">Teorema de Weierstrass</option>
+    <option value="fermat">Teorema de Fermat</option>
+    <option value="rolle">Teorema de Rolle</option>
+    <option value="lagrange">Teorema del valor medio de Lagrange</option>
+    <option value="cauchy">Teorema del valor medio de Cauchy</option>
+    <option value="darboux">Teorema de Darboux para derivadas</option>
+  </select>
+  <div class="section">Función</div>
+  <select id="functionChoice">
+    <option value="native">Ejemplo propio del teorema</option>
+    <option value="square">f(x) = x²</option>
+    <option value="abs">f(x) = |x|</option>
+    <option value="cubic">f(x) = x³ - x</option>
+    <option value="sin">f(x) = sen x</option>
+    <option value="sqrt">f(x) = √(x + 6)</option>
+  </select>
+  <div class="section">Intervalo y parámetros</div>
+  <label class="compact">\(a\)<output id="ao"></output><input id="a" type="range" min="-5" max="3" step=".01" value="-2"></label>
+  <label class="compact">\(b\)<output id="bo"></output><input id="b" type="range" min="-3" max="5" step=".01" value="2"></label>
+  <label class="compact optional targetRow">Nivel \(k\)<output id="targeto"></output><input id="target" type="range" min="-4" max="4" step=".01" value=".5"></label>
+  <label class="compact optional cRow">Punto \(c\)<output id="co"></output><input id="c" type="range" min="-5" max="5" step=".01" value="0"></label>
+  <label class="compact">Forma \(p\)<output id="shapeo"></output><input id="shape" type="range" min="-2" max="2" step=".01" value=".4"></label>
+  <div class="row"><button id="example" class="primary">Nuevo ejemplo</button><button id="fit" class="secondary">Ajustar gráfica</button></div>
+  <label class="check"><input id="showDerivative" type="checkbox">Mostrar \(f'\)</label>
+  <div class="section">Lectura</div>
+  <div id="condition" class="condition"></div>
+  <div id="formula" class="formula"></div>
+</aside>
+<section class="stage">
+  <canvas id="plot"></canvas>
+  <div class="stagebar"><div id="hint" class="hint">Arrastra \(a\), \(b\) o \(c\). Arrastra el fondo para mover y usa la rueda para zoom.</div><div class="viewbuttons"><button id="zoomOut" class="icon">−</button><button id="zoomIn" class="icon">+</button><button id="home" class="icon">⌂</button></div></div>
+</section>
+<aside class="panel right">
+  <div class="section">Valores</div><div id="stats" class="stats"></div>
+  <div class="section">Interpretación</div><div id="explanation" class="explain"></div>
+  <div class="section">Leyenda</div><div class="legend">
+    <span><i class="sw" style="background:#17202f"></i>función \(f\)</span>
+    <span><i class="sw" style="background:#dc2626"></i>intervalo y puntos</span>
+    <span><i class="sw" style="background:#0b63ce"></i>secante o nivel objetivo</span>
+    <span><i class="sw" style="background:#7c3aed"></i>tangente o derivada</span>
+  </div>
+</aside>
+</main>
+<section class="theory">
+<details open><summary>Cómo usar la simulación</summary><p>Selecciona un teorema y modifica el intervalo. Las líneas verticales rojas representan \(a\) y \(b\); en los teoremas que garantizan un punto interior, aparece un punto \(c\). El panel verde indica que se cumplen las hipótesis; si alguna falla, se muestra en rojo.</p></details>
+<details><summary>Continuidad frente a derivabilidad</summary><p>Bolzano, valor intermedio y Weierstrass requieren continuidad. Fermat, Rolle y los teoremas del valor medio añaden derivabilidad en el interior. Darboux destaca una propiedad sorprendente: aunque una derivada no sea continua, no puede saltarse valores intermedios.</p></details>
+</section>
+<script>
+(()=>{
+const $=id=>document.getElementById(id),canvas=$('plot'),ctx=canvas.getContext('2d'),finite=Number.isFinite,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const ui={theorem:$('theorem'),functionChoice:$('functionChoice'),a:$('a'),b:$('b'),target:$('target'),c:$('c'),shape:$('shape')};
+const assets='./assets/theorems/';
+const data={
+bolzano:{title:'Teorema de Bolzano',person:'Bernard Bolzano',life:'1781–1848',img:'bolzano.png',statement:'Si \\(f\\) es continua en \\([a,b]\\) y \\(f(a)f(b)<0\\), existe al menos un \\(c\\in(a,b)\\) tal que \\(f(c)=0\\).'},
+ivt:{title:'Teorema del valor intermedio',person:'Bolzano–Cauchy',life:'siglo XIX',img:'cauchy.png',statement:'Si \\(f\\) es continua en \\([a,b]\\), toma todos los valores comprendidos entre \\(f(a)\\) y \\(f(b)\\).'},
+weierstrass:{title:'Teorema de Weierstrass',person:'Karl Weierstrass',life:'1815–1897',img:'weierstrass.png',statement:'Toda función continua en un intervalo cerrado y acotado \\([a,b]\\) alcanza un máximo absoluto y un mínimo absoluto.'},
+fermat:{title:'Teorema de Fermat',person:'Pierre de Fermat',life:'1607–1665',img:'fermat.png',statement:'Si \\(f\\) tiene un extremo local en un punto interior \\(c\\) y es derivable en \\(c\\), entonces \\(f\\prime(c)=0\\).'},
+rolle:{title:'Teorema de Rolle',person:'Michel Rolle',life:'1652–1719',img:'rolle.png',statement:'Si \\(f\\) es continua en \\([a,b]\\), derivable en \\((a,b)\\) y \\(f(a)=f(b)\\), existe \\(c\\in(a,b)\\) con \\(f\\prime(c)=0\\).'},
+lagrange:{title:'Teorema del valor medio de Lagrange',person:'Joseph-Louis Lagrange',life:'1736–1813',img:'lagrange.png',statement:'Si \\(f\\) es continua en \\([a,b]\\) y derivable en \\((a,b)\\), existe \\(c\\in(a,b)\\) tal que \\(f\\prime(c)=\\dfrac{f(b)-f(a)}{b-a}\\).'},
+cauchy:{title:'Teorema del valor medio de Cauchy',person:'Augustin-Louis Cauchy',life:'1789–1857',img:'cauchy.png',statement:'Si \\(f,g\\) son continuas en \\([a,b]\\), derivables en \\((a,b)\\) y \\(g\\prime\\neq0\\), existe \\(c\\) tal que \\(\\dfrac{f\\prime(c)}{g\\prime(c)}=\\dfrac{f(b)-f(a)}{g(b)-g(a)}\\).'},
+darboux:{title:'Teorema de Darboux para derivadas',person:'Jean Gaston Darboux',life:'1842–1917',img:'darboux.png',statement:'Una derivada posee la propiedad del valor intermedio: entre dos valores de \\(f\\prime\\) toma todos los valores intermedios, aunque \\(f\\prime\\) no sea continua.'}
+};
+let W=900,H=650,view={cx:0,cy:0,sx:95,sy:75},drag=null,texTimer=null;
+const fmt=(v,d=4)=>finite(v)?v.toFixed(d).replace('.',','):'—',tex=(v,d=3)=>finite(v)?Number(v.toFixed(d)).toString():'\\text{—}';
+function values(){let a=+ui.a.value,b=+ui.b.value;if(a>b-.12){b=a+.12;ui.b.value=b}return{a,b,c:clamp(+ui.c.value,a,b),target:+ui.target.value,p:+ui.shape.value,key:ui.theorem.value,choice:ui.functionChoice.value}}
+function funcs(key,a,b,p,choice='native'){let f,df,g,dg;
+if(choice!=='native'){
+  if(choice==='square'){f=x=>x*x;df=x=>2*x}
+  else if(choice==='abs'){f=x=>Math.abs(x);df=x=>Math.abs(x)<1e-7?NaN:(x<0?-1:1)}
+  else if(choice==='cubic'){f=x=>x*x*x-x;df=x=>3*x*x-1}
+  else if(choice==='sin'){f=x=>Math.sin(x);df=x=>Math.cos(x)}
+  else{f=x=>x>=-6?Math.sqrt(x+6):NaN;df=x=>x>-6?1/(2*Math.sqrt(x+6)):NaN}
+  g=x=>x;dg=x=>1;
+  return{f,df,g,dg}
+}
+if(key==='bolzano'||key==='ivt'){f=x=>.22*x*x*x-(1.1+p*.15)*x-.35;df=x=>.66*x*x-(1.1+p*.15)}
+else if(key==='weierstrass'){f=x=>.11*x**4-.7*x*x+p*.45*x+1;df=x=>.44*x**3-1.4*x+p*.45}
+else if(key==='fermat'){f=x=>.22*(x-p)**4-(x-p)**2+1;df=x=>.88*(x-p)**3-2*(x-p)}
+else if(key==='rolle'){f=x=>(x-a)*(x-b)*(.16*x+.22*p);df=x=>(2*x-a-b)*(.16*x+.22*p)+.16*(x-a)*(x-b)}
+else if(key==='lagrange'){f=x=>.12*x**3-.55*x*x+(1+p*.25)*x+1;df=x=>.36*x*x-1.1*x+1+p*.25}
+else if(key==='cauchy'){f=x=>x*x+p*.35*x;df=x=>2*x+p*.35;g=x=>x+.08*x**3;dg=x=>1+.24*x*x}
+else{f=x=>x**3-3*x+p*.25*x*x;df=x=>3*x*x-3+p*.5*x}
+return{f,df,g,dg}}
+function roots(fn,a,b,target=0){let out=[],N=1200,px=null,py=null;for(let i=0;i<=N;i++){let x=a+(b-a)*i/N,y=fn(x)-target;if(!finite(y)){px=null;py=null;continue}if(Math.abs(y)<1e-7)out.push(x);else if(px!==null&&py*y<0){let l=px,r=x,fl=py;for(let k=0;k<45;k++){let m=(l+r)/2,fm=fn(m)-target;if(!finite(fm)){l=m;continue}if(fl*fm<=0)r=m;else{l=m;fl=fm}}out.push((l+r)/2)}px=x;py=y}return out.filter((x,i)=>i===0||Math.abs(x-out[i-1])>1e-3)}
+function extrema(f,a,b){let pts=[],N=1200;for(let i=0;i<=N;i++){let x=a+(b-a)*i/N,yy=f(x);pts.push([x,yy])}let min=pts[0],max=pts[0];for(const p of pts){if(p[1]<min[1])min=p;if(p[1]>max[1])max=p}return{min,max}}
+function solve(){let v=values(),F=funcs(v.key,v.a,v.b,v.p,v.choice),f=F.f,df=F.df,candidates=[],condition=true,message='',formula='',stats=[],explanation='';
+if(v.key==='bolzano'){condition=f(v.a)*f(v.b)<0;candidates=roots(f,v.a,v.b);message=condition?'Las hipótesis se cumplen: hay al menos una raíz interior.':'No hay cambio de signo estricto en los extremos.';formula=`\\[f(${tex(v.a)})=${tex(f(v.a))},\\quad f(${tex(v.b)})=${tex(f(v.b))}\\]`;stats=[['f(a)',f(v.a)],['f(b)',f(v.b)],['Raíz c',candidates[0]]];explanation='El cambio de signo obliga a la gráfica continua a cruzar el eje horizontal.'}
+else if(v.key==='ivt'){let lo=Math.min(f(v.a),f(v.b)),hi=Math.max(f(v.a),f(v.b));condition=v.target>=lo&&v.target<=hi;candidates=roots(f,v.a,v.b,v.target);message=condition?'El nivel k está entre f(a) y f(b).':'El nivel elegido no está entre los valores de los extremos.';formula=`\\[k=${tex(v.target)},\\qquad f(c)=k\\]`;stats=[['f(a)',f(v.a)],['f(b)',f(v.b)],['c',candidates[0]],['f(c)',candidates.length?f(candidates[0]):NaN]];explanation='La recta horizontal azul representa el valor intermedio que la función debe alcanzar.'}
+else if(v.key==='weierstrass'){let e=extrema(f,v.a,v.b);candidates=[e.min[0],e.max[0]];message='Al ser continua sobre un intervalo cerrado, existen máximo y mínimo absolutos.';formula=`\\[m=f(${tex(e.min[0])})=${tex(e.min[1])},\\quad M=f(${tex(e.max[0])})=${tex(e.max[1])}\\]`;stats=[['x mínimo',e.min[0]],['mínimo',e.min[1]],['x máximo',e.max[0]],['máximo',e.max[1]]];explanation='Los dos puntos destacados pueden estar en el interior o en los extremos del intervalo.'}
+else if(v.key==='fermat'){let rs=roots(df,v.a,v.b),chosen=rs.length?rs.reduce((best,x)=>Math.abs(x-v.c)<Math.abs(best-v.c)?x:best,rs[0]):NaN;candidates=rs;condition=finite(chosen);message=condition?'Los extremos locales interiores tienen tangente horizontal.':'No se ha encontrado un punto crítico interior.';formula=`\\[f\\prime(c)=0,\\qquad c\\approx${tex(chosen)}\\]`;stats=[['c elegido',v.c],['Punto crítico',chosen],["f'(c)",finite(chosen)?df(chosen):NaN]];explanation='Mueve c para comparar su pendiente con la del extremo local más cercano.'}
+else if(v.key==='rolle'){candidates=roots(df,v.a,v.b);condition=Math.abs(f(v.a)-f(v.b))<1e-7&&candidates.length>0;message=condition?'f(a)=f(b) y existe una tangente horizontal interior.':'Las hipótesis de Rolle no se cumplen.';formula=`\\[f(${tex(v.a)})=f(${tex(v.b)})=0,\\qquad f\\prime(c)=0\\]`;stats=[['f(a)',f(v.a)],['f(b)',f(v.b)],['c',candidates[0]],["f'(c)",candidates.length?df(candidates[0]):NaN]];explanation='La secante entre los extremos es horizontal; Rolle garantiza una tangente paralela.'}
+else if(v.key==='lagrange'){let m=(f(v.b)-f(v.a))/(v.b-v.a);candidates=roots(x=>df(x),v.a,v.b,m);condition=candidates.length>0;message=condition?'Existe una tangente paralela a la secante AB.':'No se ha localizado c numéricamente.';formula=`\\[f\\prime(c)=\\frac{f(b)-f(a)}{b-a}=${tex(m)}\\]`;stats=[['Pendiente secante',m],['c',candidates[0]],["f'(c)",candidates.length?df(candidates[0]):NaN]];explanation='La línea azul es la secante; la violeta es la tangente paralela garantizada.'}
+else if(v.key==='cauchy'){let ratio=(f(v.b)-f(v.a))/(F.g(v.b)-F.g(v.a));candidates=roots(x=>df(x)/F.dg(x),v.a,v.b,ratio);condition=candidates.length>0;message=condition?'Se cumple la igualdad de razones en un punto interior.':'No se ha localizado c numéricamente.';formula=`\\[\\frac{f\\prime(c)}{g\\prime(c)}=\\frac{f(b)-f(a)}{g(b)-g(a)}=${tex(ratio)}\\]`;stats=[['Razón global',ratio],['c',candidates[0]],['Razón local',candidates.length?df(candidates[0])/F.dg(candidates[0]):NaN]];explanation='Cauchy generaliza Lagrange comparando simultáneamente los cambios de dos funciones.'}
+else{let da=df(v.a),db=df(v.b),lo=Math.min(da,db),hi=Math.max(da,db);condition=v.target>=lo&&v.target<=hi;candidates=roots(df,v.a,v.b,v.target);message=condition?'El valor objetivo de la derivada está entre f′(a) y f′(b).':'El nivel objetivo no está entre las derivadas de los extremos.';formula=`\\[f\\prime(a)=${tex(da)},\\quad f\\prime(b)=${tex(db)},\\quad f\\prime(c)=${tex(v.target)}\\]`;stats=[["f'(a)",da],["f'(b)",db],['c',candidates[0]],["f'(c)",candidates.length?df(candidates[0]):NaN]];explanation='La curva discontinua representa f′. Darboux impide que una derivada salte el nivel azul.'}
+return{...v,...F,f,df,candidates,condition,message,formula,stats,explanation}}
+function updateHeader(key){let d=data[key],statement=$('statement');$('theoremTitle').textContent=d.title;window.MathJax?.typesetClear?.([statement]);statement.innerHTML=d.statement;$('portrait').src=assets+d.img;$('portrait').alt='Retrato de '+d.person;$('portraitMeta').innerHTML='<b>'+d.person+'</b><br>'+d.life;document.querySelector('.targetRow').style.display=['ivt','darboux'].includes(key)?'grid':'none';document.querySelector('.cRow').style.display=key==='fermat'?'grid':'none';$('showDerivative').checked=key==='darboux';typeset([statement])}
+function typeset(nodes){clearTimeout(texTimer);texTimer=setTimeout(()=>window.MathJax?.typesetPromise?.(nodes).catch(()=>{}),50)}
+function resize(){let r=canvas.getBoundingClientRect(),w=Math.max(560,Math.round(r.width)),h=Math.max(480,Math.round(r.height));if(w!==W||h!==H){canvas.width=W=w;canvas.height=H=h}}
+const X=x=>(x-view.cx)*view.sx+W/2,Y=y=>H/2-(y-view.cy)*view.sy,wx=x=>(x-W/2)/view.sx+view.cx,wy=y=>(H/2-y)/view.sy+view.cy;
+function nice(raw){let p=10**Math.floor(Math.log10(raw)),u=raw/p;return(u<1.5?1:u<3.5?2:u<7.5?5:10)*p}
+function grid(){ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);let xmin=wx(0),xmax=wx(W),ymin=wy(H),ymax=wy(0),xs=nice((xmax-xmin)/10),ys=nice((ymax-ymin)/8);ctx.lineWidth=1;for(let x=Math.ceil(xmin/xs)*xs;x<=xmax;x+=xs){ctx.strokeStyle=Math.abs(x)<xs/100?'#64748b':'#edf1f6';ctx.beginPath();ctx.moveTo(X(x),0);ctx.lineTo(X(x),H);ctx.stroke()}for(let y=Math.ceil(ymin/ys)*ys;y<=ymax;y+=ys){ctx.strokeStyle=Math.abs(y)<ys/100?'#64748b':'#edf1f6';ctx.beginPath();ctx.moveTo(0,Y(y));ctx.lineTo(W,Y(y));ctx.stroke()}}
+function curve(fn,color='#17202f',dash=[]){ctx.save();ctx.strokeStyle=color;ctx.lineWidth=2.8;ctx.setLineDash(dash);ctx.beginPath();let xmin=wx(0),xmax=wx(W),started=false;for(let i=0;i<=W;i++){let x=xmin+(xmax-xmin)*i/W,y=fn(x),py=Y(y);if(!finite(y)||Math.abs(py)>H*8){started=false;continue}started?ctx.lineTo(i,py):ctx.moveTo(i,py);started=true}ctx.stroke();ctx.restore()}
+function line(m,b,color,dash=[]){let x1=wx(0),x2=wx(W);ctx.save();ctx.strokeStyle=color;ctx.lineWidth=2.2;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(X(x1),Y(m*x1+b));ctx.lineTo(X(x2),Y(m*x2+b));ctx.stroke();ctx.restore()}
+function point(x,y,color='#dc2626',r=7){ctx.fillStyle='#fff';ctx.strokeStyle=color;ctx.lineWidth=3;ctx.beginPath();ctx.arc(X(x),Y(y),r,0,7);ctx.fill();ctx.stroke()}
+function draw(){resize();let S=solve();grid();curve(S.f);if($('showDerivative').checked)curve(S.df,'#7c3aed',[7,5]);ctx.fillStyle='rgba(14,165,233,.08)';ctx.fillRect(X(S.a),0,X(S.b)-X(S.a),H);for(const [x,l] of [[S.a,'a'],[S.b,'b']]){ctx.strokeStyle='#dc2626';ctx.lineWidth=1.7;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(X(x),0);ctx.lineTo(X(x),H);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#dc2626';ctx.font='900 15px system-ui';ctx.fillText(l,X(x)+6,H-18);point(x,S.f(x))}
+if(S.key==='ivt'){line(0,S.target,'#0b63ce',[7,5])}
+if(S.key==='darboux'){line(0,S.target,'#0b63ce',[7,5])}
+if(S.key==='rolle'){line(0,S.f(S.a),'#0b63ce',[8,5])}
+if(S.key==='lagrange'){let m=(S.f(S.b)-S.f(S.a))/(S.b-S.a);line(m,S.f(S.a)-m*S.a,'#0b63ce',[9,5])}
+if(S.key==='cauchy'&&S.g)curve(S.g,'#0b63ce',[8,5]);
+S.candidates.forEach((c,i)=>{let y=S.key==='darboux'?S.df(c):S.f(c),color=i?'#d97706':'#7c3aed';point(c,y,color,8);if(['fermat','rolle','lagrange'].includes(S.key)){let slope=S.df(c);line(slope,S.f(c)-slope*c,'#7c3aed',[4,5])}})
+if(S.key==='fermat'){let c=clamp(S.c,S.a,S.b);point(c,S.f(c),'#d97706',6)}
+updatePanels(S)}
+function updatePanels(S){$('ao').textContent=fmt(S.a,2);$('bo').textContent=fmt(S.b,2);$('co').textContent=fmt(S.c,2);$('targeto').textContent=fmt(S.target,2);$('shapeo').textContent=fmt(S.p,2);let box=$('condition'),formula=$('formula'),stats=$('stats');box.classList.toggle('fail',!S.condition);box.textContent=S.message;window.MathJax?.typesetClear?.([formula,stats]);formula.innerHTML=S.formula;stats.innerHTML=S.stats.map(([k,v])=>'<div class="stat"><span>'+k+'</span><strong>'+fmt(v)+'</strong></div>').join('');$('explanation').textContent=S.explanation;typeset([formula,stats])}
+function fit(){resize();let S=solve(),min=Infinity,max=-Infinity,x0=S.a-1,x1=S.b+1;for(let i=0;i<=500;i++){let x=x0+(x1-x0)*i/500,y=S.f(x);if(finite(y)){min=Math.min(min,y);max=Math.max(max,y)}if($('showDerivative').checked){let d=S.df(x);if(finite(d)){min=Math.min(min,d);max=Math.max(max,d)}}}if(!finite(min)||max===min){min=-2;max=2}view.cx=(S.a+S.b)/2;view.cy=(min+max)/2;view.sx=(W-100)/(x1-x0);view.sy=(H-100)/(max-min||4)}
+function zoom(px,py,z){let bx=wx(px),by=wy(py);view.sx=clamp(view.sx*z,15,1500);view.sy=clamp(view.sy*z,15,1500);view.cx=bx-(px-W/2)/view.sx;view.cy=by-(H/2-py)/view.sy}
+canvas.onwheel=e=>{e.preventDefault();let r=canvas.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width,py=(e.clientY-r.top)*H/r.height;zoom(px,py,Math.exp(-e.deltaY*.0015));draw()};
+canvas.onpointerdown=e=>{let r=canvas.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width,py=(e.clientY-r.top)*H/r.height,S=solve(),cands=[['a',S.a],['b',S.b]];if(S.key==='fermat')cands.push(['c',S.c]);let hit=null;if(S.key==='ivt'&&Math.abs(py-Y(S.target))<13&&px>Math.min(X(S.a),X(S.b))-25&&px<Math.max(X(S.a),X(S.b))+25)hit={type:'target'};if(!hit){let h=cands.find(([,x])=>Math.abs(px-X(x))<14);if(h)hit={type:h[0]}}drag=hit?{type:hit.type}:{type:'pan',px,py,cx:view.cx,cy:view.cy};canvas.classList.add('dragging');canvas.setPointerCapture(e.pointerId)};
+canvas.onpointermove=e=>{if(!drag)return;let r=canvas.getBoundingClientRect(),px=(e.clientX-r.left)*W/r.width,py=(e.clientY-r.top)*H/r.height;if(drag.type==='pan'){view.cx=drag.cx-(px-drag.px)/view.sx;view.cy=drag.cy+(py-drag.py)/view.sy}else{let x=wx(px);if(drag.type==='a')ui.a.value=Math.min(x,+ui.b.value-.12);if(drag.type==='b')ui.b.value=Math.max(x,+ui.a.value+.12);if(drag.type==='c')ui.c.value=clamp(x,+ui.a.value,+ui.b.value);if(drag.type==='target')ui.target.value=clamp(wy(py),+ui.target.min,+ui.target.max)}draw()};
+canvas.onpointerup=()=>{drag=null;canvas.classList.remove('dragging')};canvas.ondblclick=()=>{fit();draw()};
+Object.values(ui).forEach(el=>el.oninput=()=>{if(el===ui.theorem){updateHeader(el.value);fit()}draw()});$('showDerivative').onchange=()=>{fit();draw()};$('fit').onclick=()=>{fit();draw()};$('home').onclick=$('fit').onclick;$('zoomIn').onclick=()=>{zoom(W/2,H/2,1.3);draw()};$('zoomOut').onclick=()=>{zoom(W/2,H/2,1/1.3);draw()};
+$('example').onclick=()=>{let key=ui.theorem.value,presets={bolzano:[-2,2,.4,0,0],ivt:[-2,2,-.3,.5,0],weierstrass:[-2.5,2.5,.7,0,0],fermat:[-2.5,2.5,.5,0,.5],rolle:[-2,2,.6,0,0],lagrange:[-2,2,.2,0,0],cauchy:[-1.5,2,.5,0,0],darboux:[-2,2,.3,0,0]},v=presets[key];ui.a.value=v[0];ui.b.value=v[1];ui.shape.value=v[2];ui.target.value=v[3];ui.c.value=v[4];fit();draw()};
+document.addEventListener('click',e=>{let out=e.target.closest('output');if(!out||out.dataset.editing==='1')return;let label=out.closest('label'),range=label?.querySelector('input[type=range]');if(!range)return;e.preventDefault();let input=document.createElement('input');input.type='number';input.className='inlineValue';input.min=range.min;input.max=range.max;input.step=range.step||'any';input.value=range.value;out.dataset.editing='1';out.replaceWith(input);input.focus();input.select();let done=false;function finish(save){if(done)return;done=true;let changed=false;if(save){let n=Number(String(input.value).replace(',','.'));if(finite(n)){range.value=clamp(n,+range.min,+range.max);changed=true}}input.replaceWith(out);out.dataset.editing='0';if(changed)range.dispatchEvent(new Event('input',{bubbles:true}))}input.onkeydown=ev=>{if(ev.key==='Enter')finish(true);if(ev.key==='Escape')finish(false)};input.onblur=()=>finish(true)});
+window.addEventListener('resize',draw);updateHeader(ui.theorem.value);resize();fit();draw();
+})();
+</script>
+</body></html>
