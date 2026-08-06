@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fractales por iteración compleja</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#111833;
+      --panel2:#182142;
+      --text:#eef3ff;
+      --muted:#aeb9d6;
+      --line:#2b376a;
+      --accent:#7dd3fc;
+      --accent2:#fbbf24;
+      --danger:#fb7185;
+      --good:#86efac;
+      --shadow:0 16px 45px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;overflow:hidden}
+    body{display:grid;grid-template-columns:380px 1fr;}
+    aside{height:100vh;overflow:auto;padding:18px 16px 20px;background:linear-gradient(180deg,var(--panel),#0b1020);border-right:1px solid var(--line);box-shadow:var(--shadow);z-index:2}
+    main{position:relative;height:100vh;background:radial-gradient(circle at 50% 50%,#141c39,#080b16 70%);}
+    h1{font-size:22px;line-height:1.15;margin:0 0 8px;font-weight:800;letter-spacing:.2px}
+    .subtitle{color:var(--muted);font-size:13px;line-height:1.35;margin:0 0 16px}
+    .card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.10);border-radius:var(--radius);padding:13px;margin:12px 0;box-shadow:0 8px 22px rgba(0,0,0,.13)}
+    .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.10em;margin:0 0 10px;color:#dbeafe}
+    label{display:block;font-size:12px;color:var(--muted);margin:9px 0 5px}
+    select,input,button{width:100%;font:inherit;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:#0d1430;color:var(--text);padding:9px 10px;outline:none}
+    input[type="range"]{padding:0;height:34px;accent-color:var(--accent)}
+    input[type="number"]{appearance:textfield}
+    input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(125,211,252,.15)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:end}
+    .inline{display:flex;gap:9px;align-items:center}
+    .inline > *{flex:1}
+    .tiny{font-size:11px;color:var(--muted);line-height:1.35}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,monospace;background:#070b19;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px 11px;color:#e0f2fe;font-size:13px;line-height:1.45;white-space:normal;overflow-wrap:anywhere}
+    .pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#0b1020;background:var(--accent);font-weight:800;padding:3px 8px;border-radius:999px;margin-right:5px}
+    .warn{color:#fde68a}
+    button{cursor:pointer;font-weight:750;background:linear-gradient(180deg,#1d2a54,#142047)}
+    button:hover{filter:brightness(1.12)}
+    .btnbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    #canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+    #canvas:active{cursor:grabbing}
+    .hud{position:absolute;left:18px;bottom:18px;right:18px;display:flex;gap:12px;align-items:flex-end;pointer-events:none;flex-wrap:wrap}
+    .hudbox{background:rgba(7,11,25,.72);border:1px solid rgba(255,255,255,.16);border-radius:15px;padding:10px 12px;backdrop-filter:blur(8px);box-shadow:0 8px 28px rgba(0,0,0,.28);font-size:12px;color:#dbeafe;min-width:220px}
+    .hudbox strong{color:white}
+    .legend{margin-left:auto;min-width:260px}
+    .bar{height:8px;border-radius:999px;background:linear-gradient(90deg,#020617,#2563eb,#7dd3fc,#facc15,#fb7185,#ffffff);margin-top:7px;border:1px solid rgba(255,255,255,.25)}
+    #progressWrap{height:8px;background:#0b132a;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.10);margin-top:8px}
+    #progress{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .08s linear}
+    .readout{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+    .readout div{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:7px}
+    .hidden{display:none!important}
+    details{border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:9px 10px;margin-top:10px;background:rgba(255,255,255,.035)}
+    summary{cursor:pointer;font-weight:750;color:#dbeafe;font-size:13px}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,monospace;color:#bae6fd}
+    .smallbutton{padding:8px 9px;font-size:12px}
+    @media (max-width:900px){body{grid-template-columns:1fr;grid-template-rows:auto 1fr;overflow:auto}aside{height:auto;max-height:48vh;border-right:0;border-bottom:1px solid var(--line)}main{height:52vh;min-height:420px}.hud{left:10px;right:10px;bottom:10px}.legend{margin-left:0}}
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>Fractales por iteración compleja</h1>
+    <p class="subtitle">Explora mapas de escape del tipo <code>z<sub>n+1</sub>=f(z<sub>n</sub>,c)</code>. Usa la rueda para hacer zoom y arrastra para desplazarte. Las iteraciones aumentan automáticamente al ampliar para conservar el detalle.</p>
+
+    <div class="card">
+      <h2>Modelo</h2>
+      <label for="preset">Presets rápidos</label>
+      <select id="preset">
+        <option value="custom">Personalizado</option>
+        <option value="mandelbrot" selected>Mandelbrot clásico</option>
+        <option value="julia1">Julia: dendrita</option>
+        <option value="julia2">Julia: conejo de Douady</option>
+        <option value="julia3">Julia: espiral</option>
+        <option value="cubic">Mandelbrot cúbico</option>
+        <option value="sin">Fractal seno</option>
+        <option value="cos">Fractal coseno</option>
+        <option value="exp">Fractal exponencial</option>
+        <option value="logistic">Logístico complejo</option>
+      </select>
+
+      <label for="mode">Qué representa cada punto del plano</label>
+      <select id="mode">
+        <option value="cplane">Mandelbrot generalizado: el plano representa c</option>
+        <option value="zplane">Julia generalizada: el plano representa z₀</option>
+        <option value="bothplane">Plano doble: c y z₀ cambian con el punto</option>
+      </select>
+
+      <label for="fn">Función de iteración</label>
+      <select id="fn">
+        <option value="pow">zₙ₊₁ = zₙᵈ + c</option>
+        <option value="powplusz">zₙ₊₁ = zₙᵈ + zₙ + c</option>
+        <option value="sin">zₙ₊₁ = sin(zₙ) + c</option>
+        <option value="cos">zₙ₊₁ = cos(zₙ) + c</option>
+        <option value="tan">zₙ₊₁ = tan(zₙ) + c</option>
+        <option value="sinh">zₙ₊₁ = sinh(zₙ) + c</option>
+        <option value="exp">zₙ₊₁ = exp(zₙ) + c</option>
+        <option value="sinpow">zₙ₊₁ = sin(zₙᵈ) + c</option>
+        <option value="cospow">zₙ₊₁ = cos(zₙᵈ) + c</option>
+        <option value="logistic">zₙ₊₁ = c zₙ(1-zₙ)</option>
+        <option value="burning">Burning ship: (|Re zₙ|+i|Im zₙ|)ᵈ+c</option>
+      </select>
+
+      <div class="row">
+        <div>
+          <label for="degree">Grado d</label>
+          <input id="degree" type="number" min="2" max="12" step="1" value="2" />
+        </div>
+        <div>
+          <label for="escape">Radio de escape</label>
+          <input id="escape" type="number" min="2" max="100000" step="1" value="16" />
+        </div>
+      </div>
+
+      <div class="formula" id="formulaBox"></div>
+    </div>
+
+    <div class="card">
+      <h2>Parámetros complejos</h2>
+      <div class="tiny">Introduce parte real e imaginaria. En modo Mandelbrot, <code>c</code> se toma del plano y estos valores actúan como desplazamiento. En modo Julia, <code>c</code> queda fijo y el plano representa <code>z₀</code>.</div>
+      <div class="row">
+        <div>
+          <label for="cRe">Re(c)</label>
+          <input id="cRe" type="number" step="0.001" value="0" />
+        </div>
+        <div>
+          <label for="cIm">Im(c)</label>
+          <input id="cIm" type="number" step="0.001" value="0" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="zRe">Re(z₀)</label>
+          <input id="zRe" type="number" step="0.001" value="0" />
+        </div>
+        <div>
+          <label for="zIm">Im(z₀)</label>
+          <input id="zIm" type="number" step="0.001" value="0" />
+        </div>
+      </div>
+      <details>
+        <summary>Cómo interpretar estos controles</summary>
+        <p class="tiny">Si el plano representa <code>c</code>, cada píxel usa <code>c=p+c₀</code> y el mismo <code>z₀</code> inicial. Si el plano representa <code>z₀</code>, cada píxel usa <code>z₀=p+z₀,base</code> y el mismo <code>c</code>. Así aparecen los comportamientos tipo Mandelbrot y tipo Julia.</p>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>Iteración y calidad</h2>
+      <label for="iterRange">Iteraciones máximas: <span id="iterLabel">700</span></label>
+      <input id="iterRange" type="range" min="10" max="6000" step="10" value="700" />
+      <div class="row">
+        <div>
+          <label for="iterNum">Valor exacto</label>
+          <input id="iterNum" type="number" min="10" max="50000" step="10" value="700" />
+        </div>
+        <div>
+          <label for="quality">Calidad</label>
+          <select id="quality">
+            <option value="1" selected>Alta</option>
+            <option value="2">Rápida</option>
+            <option value="3">Muy rápida</option>
+          </select>
+        </div>
+      </div>
+      <label for="colorShift">Desplazamiento de color</label>
+      <input id="colorShift" type="range" min="0" max="360" step="1" value="215" />
+      <div id="progressWrap"><div id="progress"></div></div>
+      <div class="btnbar">
+        <button id="reset" type="button">Recentrar vista</button>
+        <button id="render" type="button">Redibujar</button>
+      </div>
+      <div class="btnbar">
+        <button id="save" type="button" class="smallbutton">Exportar PNG</button>
+        <button id="orbitToggle" type="button" class="smallbutton">Órbita: activada</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Uso</h2>
+      <p class="tiny"><span class="pill">Zoom</span> rueda del ratón sobre la zona que quieres ampliar.</p>
+      <p class="tiny"><span class="pill">Mover</span> pulsa y arrastra el plano.</p>
+      <p class="tiny"><span class="pill">Órbita</span> haz clic en un punto para ver sus primeras iteraciones.</p>
+      <p class="tiny"><span class="pill">Zoom adaptativo</span> al ampliar se añaden iteraciones automáticamente, hasta un máximo de 50&nbsp;000.</p>
+      <p class="tiny warn">Consejo: funciones como <code>exp</code>, <code>tan</code> o grados grandes pueden escapar muy rápido. Baja el radio de escape o cambia el zoom para ver estructura.</p>
+    </div>
+  </aside>
+
+  <main>
+    <canvas id="canvas"></canvas>
+    <div class="hud">
+      <div class="hudbox" id="status"><strong>Preparando…</strong></div>
+      <div class="hudbox" id="pointBox">
+        <strong>Punto seleccionado</strong>
+        <div class="readout">
+          <div>Plano<br><span id="pRead">—</span></div>
+          <div>Escape<br><span id="eRead">—</span></div>
+        </div>
+      </div>
+      <div class="hudbox legend">
+        <strong>Color</strong>: número de iteraciones hasta escapar. Negro: no escapa antes del máximo.
+        <div class="bar"></div>
+      </div>
+    </div>
+  </main>
+
+<script>
+(() => {
+  'use strict';
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d', { alpha:false });
+  const $ = id => document.getElementById(id);
+
+  const controls = {
+    preset:$('preset'), mode:$('mode'), fn:$('fn'), degree:$('degree'), escape:$('escape'),
+    cRe:$('cRe'), cIm:$('cIm'), zRe:$('zRe'), zIm:$('zIm'),
+    iterRange:$('iterRange'), iterNum:$('iterNum'), iterLabel:$('iterLabel'), quality:$('quality'),
+    colorShift:$('colorShift'), formulaBox:$('formulaBox'), progress:$('progress'),
+    reset:$('reset'), render:$('render'), save:$('save'), status:$('status'),
+    pRead:$('pRead'), eRead:$('eRead'), orbitToggle:$('orbitToggle')
+  };
+
+  let W = 0, H = 0, DPR = 1;
+  let center = { re:-0.55, im:0 };
+  let scale = 4.2 / 900;       // unidades complejas por píxel real
+  let referenceScale = scale;    // escala de la vista inicial, para iteraciones adaptativas
+  let renderToken = 0;
+  let dragging = false;
+  let dragStart = null;
+  let selected = null;
+  let showOrbit = true;
+  let lastImage = null;
+
+  const presets = {
+    mandelbrot:{ mode:'cplane', fn:'pow', d:2, c:[0,0], z:[0,0], iter:900, escape:16, center:[-0.55,0], span:4.2, color:215 },
+    julia1:{ mode:'zplane', fn:'pow', d:2, c:[-0.8,0.156], z:[0,0], iter:1100, escape:16, center:[0,0], span:3.4, color:210 },
+    julia2:{ mode:'zplane', fn:'pow', d:2, c:[-0.123,0.745], z:[0,0], iter:1100, escape:16, center:[0,0], span:3.2, color:185 },
+    julia3:{ mode:'zplane', fn:'pow', d:2, c:[0.285,0.01], z:[0,0], iter:1000, escape:16, center:[0,0], span:3.0, color:280 },
+    cubic:{ mode:'cplane', fn:'pow', d:3, c:[0,0], z:[0,0], iter:1000, escape:16, center:[0,0], span:3.2, color:245 },
+    sin:{ mode:'cplane', fn:'sin', d:2, c:[0,0], z:[0,0], iter:650, escape:32, center:[0,0], span:8.0, color:35 },
+    cos:{ mode:'cplane', fn:'cos', d:2, c:[0,0], z:[0,0], iter:650, escape:32, center:[0,0], span:8.0, color:120 },
+    exp:{ mode:'cplane', fn:'exp', d:2, c:[0,0], z:[0,0], iter:450, escape:64, center:[0,0], span:7.0, color:300 },
+    logistic:{ mode:'cplane', fn:'logistic', d:2, c:[0,0], z:[0.5,0], iter:1000, escape:16, center:[0.25,0], span:4.0, color:15 }
+  };
+
+  function C(re=0, im=0){ return {re, im}; }
+  function cAdd(a,b){ return {re:a.re+b.re, im:a.im+b.im}; }
+  function cSub(a,b){ return {re:a.re-b.re, im:a.im-b.im}; }
+  function cMul(a,b){ return {re:a.re*b.re-a.im*b.im, im:a.re*b.im+a.im*b.re}; }
+  function cAbs2(a){ return a.re*a.re + a.im*a.im; }
+  function cPowInt(z, d){
+    if(d === 2) return {re:z.re*z.re-z.im*z.im, im:2*z.re*z.im};
+    if(d === 3){ const z2 = cMul(z,z); return cMul(z2,z); }
+    let result = {re:1, im:0};
+    let base = z;
+    let n = Math.max(1, Math.floor(d));
+    while(n > 0){
+      if(n & 1) result = cMul(result, base);
+      base = cMul(base, base);
+      n >>= 1;
+      if(!isFinite(result.re) || !isFinite(result.im) || cAbs2(result)>1e300) return {re:1e200, im:1e200};
+    }
+    return result;
+  }
+  function cSin(z){ return {re:Math.sin(z.re)*Math.cosh(z.im), im:Math.cos(z.re)*Math.sinh(z.im)}; }
+  function cCos(z){ return {re:Math.cos(z.re)*Math.cosh(z.im), im:-Math.sin(z.re)*Math.sinh(z.im)}; }
+  function cTan(z){
+    const s = cSin(z), c = cCos(z);
+    const den = c.re*c.re + c.im*c.im;
+    if(den < 1e-12) return {re:1e120, im:1e120};
+    return {re:(s.re*c.re+s.im*c.im)/den, im:(s.im*c.re-s.re*c.im)/den};
+  }
+  function cExp(z){
+    if(z.re > 80) return {re:1e120, im:1e120};
+    if(z.re < -80) return {re:0, im:0};
+    const e = Math.exp(z.re);
+    return {re:e*Math.cos(z.im), im:e*Math.sin(z.im)};
+  }
+  function cSinh(z){ return {re:Math.sinh(z.re)*Math.cos(z.im), im:Math.cosh(z.re)*Math.sin(z.im)}; }
+
+  function step(z, c, fn, d){
+    let v;
+    if(Math.abs(z.re)>1e120 || Math.abs(z.im)>1e120) return {re:1e200, im:1e200};
+    switch(fn){
+      case 'pow': return cAdd(cPowInt(z,d), c);
+      case 'powplusz': return cAdd(cAdd(cPowInt(z,d), z), c);
+      case 'sin': return cAdd(cSin(z), c);
+      case 'cos': return cAdd(cCos(z), c);
+      case 'tan': return cAdd(cTan(z), c);
+      case 'sinh': return cAdd(cSinh(z), c);
+      case 'exp': return cAdd(cExp(z), c);
+      case 'sinpow': v = cPowInt(z,d); return cAdd(cSin(v), c);
+      case 'cospow': v = cPowInt(z,d); return cAdd(cCos(v), c);
+      case 'logistic': return cMul(c, cMul(z, cSub({re:1,im:0}, z)));
+      case 'burning': v = {re:Math.abs(z.re), im:Math.abs(z.im)}; return cAdd(cPowInt(v,d), c);
+      default: return cAdd(cPowInt(z,d), c);
+    }
+  }
+
+  function getParams(){
+    const d = clamp(parseInt(controls.degree.value,10) || 2, 2, 12);
+    const escape = Math.max(2, Number(controls.escape.value) || 16);
+    const baseIter = clamp(parseInt(controls.iterNum.value,10) || 700, 1, 50000);
+    // Al ampliar, las órbitas cercanas a la frontera tardan más en escapar.
+    // Aumentamos automáticamente el presupuesto para que el fractal no desaparezca.
+    const zoomDepth = Math.max(0, Math.log2(Math.max(1, referenceScale / Math.max(scale, 1e-18))));
+    const adaptiveExtra = Math.floor(zoomDepth * 90);
+    const maxIter = clamp(baseIter + adaptiveExtra, 1, 50000);
+    const quality = Math.max(1, parseInt(controls.quality.value,10) || 1);
+    return {
+      mode:controls.mode.value, fn:controls.fn.value, d, escape, escape2:escape*escape,
+      c0:C(Number(controls.cRe.value)||0, Number(controls.cIm.value)||0),
+      zBase:C(Number(controls.zRe.value)||0, Number(controls.zIm.value)||0),
+      baseIter, maxIter, quality, colorShift:Number(controls.colorShift.value)||0
+    };
+  }
+
+  function pointForPixel(px, py){
+    return {
+      re: center.re + (px - W/2) * scale,
+      im: center.im - (py - H/2) * scale
+    };
+  }
+
+  function pixelForPoint(p){
+    return {
+      x: W/2 + (p.re - center.re) / scale,
+      y: H/2 - (p.im - center.im) / scale
+    };
+  }
+
+  function initialForPlane(p, params){
+    if(params.mode === 'cplane') return { c:cAdd(p, params.c0), z:params.zBase };
+    if(params.mode === 'zplane') return { c:params.c0, z:cAdd(p, params.zBase) };
+    return { c:cAdd(p, params.c0), z:cAdd(p, params.zBase) };
+  }
+
+  function escapeInfo(p, params, needOrbit=false){
+    let {c,z} = initialForPlane(p, params);
+    const orbit = needOrbit ? [z] : null;
+    let n = 0;
+    let a2 = cAbs2(z);
+    for(; n < params.maxIter; n++){
+      if(a2 > params.escape2 || !isFinite(a2)) break;
+      z = step(z, c, params.fn, params.d);
+      a2 = cAbs2(z);
+      if(needOrbit && n < 120) orbit.push(z);
+    }
+    let smooth = n;
+    if(n < params.maxIter && isFinite(a2) && a2 > 1){
+      // suavizado aproximado: suficiente para colorear mapas de escape variados
+      smooth = n + 1 - Math.log(Math.log(Math.sqrt(a2))) / Math.log(2);
+    }
+    return { n, smooth, z, c, orbit, escaped:n < params.maxIter };
+  }
+
+  function hslToRgb(h, s, l){
+    h = ((h % 360) + 360) % 360;
+    s /= 100; l /= 100;
+    const c = (1 - Math.abs(2*l - 1)) * s;
+    const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+    const m = l - c/2;
+    let r=0,g=0,b=0;
+    if(h < 60){ r=c; g=x; }
+    else if(h < 120){ r=x; g=c; }
+    else if(h < 180){ g=c; b=x; }
+    else if(h < 240){ g=x; b=c; }
+    else if(h < 300){ r=x; b=c; }
+    else { r=c; b=x; }
+    return [Math.round((r+m)*255), Math.round((g+m)*255), Math.round((b+m)*255)];
+  }
+
+  function colorFor(info, params){
+    if(!info.escaped) return [3, 5, 12];
+    // Paleta independiente del máximo de iteraciones: al aumentarlo o hacer zoom,
+    // los puntos que escapan pronto no se vuelven casi negros ni "desaparecen".
+    const v = Math.max(0, info.smooth);
+    const wave = Math.log1p(v);
+    const h = params.colorShift + 78 * wave + 24 * Math.sin(v * 0.055);
+    const l = 24 + 50 * (1 - Math.exp(-v / 32));
+    const s = 90;
+    return hslToRgb(h, s, l);
+  }
+
+  function resize(){
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    const rect = canvas.getBoundingClientRect();
+    const oldW = W || 1;
+    W = Math.max(240, Math.floor(rect.width * DPR));
+    H = Math.max(240, Math.floor(rect.height * DPR));
+    canvas.width = W; canvas.height = H;
+    if(oldW !== W && oldW > 1) scale *= oldW / W;
+    scheduleRender(40);
+  }
+
+  let scheduleTimer = 0;
+  function scheduleRender(delay=120){
+    clearTimeout(scheduleTimer);
+    scheduleTimer = setTimeout(render, delay);
+    updateFormula();
+  }
+
+  function render(){
+    const token = ++renderToken;
+    const params = getParams();
+    controls.iterRange.value = Math.min(6000, params.baseIter);
+    controls.iterNum.value = params.baseIter;
+    controls.iterLabel.textContent = String(params.baseIter);
+    controls.progress.style.width = '0%';
+    controls.status.innerHTML = '<strong>Dibujando…</strong><br>0%';
+
+    const q = params.quality;
+    const image = ctx.createImageData(W, H);
+    const data = image.data;
+    const rowsPerChunk = Math.max(3, Math.floor(24 / q));
+    let y = 0;
+
+    function fillBlock(x0, y0, block, rgb){
+      for(let yy=0; yy<block && y0+yy<H; yy++){
+        let idx = ((y0+yy)*W + x0) * 4;
+        for(let xx=0; xx<block && x0+xx<W; xx++){
+          data[idx] = rgb[0]; data[idx+1] = rgb[1]; data[idx+2] = rgb[2]; data[idx+3] = 255;
+          idx += 4;
+        }
+      }
+    }
+
+    function chunk(){
+      if(token !== renderToken) return;
+      const yEnd = Math.min(H, y + rowsPerChunk*q);
+      for(; y < yEnd; y += q){
+        for(let x=0; x<W; x += q){
+          const p = pointForPixel(x + q*0.5, y + q*0.5);
+          const info = escapeInfo(p, params, false);
+          const rgb = colorFor(info, params);
+          fillBlock(x, y, q, rgb);
+        }
+      }
+      if(y < H){
+        const pct = Math.round(100*y/H);
+        controls.progress.style.width = pct + '%';
+        controls.status.innerHTML = '<strong>Dibujando…</strong><br>' + pct + '%';
+        requestAnimationFrame(chunk);
+      }else{
+        ctx.putImageData(image,0,0);
+        lastImage = image;
+        controls.progress.style.width = '100%';
+        controls.status.innerHTML = statusText(params);
+        drawOverlay();
+      }
+    }
+    requestAnimationFrame(chunk);
+  }
+
+  function statusText(params){
+    const span = Math.min(W,H) * scale;
+    return `<strong>Vista actual</strong><br>`+
+      `Centro: ${fmt(center.re)} ${center.im<0?'−':'+'} ${fmt(Math.abs(center.im))}i<br>`+
+      `Ancho aprox.: ${fmt(span)} unidades<br>`+
+      `Iteraciones base: ${params.baseIter}<br>`+
+      `Iteraciones efectivas: ${params.maxIter}`;
+  }
+
+  function drawOverlay(){
+    if(lastImage) ctx.putImageData(lastImage,0,0);
+    if(!showOrbit || !selected) return;
+    const params = getParams();
+    const info = escapeInfo(selected, params, true);
+    const orbit = info.orbit || [];
+    if(orbit.length < 2) return;
+    ctx.save();
+    ctx.lineWidth = Math.max(1.5, 1.5 * DPR);
+    ctx.strokeStyle = 'rgba(255,255,255,.88)';
+    ctx.fillStyle = 'rgba(251,191,36,.95)';
+    ctx.beginPath();
+    let started=false;
+    for(const z of orbit){
+      const pp = pixelForPoint(z);
+      if(pp.x < -W || pp.x > 2*W || pp.y < -H || pp.y > 2*H) continue;
+      if(!started){ ctx.moveTo(pp.x, pp.y); started=true; }
+      else ctx.lineTo(pp.x, pp.y);
+    }
+    ctx.stroke();
+    for(let i=0; i<Math.min(orbit.length,20); i++){
+      const pp = pixelForPoint(orbit[i]);
+      if(pp.x>=0 && pp.x<=W && pp.y>=0 && pp.y<=H){
+        ctx.beginPath(); ctx.arc(pp.x, pp.y, Math.max(2.2,3.2*DPR), 0, Math.PI*2); ctx.fill();
+      }
+    }
+    const s = pixelForPoint(selected);
+    ctx.strokeStyle = 'rgba(255,255,255,.95)';
+    ctx.lineWidth = 2*DPR;
+    ctx.beginPath(); ctx.arc(s.x, s.y, 7*DPR, 0, Math.PI*2); ctx.stroke();
+    ctx.restore();
+    updatePointReadout(info);
+  }
+
+  function updatePointReadout(info){
+    if(!selected){ controls.pRead.textContent = '—'; controls.eRead.textContent = '—'; return; }
+    controls.pRead.textContent = `${fmt(selected.re)} ${selected.im<0?'−':'+'} ${fmt(Math.abs(selected.im))}i`;
+    if(info){
+      controls.eRead.textContent = info.escaped ? `${info.n} iter.` : `no escapa`;
+    }
+  }
+
+  function updateFormula(){
+    const params = getParams();
+    const modeText = params.mode === 'cplane'
+      ? 'Cada punto del plano es c. Se itera desde el z₀ elegido.'
+      : params.mode === 'zplane'
+        ? 'Cada punto del plano es z₀. El parámetro c queda fijo.'
+        : 'Cada punto del plano modifica simultáneamente c y z₀.';
+    const fnText = controls.fn.options[controls.fn.selectedIndex].textContent;
+    controls.formulaBox.innerHTML = `<strong>${fnText}</strong><br>${modeText}<br>`+
+      `<span class="tiny">d=${params.d}, c₀=${fmt(params.c0.re)} ${params.c0.im<0?'−':'+'} ${fmt(Math.abs(params.c0.im))}i, `+
+      `z₀=${fmt(params.zBase.re)} ${params.zBase.im<0?'−':'+'} ${fmt(Math.abs(params.zBase.im))}i</span>`;
+  }
+
+  function clamp(x,a,b){ return Math.max(a, Math.min(b,x)); }
+  function fmt(x){
+    if(!isFinite(x)) return '∞';
+    const ax = Math.abs(x);
+    if(ax !== 0 && (ax < 0.001 || ax > 10000)) return x.toExponential(2);
+    return Number(x).toFixed(ax < 10 ? 4 : ax < 100 ? 3 : 2).replace(/\.0+$/,'').replace(/(\.\d*?)0+$/,'$1');
+  }
+
+  function applyPreset(name){
+    const p = presets[name];
+    if(!p) return;
+    controls.mode.value = p.mode;
+    controls.fn.value = p.fn;
+    controls.degree.value = p.d;
+    controls.cRe.value = p.c[0]; controls.cIm.value = p.c[1];
+    controls.zRe.value = p.z[0]; controls.zIm.value = p.z[1];
+    controls.iterNum.value = p.iter; controls.iterRange.value = Math.min(6000,p.iter); controls.iterLabel.textContent = p.iter;
+    controls.escape.value = p.escape;
+    controls.colorShift.value = p.color;
+    center = {re:p.center[0], im:p.center[1]};
+    scale = p.span / Math.min(W || 900, H || 700);
+    referenceScale = scale;
+    selected = null;
+    updatePointReadout(null);
+    updateFormula();
+    scheduleRender(20);
+  }
+
+  function resetView(){
+    const params = getParams();
+    if(params.mode === 'cplane') center = {re:-0.45, im:0};
+    else center = {re:0, im:0};
+    const span = params.fn === 'sin' || params.fn === 'cos' || params.fn === 'exp' || params.fn === 'sinh' || params.fn === 'tan' ? 7.5 : 4.0;
+    scale = span / Math.min(W,H);
+    referenceScale = scale;
+    selected = null;
+    updatePointReadout(null);
+    scheduleRender(20);
+  }
+
+  controls.preset.addEventListener('change', () => applyPreset(controls.preset.value));
+
+  for(const el of [controls.mode, controls.fn, controls.degree, controls.escape, controls.cRe, controls.cIm, controls.zRe, controls.zIm, controls.quality, controls.colorShift]){
+    el.addEventListener('input', () => { controls.preset.value = 'custom'; scheduleRender(); });
+    el.addEventListener('change', () => { controls.preset.value = 'custom'; scheduleRender(); });
+  }
+
+  controls.iterRange.addEventListener('input', () => {
+    controls.iterNum.value = controls.iterRange.value;
+    controls.iterLabel.textContent = controls.iterRange.value;
+    controls.preset.value = 'custom';
+    scheduleRender(60);
+  });
+  controls.iterNum.addEventListener('input', () => {
+    let v = clamp(parseInt(controls.iterNum.value,10) || 10, 1, 50000);
+    controls.iterLabel.textContent = String(v);
+    controls.iterRange.value = Math.min(6000, v);
+    controls.preset.value = 'custom';
+    scheduleRender(80);
+  });
+
+  controls.reset.addEventListener('click', resetView);
+  controls.render.addEventListener('click', render);
+  controls.save.addEventListener('click', () => {
+    drawOverlay();
+    const a = document.createElement('a');
+    a.download = 'fractal_iteracion_compleja.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  });
+  controls.orbitToggle.addEventListener('click', () => {
+    showOrbit = !showOrbit;
+    controls.orbitToggle.textContent = showOrbit ? 'Órbita: activada' : 'Órbita: desactivada';
+    drawOverlay();
+  });
+
+  canvas.addEventListener('wheel', ev => {
+    ev.preventDefault();
+    const rect = canvas.getBoundingClientRect();
+    const mx = (ev.clientX - rect.left) * DPR;
+    const my = (ev.clientY - rect.top) * DPR;
+    const before = pointForPixel(mx,my);
+    const zoom = Math.exp(ev.deltaY * 0.0015);
+    scale = clamp(scale * zoom, 1e-17, 1e6);
+    const after = pointForPixel(mx,my);
+    center.re += before.re - after.re;
+    center.im += before.im - after.im;
+    scheduleRender(25);
+  }, {passive:false});
+
+  canvas.addEventListener('pointerdown', ev => {
+    dragging = true;
+    canvas.setPointerCapture(ev.pointerId);
+    dragStart = {x:ev.clientX*DPR, y:ev.clientY*DPR, center:{...center}, moved:false};
+  });
+  canvas.addEventListener('pointermove', ev => {
+    if(!dragging || !dragStart) return;
+    const dx = ev.clientX*DPR - dragStart.x;
+    const dy = ev.clientY*DPR - dragStart.y;
+    if(Math.hypot(dx,dy) > 3*DPR) dragStart.moved = true;
+    center.re = dragStart.center.re - dx * scale;
+    center.im = dragStart.center.im + dy * scale;
+    if(lastImage){
+      ctx.putImageData(lastImage, dx, dy);
+    }
+    scheduleRender(60);
+  });
+  canvas.addEventListener('pointerup', ev => {
+    if(!dragging) return;
+    dragging = false;
+    canvas.releasePointerCapture(ev.pointerId);
+    if(dragStart && !dragStart.moved){
+      const rect = canvas.getBoundingClientRect();
+      selected = pointForPixel((ev.clientX - rect.left)*DPR, (ev.clientY - rect.top)*DPR);
+      updatePointReadout(escapeInfo(selected, getParams(), false));
+      drawOverlay();
+    }else{
+      scheduleRender(5);
+    }
+    dragStart = null;
+  });
+  canvas.addEventListener('pointercancel', () => { dragging=false; dragStart=null; });
+
+  window.addEventListener('resize', resize);
+  resize();
+  applyPreset('mandelbrot');
+})();
+</script>
+</body>
+</html>
