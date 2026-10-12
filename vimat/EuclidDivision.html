@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#11695f">
+<meta name="description" content="División euclídea de polinomios, paso a paso. Simulador interactivo de VConce para 4.º de ESO: divide, multiplica, coloca el producto y resta.">
+<title>EuclidDivision · VConce</title>
+<style>
+:root{--page:#f5f6f8;--paper:#fff;--ink:#182a3a;--muted:#657180;--line:#e2e7ec;--primary:#11695f;--primary-dark:#0c544c;--primary-soft:#e9f4f0;--quotient:#3d5fd3;--quotient-soft:#edf0fd;--divisor:#146f67;--product:#b16a13;--product-soft:#fff5e5;--negative:#be4955;--negative-soft:#fcedee;--remainder:#15735c;--remainder-soft:#e8f5ed;--cell:108px;--gutter:48px;--math-size:30px;--sans:Inter,"Segoe UI",Arial,sans-serif;--math:"Cambria Math",Cambria,"Times New Roman",serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--page);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5}button,input,select{font:inherit}button,a,input,select,summary{-webkit-tap-highlight-color:transparent}button{cursor:pointer}button:disabled{cursor:default;opacity:.4}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #5ca9e0;outline-offset:3px}input:focus-visible,select:focus-visible{outline:2px solid #4a918a;outline-offset:2px}[hidden]{display:none!important}a{color:inherit}svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block}button [data-icon]{display:inline-flex;flex-shrink:0}.site-header{height:86px;max-width:1440px;margin:auto;padding:0 36px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.brand{display:flex;gap:11px;align-items:center;text-decoration:none;font-size:22px;font-weight:750;line-height:1.1;letter-spacing:-.7px}.brand-light{font-weight:430}.brand small{display:block;font-size:8.5px;letter-spacing:2px;font-weight:600;color:var(--muted);margin-top:7px}.brand-icon{height:43px;width:43px;display:grid;place-items:center;background:var(--primary);color:#fff;border-radius:12px}.brand-icon svg{width:29px;height:29px;stroke-width:1.8}.header-actions{display:flex;gap:10px;align-items:center}.course-badge{font-size:12px;font-weight:650;margin-right:14px}.course-badge span{font-weight:400;margin-left:7px;color:var(--muted)}.btn{border:1px solid transparent;border-radius:9px;min-height:40px;padding:9px 14px;display:inline-flex;gap:8px;align-items:center;justify-content:center;font-weight:600;white-space:nowrap;background:none;color:var(--ink);transition:background .15s,border-color .15s}.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}.btn-primary:hover:not(:disabled){background:var(--primary-dark)}.btn-outline{background:#fff;border-color:#d6dde3}.btn-outline:hover:not(:disabled){background:#f2f6f7;border-color:#bccbcf}.btn-quiet:hover:not(:disabled){background:#e9eeef}.icon-btn{width:34px;height:34px;border:0;display:inline-grid;place-items:center;background:transparent;border-radius:8px;color:var(--muted)}.icon-btn:hover:not(:disabled){background:#e9eeef;color:var(--ink)}main{max-width:1440px;margin:auto;padding:30px 36px 0}.intro{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}.eyebrow{color:var(--muted);font-size:10px;font-weight:700;letter-spacing:1.45px;line-height:1.5}h1{font-size:32px;font-weight:650;letter-spacing:-1.1px;line-height:1.2;margin:7px 0 8px}.intro p{margin:0;color:var(--muted);font-size:14px}.math{font-family:var(--math);font-size:1.17em;line-height:1.65;font-variant-numeric:lining-nums tabular-nums}.math sup{font-size:.59em;line-height:0;vertical-align:super;position:relative;top:-.05em}.identity-chip{display:flex;align-items:center;gap:12px;font-size:24px;background:#fff;padding:13px 21px;border:1px solid var(--line);border-radius:12px}.c-divisor{color:var(--divisor)}.c-quotient{color:var(--quotient)}.c-product{color:var(--product)}.c-negative{color:var(--negative)}.c-remainder{color:var(--remainder)}.editor-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px 14px;margin-bottom:20px;box-shadow:0 2px 6px #182a3a03}#polynomial-form{display:grid;grid-template-columns:minmax(240px,1.35fr) minmax(210px,1fr) auto;gap:18px;align-items:start}.input-field label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;margin:0 0 7px}.label-variable{margin-left:auto;font-family:var(--math);font-size:13px;color:var(--muted);font-weight:400}.label-dot{height:7px;width:7px;border-radius:50%}.dividend-dot{background:var(--ink)}.divisor-dot{background:var(--divisor)}.input-field input{display:block;width:100%;min-width:0;border:1px solid #d5dde4;border-radius:8px;background:#fcfdfe;height:43px;padding:8px 12px;font-size:16px;color:var(--ink);letter-spacing:.1px}.input-field input:focus{background:#fff}.input-field input[aria-invalid="true"]{border-color:var(--negative)}.input-preview{font-size:17px;min-height:28px;margin:4px 2px 0;color:#73818e;white-space:normal;overflow-wrap:anywhere}.input-preview .frac{font-size:.85em}.start-btn{margin-top:25px;height:43px}.editor-bottom{display:flex;justify-content:space-between;gap:14px;border-top:1px solid #edf0f3;padding-top:12px;align-items:flex-start}.examples{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.examples-label{color:var(--muted);font-size:11px;margin-right:3px}.example-btn{font-size:11px;font-weight:550;padding:5px 10px;line-height:1.3;border:1px solid var(--line);border-radius:6px;color:#60717c;background:#fff}.example-btn.selected,.example-btn:hover{background:var(--primary-soft);border-color:#c8e2d9;color:var(--primary)}.syntax{font-size:11px;color:var(--muted);max-width:320px;padding-top:4px;position:relative}.syntax summary{cursor:pointer;white-space:nowrap}.syntax>div{position:absolute;z-index:10;right:0;top:28px;width:320px;padding:16px;background:#fff;box-shadow:0 4px 24px #152a4220;border:1px solid var(--line);border-radius:9px;line-height:1.8;font-size:12px}code{background:#f1f4f6;border-radius:3px;padding:1px 3px}p.input-error{font-size:12px;color:#9f2c40;margin:4px 0 12px;background:#fff0f1;padding:9px 12px;border-radius:7px}.simulator{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 4px 15px #152a4204}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 290px}.board-panel{min-width:0;display:flex;flex-direction:column;background:#fff}.board-toolbar{height:61px;padding:14px 23px;display:flex;align-items:center;gap:15px;justify-content:space-between}.board-title{font-size:12px;font-weight:650;display:flex;align-items:center;gap:8px;white-space:nowrap}.live-dot{width:6px;height:6px;background:var(--primary);border-radius:50%}.round-badge{font-size:10px;font-weight:500;color:var(--muted);border-left:1px solid var(--line);padding-left:9px;margin-left:2px}.switch-label{display:flex;align-items:center;gap:7px;font-size:10px;color:var(--muted);cursor:pointer;white-space:nowrap}.switch-label input{position:absolute;opacity:0;width:1px;height:1px}.switch{width:26px;height:15px;border-radius:12px;background:#c3cbd2;position:relative;transition:background .2s}.switch:before{content:"";position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:white;transition:transform .2s}.switch-label input:checked+.switch{background:var(--primary)}.switch-label input:checked+.switch:before{transform:translateX(11px)}.switch-label input:focus-visible+.switch{outline:3px solid #5ca9e0;outline-offset:2px}.board-scroll{position:relative;overflow:auto;padding:16px 24px 22px;min-height:330px;max-height:545px;scrollbar-width:thin;scrollbar-color:#c9d4d7 transparent;flex:1;background-image:radial-gradient(#dce4e750 .7px,transparent .7px);background-size:16px 16px}.long-division{display:grid;grid-template-columns:max-content minmax(220px,1fr);min-height:280px;align-content:start;gap:0 0;width:100%;position:relative}.left-operation{padding-right:25px;min-width:0}.right-operation{min-width:220px;max-width:400px;padding-left:0;align-self:start}.column-labels{display:grid;grid-template-columns:repeat(var(--cols),var(--cell));margin-left:var(--gutter);height:24px;color:#97a2ad;font-family:var(--math);font-size:12px;text-align:center}.polyrow{position:relative;padding-left:var(--gutter);padding-right:14px;height:62px;width:calc(var(--gutter) + var(--cols)*var(--cell) + 14px);display:flex;align-items:center}.cell-grid{display:grid;grid-template-columns:repeat(var(--cols),var(--cell));align-items:center;min-height:52px;width:100%}.term-cell{min-width:0;text-align:center;position:relative;font-family:var(--math);font-size:var(--math-size);font-variant-numeric:lining-nums tabular-nums;line-height:1.55;border-radius:7px;padding:2px 0;white-space:nowrap}.term-cell sup{font-size:.58em;line-height:0;vertical-align:super;position:relative;top:-.04em}.term-cell .sign{display:inline-block;margin-right:.13em}.term-cell.is-hole{color:#a5adb7;font-size:calc(var(--math-size)*.88)}.term-cell.canceled-zero{color:#a0a9b5;font-size:calc(var(--math-size)*.82)}.term-cell.term-highlight{background:var(--quotient-soft);color:var(--quotient);box-shadow:inset 0 -2px 0 #bbc7f0}.term-cell.term-divisor-highlight{background:var(--primary-soft);color:var(--divisor)}.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.04;font-size:.78em;margin:0 .1em;position:relative;top:-.02em;font-variant-numeric:lining-nums tabular-nums}.frac .num{padding:0 .14em .07em;border-bottom:1px solid currentColor}.frac .den{padding:.07em .14em 0}.initial-row .term-cell{font-weight:500}.row-subtitle{font-size:9px;text-transform:uppercase;letter-spacing:1.1px;color:#99a4ae;height:18px;padding-left:var(--gutter);margin-top:10px}.row-subtitle:first-child{margin-top:0}.product-row{color:var(--product)}.signed-row{color:var(--negative)}.product-row .term-cell{background:var(--product-soft)}.signed-row .term-cell:not(.empty){background:var(--negative-soft)}.product-row .empty,.product-row .is-hole,.signed-row .is-hole{background:transparent}.sub-open,.sub-close,.sub-minus{position:absolute;top:6px;height:50px;line-height:50px;font-family:var(--math);font-size:42px;color:var(--negative);pointer-events:none}.sub-minus{font-size:29px;top:7px}.subtraction-rule{height:1.5px;background:#c1cbd4;position:absolute;bottom:0;left:var(--gutter);right:10px;border-radius:2px}.remainder-row .term-cell:not(.empty):not(.is-hole):not(.canceled-zero){color:var(--remainder)}.remainder-row.active-result .term-cell:not(.empty):not(.is-hole):not(.canceled-zero){background:var(--remainder-soft);box-shadow:inset 0 -2px 0 #c9e2d2}.past-round{opacity:.8}.current-round{opacity:1}.zero-result-cell{color:var(--remainder)!important}.divisor-label{font-size:9px;letter-spacing:1.3px;font-weight:650;color:var(--divisor);padding:0 18px;height:24px;line-height:24px}.divisor-value{font-size:var(--math-size);white-space:nowrap;border-left:2px solid #869b9d;border-bottom:2px solid #869b9d;padding:7px 18px 9px;min-height:62px;color:var(--divisor);line-height:1.5}.inline-term{display:inline-block;border-radius:6px}.divisor-value .inline-term.highlight{background:var(--primary-soft);outline:4px solid var(--primary-soft)}.quotient-label{font-size:9px;letter-spacing:1.3px;color:var(--quotient);font-weight:650;padding:13px 18px 2px}.quotient-value{color:var(--quotient);padding:0 18px 11px;font-size:var(--math-size);min-height:55px;line-height:1.65}.quotient-empty{color:#b0b9c4;font-size:23px;letter-spacing:5px}.quotient-value .new-term{background:var(--quotient-soft);box-shadow:0 2px 0 #c7d0f4;padding:1px 5px}.work-product{border:1px solid #f1dfc5;border-radius:10px;background:#fffaf2;margin:15px 0 0 15px;padding:13px 12px;max-width:360px}.work-product-label{font-size:9px;letter-spacing:1.1px;color:#9e7947;font-weight:650}.work-product .multiply-expression{font-size:22px;margin-top:7px;line-height:1.7;overflow-wrap:anywhere}.product-arrow{color:#c9a471;margin:4px 0}.product-source{font-size:24px;color:var(--product);line-height:1.7;min-height:36px;display:flex;gap:6px;flex-wrap:wrap}.product-source.moved{opacity:.3}.source-term{display:inline-block;white-space:nowrap}.operation-placeholder{margin:38px 14px 0 17px;color:#94a1ad;font-size:12px;line-height:1.8;max-width:230px}.operation-placeholder svg{width:25px;height:25px;margin-bottom:10px;stroke:#97aea8}.board-legend{display:flex;gap:16px;flex-wrap:wrap;padding:13px 24px;color:#75828d;font-size:10px;border-top:1px solid #f0f3f5;margin-top:auto;background:#fff}.board-legend>span{display:flex;align-items:center;gap:5px}.legend-dot{height:6px;width:6px;border-radius:50%;display:inline-block}.scroll-hint{font-size:11px;color:#806029;padding:6px 20px;background:#fff8e9}.result-banner{margin:10px 24px 18px;padding:14px 17px;border:1px solid #cce4d8;background:#f1faf5;border-radius:10px;color:var(--remainder);display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px}.result-banner strong{font-size:12px;font-weight:650}.result-banner .math{font-size:22px}.explanation{background:#f8fafb;border-left:1px solid var(--line);padding:19px 23px 20px;display:flex;flex-direction:column;min-width:0}.explanation-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;height:22px}.explanation-top .eyebrow{font-size:9px;letter-spacing:1px;color:#7a8794}.explanation h2{font-size:23px;line-height:1.25;letter-spacing:-.5px;font-weight:650;margin:0 0 12px}.explanation p{font-size:12.5px;line-height:1.8;margin:10px 0;color:#5c6d7b}.explanation p strong{font-weight:650;color:var(--ink)}.explanation .equation-box{background:#fff;border:1px solid var(--line);border-radius:9px;padding:12px 10px;margin:15px 0;text-align:center;font-size:22px;line-height:1.9;overflow-x:auto;max-width:100%}.equation-line{display:block}.large-fraction{display:inline-flex;flex-direction:column;text-align:center;vertical-align:middle;font-size:.95em;line-height:1.55;margin:0 5px}.large-fraction .top{border-bottom:1px solid currentColor;padding:0 7px 4px}.large-fraction .bottom{padding:4px 7px 0}.hint-pill{display:inline-block;font-size:10px;padding:5px 9px;color:var(--primary);background:var(--primary-soft);border-radius:5px;margin-top:6px}.remember{margin-top:auto;padding-top:25px;display:flex;gap:8px;color:#a5adb4}.remember svg{width:17px;height:17px;margin-top:3px;flex-shrink:0}.remember p{font-size:10.5px;line-height:1.65;margin:0;color:#84929d}.remember strong{color:#657583!important}.calculation-list{display:flex;flex-direction:column;gap:5px;margin:13px 0 8px}.column-calculation{font-size:18px;padding:5px 8px;border-radius:6px;background:#fff;border:1px solid #e8edef;line-height:1.8;white-space:nowrap;overflow-x:auto}.column-calculation .calc-result{color:var(--remainder)}.verified-mark{display:inline-flex;align-items:center;gap:6px;color:var(--remainder);font-size:11px;font-weight:650;background:var(--remainder-soft);padding:6px 9px;border-radius:6px;margin-bottom:7px}.verified-mark svg{height:14px;width:14px}.check-identity{font-size:17px;text-align:left!important;line-height:1.9!important;word-wrap:break-word}.controls{border-top:1px solid var(--line);padding:0 24px 15px;background:#fff}.phase-strip{display:flex;align-items:center;justify-content:center;padding:16px 10px 15px;gap:11px;border-bottom:1px solid #f0f3f5;margin-bottom:15px;overflow:auto}.phase-strip>span[data-phase]{font-size:10px;color:#88949e;white-space:nowrap;display:flex;align-items:center;gap:7px;font-weight:550}.phase-strip b{width:19px;height:19px;display:inline-grid;place-items:center;border:1px solid #dce3e8;border-radius:50%;font-size:10px;font-weight:550;background:#fff}.phase-strip>span.active{color:var(--primary);font-weight:700}.phase-strip>span.active b{background:var(--primary);border-color:var(--primary);color:#fff}.phase-strip>span.complete{color:#5d8176}.phase-strip>span.complete b{background:var(--primary-soft);border-color:#d5e7e0;color:var(--primary)}.phase-connector{height:1px;width:23px;background:#dfe6e9;flex-shrink:0}.transport{display:flex;align-items:center;justify-content:space-between;gap:15px}.transport-left{display:flex;align-items:center;gap:9px}.reset-btn{margin-right:3px}.next-btn{min-width:142px}.play-btn{font-size:12px;margin-left:3px;color:#657682}.play-btn[aria-pressed="true"]{color:var(--primary);background:var(--primary-soft)}.speed-label{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:9px}.speed-label select{border:1px solid #dce3e7;border-radius:7px;background:white;padding:7px 25px 7px 9px;font-size:11px;color:#536777;max-width:120px}.progress-row{display:flex;align-items:center;gap:13px;margin-top:17px;font-size:10px;color:#8b969f}.progress-row>span:first-child{font-variant-numeric:tabular-nums;min-width:39px}.progress-row input{accent-color:var(--primary);flex:1;height:4px;min-width:35px;cursor:pointer}.keyboard-hint{font-size:9px;white-space:nowrap;margin-left:12px}.keyboard-hint kbd{font-family:var(--sans);font-size:9px;display:inline-block;background:#f6f8f9;border:1px solid #e1e7eb;border-radius:3px;padding:0px 3px;margin:0 2px}.page-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:19px 3px 23px;font-size:10px;color:#91a0aa}.page-footer>span:first-child{color:#71818e;font-weight:550}.footer-separator{margin:0 9px;color:#bec9cf}.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:#183b36;color:#fff;padding:12px 20px;border-radius:9px;box-shadow:0 5px 25px #0d292d30;z-index:10000;font-size:13px;max-width:90vw}.flying-term{position:fixed;z-index:1000;pointer-events:none;white-space:nowrap;font-family:var(--math);font-size:var(--math-size);font-variant-numeric:lining-nums tabular-nums;color:var(--product);background:var(--product-soft);border-radius:8px;padding:2px 8px;box-shadow:0 5px 14px #9d68151f;transform-origin:center;line-height:1.55}.flying-term sup{font-size:.58em;line-height:0;vertical-align:super}.flying-term .sign{margin-right:.13em}.projecting .site-header{height:65px;max-width:none;padding:0 25px}.projecting main{padding:16px 20px 0;max-width:none}.projecting .intro,.projecting .editor-card,.projecting .page-footer,.projecting .course-badge,.projecting #share{display:none}.projecting .board-scroll{min-height:360px;max-height:calc(100vh - 340px)}.projecting .workspace{grid-template-columns:minmax(0,1fr) 310px}.projecting .board-toolbar{height:52px}.projecting .simulator{max-width:1800px;margin:0 auto}.projecting{--cell:128px;--math-size:36px}.projecting .explanation h2{font-size:27px}.projecting .explanation p{font-size:14px}.projecting .column-calculation{font-size:22px}
+@media(min-width:1500px){.board-scroll{min-height:375px}.workspace{grid-template-columns:minmax(0,1fr) 305px}:root{--cell:112px;--math-size:32px}}
+@media(max-width:1150px){main{padding:25px 22px 0}.site-header{padding:0 22px}.workspace{grid-template-columns:minmax(0,1fr) 265px}.explanation{padding:18px}.board-scroll{padding:12px 16px 20px}.board-toolbar{padding:14px 17px}.round-badge{display:none}:root{--cell:95px;--math-size:28px}.right-operation{min-width:190px}.long-division{grid-template-columns:max-content minmax(190px,1fr)}.left-operation{padding-right:18px}.work-product{margin-left:10px;padding:11px 10px}.work-product .multiply-expression{font-size:20px}.product-source{font-size:22px}.identity-chip{font-size:22px}.keyboard-hint{display:none}}
+@media(max-width:960px){.workspace{grid-template-columns:1fr}.explanation{border-left:0;border-top:1px solid var(--line);display:block;padding:18px 23px}.explanation-top{margin-bottom:6px}.explanation h2{font-size:21px}.explanation p{font-size:13px}.explanation .equation-box{margin:9px 0;padding:8px 12px}.remember{display:none}#explanation-content{display:grid;grid-template-columns:minmax(180px,1fr) minmax(210px,1fr);column-gap:24px;align-items:start}#explanation-content h2{grid-column:1;grid-row:1}#explanation-content>.instruction{grid-column:1}#explanation-content>.equation-box,#explanation-content>.calculation-list{grid-column:2;grid-row:1 / span 4;margin-top:0}#explanation-content>.hint-pill{grid-column:1;justify-self:start}#explanation-content>.verified-mark{grid-column:1;grid-row:1}#explanation-content>.verified-mark+h2{grid-row:2}.board-scroll{min-height:280px;max-height:450px}:root{--cell:108px;--math-size:30px}.right-operation{min-width:230px}.long-division{grid-template-columns:max-content minmax(230px,1fr)}.projecting .workspace{grid-template-columns:1fr}.projecting #explanation-content{grid-template-columns:1fr 1fr}.projecting .board-scroll{min-height:220px;max-height:calc(100vh - 470px)}.projecting .explanation{padding:13px 20px}.projecting .explanation-top{display:none}.projecting .explanation p{font-size:12px}.projecting .explanation h2{font-size:20px}#polynomial-form{grid-template-columns:minmax(200px,1.25fr) minmax(180px,1fr) auto;gap:12px}.start-btn{font-size:12px;padding:9px 11px}.input-field input{font-size:14px}.editor-card{padding:18px 18px 13px}.course-badge span{display:none}}
+@media(max-width:700px){main{padding:22px 12px 0}.site-header{height:72px;padding:0 15px}.brand{font-size:19px;gap:8px}.brand-icon{width:36px;height:36px;border-radius:10px}.brand small{font-size:7px;letter-spacing:1.4px}.header-actions{gap:4px}.header-actions .btn{padding:8px 9px;font-size:11px;min-height:34px}.course-badge,.hide-mobile{display:none}.intro{margin-bottom:18px}.intro .eyebrow{font-size:8px;letter-spacing:1.2px}h1{font-size:27px}.intro p{font-size:12px}.identity-chip{display:none}.editor-card{padding:16px 14px 12px;margin-bottom:14px}#polynomial-form{grid-template-columns:1fr 1fr;gap:5px 12px}.input-field:first-child{grid-column:1/-1}.input-field:nth-child(2){grid-column:1}.input-preview{min-height:24px;font-size:15px}.start-btn{grid-column:2;align-self:start;margin-top:25px;font-size:11px;height:43px;padding:6px}.start-btn svg{display:none}.input-field input{font-size:14px}.editor-bottom{flex-direction:column;gap:7px}.examples{gap:5px}.examples-label{font-size:10px}.example-btn{padding:5px 7px;font-size:10px}.syntax>div{left:0;right:auto;width:min(310px,80vw)}.board-toolbar{height:52px;gap:7px;padding:12px 14px}.board-title{font-size:11px}.switch-label{font-size:9px;gap:5px}.board-scroll{padding:8px 12px 19px;min-height:265px;max-height:420px}.board-legend{font-size:9px;gap:10px;padding:11px 14px}:root{--cell:95px;--math-size:28px;--gutter:41px}.left-operation{padding-right:14px}.long-division{grid-template-columns:max-content minmax(205px,1fr)}.right-operation{min-width:205px}.controls{padding:0 12px 15px}.phase-strip{justify-content:flex-start;padding:13px 2px;gap:6px;margin-bottom:13px}.phase-strip>span[data-phase]{font-size:9px;gap:4px}.phase-strip b{width:16px;height:16px;font-size:8px}.phase-connector{width:8px}.transport{flex-wrap:wrap;gap:12px}.transport-left{gap:6px;flex:1;justify-content:space-between}.transport .btn{min-height:38px;padding:8px 10px;font-size:12px}.next-btn{min-width:120px}.play-label{display:none}.play-btn{padding:8px!important;margin-left:0}.reset-btn{width:25px;margin-right:0}.speed-label{font-size:10px;margin-left:auto}.speed-label select{padding:4px 20px 4px 7px;font-size:10px}.progress-row{margin-top:14px;gap:8px}.explanation{padding:16px}.explanation-top{margin-bottom:8px}#explanation-content{display:block}.explanation p{line-height:1.7;font-size:12px}.explanation .equation-box{font-size:22px;margin:12px 0}#explanation-content .calculation-list{display:grid;grid-template-columns:1fr 1fr;gap:6px}.column-calculation{font-size:17px;padding:5px}.result-banner{margin:7px 14px 14px;padding:11px 13px;gap:6px 18px}.result-banner .math{font-size:20px}.page-footer{padding:15px 3px 20px;font-size:9px;flex-direction:column;align-items:flex-start;gap:5px}.projecting .site-header{padding:0 12px}.projecting main{padding:10px 7px 0}.projecting{--cell:98px;--math-size:29px}.projecting #explanation-content{display:block}.projecting .board-scroll{max-height:40vh;min-height:180px}.projecting .calculation-list{display:none!important}.projecting .explanation .equation-box{font-size:20px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation-duration:.01ms!important}}
+@media print{.site-header,.intro,.editor-card,.controls,.explanation,.page-footer,.board-toolbar,.board-legend{display:none!important}.workspace{display:block}main{padding:0}.simulator{border:0}.board-scroll{overflow:visible;max-height:none}.long-division{transform-origin:top left}.board-panel{width:100%}.result-banner{break-inside:avoid}}
+.right-operation{position:sticky;top:0;z-index:2;background:#ffffffed;border-radius:0 0 10px 10px}
+
+.explanation .equation-box.check-identity{font-size:17px;line-height:1.9}.no-wrap{display:inline-block;white-space:nowrap}.check-identity .equation-line+.equation-line{margin-top:6px}
+
+</style>
+</head>
+<body>
+<header class="site-header">
+ <a href="#" class="brand" aria-label="EuclidDivision, inicio" id="brand-reset">
+  <span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M18 6v20M18 17h9M6 10h6M9 7v6M6 23h6"/></svg></span>
+  <span>Euclid<span class="brand-light">Division</span><small>UN RECURSO DE VCONCE</small></span>
+ </a>
+ <div class="header-actions"><span class="course-badge">4.º ESO <span>Matemáticas</span></span><button class="btn btn-quiet" id="share" type="button" aria-label="Copiar enlace a esta división"><span data-icon="link"></span><span class="hide-mobile">Compartir</span></button><button class="btn btn-outline" id="project" type="button" aria-pressed="false"><span data-icon="expand"></span><span id="project-label">Proyectar</span></button></div>
+</header>
+<main>
+ <section class="intro" aria-labelledby="main-title"><div><div class="eyebrow">ÁLGEBRA · LABORATORIO INTERACTIVO</div><h1 id="main-title">División de polinomios</h1><p>El mismo algoritmo que en tu cuaderno. Un paso cada vez.</p></div><div class="identity-chip math" aria-label="Dividendo igual a divisor por cociente más resto"><span>D</span><span>=</span><span class="c-divisor">d</span><span>·</span><span class="c-quotient">Q</span><span>+</span><span class="c-remainder">R</span></div></section>
+ <section class="editor-card" aria-label="Elige los polinomios">
+  <form id="polynomial-form" novalidate>
+   <div class="input-field"><label for="dividend"><span class="label-dot dividend-dot"></span>Dividendo <span class="label-variable">D(x)</span></label><input id="dividend" name="dividend" spellcheck="false" autocomplete="off" autocapitalize="off" maxlength="300" value="2x^3 - 3x^2 + 4x - 5" aria-describedby="syntax-help input-error"><div class="input-preview math" id="dividend-preview" aria-hidden="true"></div></div>
+   <div class="input-field"><label for="divisor"><span class="label-dot divisor-dot"></span>Divisor <span class="label-variable">d(x)</span></label><input id="divisor" name="divisor" spellcheck="false" autocomplete="off" autocapitalize="off" maxlength="300" value="x - 2" aria-describedby="syntax-help input-error"><div class="input-preview math" id="divisor-preview" aria-hidden="true"></div></div>
+   <button class="btn btn-primary start-btn" type="submit"><span data-icon="refresh"></span>Comenzar división</button>
+  </form>
+  <p class="input-error" id="input-error" role="alert" hidden></p>
+  <div class="editor-bottom"><div class="examples"><span class="examples-label">Prueba:</span><button type="button" data-example="0" class="example-btn selected">Con resto</button><button type="button" data-example="1" class="example-btn">Exacta</button><button type="button" data-example="2" class="example-btn">Con huecos</button><button type="button" data-example="3" class="example-btn">Con fracciones</button></div><details class="syntax"><summary>Cómo escribir</summary><div id="syntax-help">Usa <code>x^3</code> para x³, <code>2x</code>, <code>1/2x</code> o <code>0,5x</code>. También se admiten <code>x²</code> y paréntesis, como <code>(x+1)(x-2)</code>. Grado máximo: 10. El divisor no puede ser cero.</div></details></div>
+ </section>
+ <section class="simulator" aria-label="División paso a paso">
+  <div class="workspace">
+   <div class="board-panel">
+    <div class="board-toolbar"><div class="board-title"><span class="live-dot"></span>La operación <span id="round-badge" class="round-badge">Preparación</span></div><label class="switch-label"><input type="checkbox" id="show-zeros" checked><span class="switch" aria-hidden="true"></span>Mostrar huecos con 0</label></div>
+    <div id="scroll-hint" class="scroll-hint" hidden>Desliza la operación hacia los lados para ver todas las columnas.</div>
+    <div class="board-scroll" id="board-scroll" tabindex="0" aria-label="Operación. Desplazamiento disponible para polinomios largos."><div class="long-division" id="long-division"></div></div>
+    <div id="result-banner" class="result-banner" hidden></div>
+    <div class="board-legend"><span><i class="legend-dot" style="background:var(--quotient)"></i>Cociente</span><span><i class="legend-dot" style="background:var(--product)"></i>Producto</span><span><i class="legend-dot" style="background:var(--negative)"></i>Signos al restar</span><span><i class="legend-dot" style="background:var(--remainder)"></i>Resto</span></div>
+   </div>
+   <aside class="explanation" aria-label="Explicación del paso"><div class="explanation-top"><span class="eyebrow" id="step-counter">PREPARACIÓN</span><button class="icon-btn" id="replay" aria-label="Repetir la animación" title="Repetir la animación" disabled><span data-icon="replay"></span></button></div><div id="explanation-content" aria-live="polite" aria-atomic="true"></div><div class="remember"><span data-icon="bulb"></span><p>El signo menos afecta a <strong>todos</strong> los términos del paréntesis.</p></div></aside>
+  </div>
+  <div class="controls">
+   <nav class="phase-strip" id="phase-strip" aria-label="Fases de cada vuelta"><span data-phase="divide"><b>1</b>Divide</span><span class="phase-connector"></span><span data-phase="multiply"><b>2</b>Multiplica</span><span class="phase-connector"></span><span data-phase="place"><b>3</b>Coloca</span><span class="phase-connector"></span><span data-phase="signs"><b>4</b>Cambia signos</span><span class="phase-connector"></span><span data-phase="subtract"><b>5</b>Resta</span></nav>
+   <div class="transport"><div class="transport-left"><button class="icon-btn reset-btn" id="reset" aria-label="Volver al principio" title="Volver al principio"><span data-icon="reset"></span></button><button class="btn btn-outline" id="previous" disabled><span data-icon="left"></span>Anterior</button><button class="btn btn-primary next-btn" id="next">Siguiente<span data-icon="right"></span></button><button class="btn btn-quiet play-btn" id="play" aria-pressed="false"><span data-icon="play"></span><span class="play-label">Automático</span></button></div><label class="speed-label" for="speed">Ritmo<select id="speed"><option value="1.6">Pausado</option><option value="1" selected>Normal</option><option value="0.6">Ágil</option></select></label></div>
+   <div class="progress-row"><span id="progress-text">0 / 16</span><input type="range" id="progress" min="0" max="16" value="0" step="1" aria-label="Ir a un paso de la división"><span class="keyboard-hint"><kbd>←</kbd><kbd>→</kbd> para avanzar · <kbd>Espacio</kbd> automático</span></div>
+  </div>
+ </section>
+ <footer class="page-footer"><span>EuclidDivision <span class="footer-separator">/</span> VConce</span><span>Cálculo exacto con fracciones. Sin registro ni conexión a Internet.</span></footer>
+</main>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+/* EuclidDivision · Aritmética racional exacta. Sin eval ni dependencias. */
+(function (root) {
+  'use strict';
+  const MAX_DEGREE = 10;
+  function gcd(a, b) { a = a < 0n ? -a : a; b = b < 0n ? -b : b; while (b) [a, b] = [b, a % b]; return a || 1n; }
+  class Rational {
+    constructor(n = 0n, d = 1n) {
+      n = BigInt(n); d = BigInt(d);
+      if (d === 0n) throw new Error('No se puede dividir entre cero.');
+      if (d < 0n) { n = -n; d = -d; }
+      const g = gcd(n, d); this.n = n / g; this.d = d / g;
+      Object.freeze(this);
+    }
+    add(b) { return new Rational(this.n * b.d + b.n * this.d, this.d * b.d); }
+    sub(b) { return this.add(b.neg()); }
+    mul(b) { return new Rational(this.n * b.n, this.d * b.d); }
+    div(b) { return new Rational(this.n * b.d, this.d * b.n); }
+    neg() { return new Rational(-this.n, this.d); }
+    abs() { return this.n < 0n ? this.neg() : this; }
+    get zero() { return this.n === 0n; }
+    get one() { return this.n === this.d; }
+    eq(b) { return this.n === b.n && this.d === b.d; }
+    toString() { return this.d === 1n ? String(this.n) : `${this.n}/${this.d}`; }
+    static decimal(s) {
+      if (s.replace('.', '').length > 12) throw new Error('Usa coeficientes de hasta 12 cifras.');
+      const [a, b = ''] = s.split('.'); return new Rational(BigInt((a || '0') + b), 10n ** BigInt(b.length));
+    }
+  }
+  const ZERO = new Rational(), ONE = new Rational(1n);
+  const trim = p => { const q = p.slice(); while (q.length > 1 && q.at(-1).zero) q.pop(); return q.length ? q : [ZERO]; };
+  const degree = p => p.length === 1 && p[0].zero ? -1 : p.length - 1;
+  const at = (p, k) => p[k] || ZERO;
+  const add = (a, b) => trim(Array.from({ length: Math.max(a.length, b.length) }, (_, k) => at(a,k).add(at(b,k))));
+  const neg = p => p.map(c => c.neg());
+  const sub = (a, b) => add(a, neg(b));
+  function mul(a, b) {
+    if (a.length + b.length - 2 > 24) throw new Error('El grado de la expresión es demasiado alto.');
+    const c = Array(a.length + b.length - 1).fill(ZERO);
+    a.forEach((x,i) => b.forEach((y,j) => { c[i+j] = c[i+j].add(x.mul(y)); }));
+    return trim(c);
+  }
+  function power(p, n) { let r = [ONE]; for (let i=0; i<n; i++) r = mul(r, p); return r; }
+  function parse(input) {
+    if (typeof input !== 'string' || !input.trim()) throw new Error('Escribe un polinomio.');
+    if (input.length > 300) throw new Error('La expresión es demasiado larga (máximo 300 caracteres).');
+    const supers = { '⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9' };
+    const text = input.toLowerCase().replace(/[−–]/g,'-').replace(/[·×]/g,'*').replace(/,/g,'.')
+      .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]+/g, s => '^' + [...s].map(c=>supers[c]).join(''));
+    let i=0, count=0; const toks=[];
+    while (i<text.length) {
+      const c=text[i]; if (/\s/.test(c)) { i++; continue; }
+      const num=text.slice(i).match(/^(?:\d+(?:\.\d*)?|\.\d+)/);
+      if (num) { toks.push({ t:'n', v:num[0] }); i+=num[0].length; }
+      else if ('x+-*/^()'.includes(c)) { toks.push({t:c}); i++; }
+      else throw new Error(`No se reconoce «${c}». Usa solo la variable x, números y operaciones.`);
+      if (++count>160) throw new Error('Simplifica la expresión antes de introducirla.');
+    }
+    toks.push({t:'end'}); let pos=0, depth=0;
+    const peek=()=>toks[pos].t, take=()=>toks[pos++];
+    function atom() {
+      if (++depth>24) throw new Error('Hay demasiados paréntesis anidados.');
+      let p;
+      if (peek()==='n') p=[Rational.decimal(take().v)];
+      else if (peek()==='x') { take(); p=[ZERO,ONE]; }
+      else if (peek()==='(') { take(); p=expression(); if(peek()!==')') throw new Error('Falta cerrar un paréntesis.'); take(); }
+      else throw new Error('Se esperaba un número, x o un paréntesis. Revisa los signos.');
+      depth--; return p;
+    }
+    function exponent() {
+      let p=atom();
+      if(peek()==='^') {
+        take(); if(peek()!=='n' || !/^\d+$/.test(toks[pos].v)) throw new Error('Los exponentes deben ser enteros no negativos, como x^3.');
+        const n=Number(take().v); if(n>MAX_DEGREE) throw new Error(`Usa exponentes de 0 a ${MAX_DEGREE}.`);
+        p=power(p,n);
+      }
+      return p;
+    }
+    function unary() { if(peek()==='+') {take();return unary();} if(peek()==='-'){take();return neg(unary());} return exponent(); }
+    function product() {
+      let p=unary();
+      while(peek()==='*' || peek()==='/' || ['x','n','('].includes(peek())) {
+        const op=peek(); if(op==='*'||op==='/') take();
+        const q=unary();
+        if(op==='/') { if(degree(q)>0) throw new Error('Cada entrada debe ser un polinomio: no pongas x en un denominador.'); p=trim(p.map(c=>c.div(q[0]))); }
+        else p=mul(p,q);
+      }
+      return p;
+    }
+    function expression() { let p=product(); while(peek()==='+'||peek()==='-'){const op=take().t;const q=product();p=op==='+'?add(p,q):sub(p,q);}return p; }
+    const p=trim(expression());
+    if(peek()!=='end') throw new Error('La expresión no está completa. Revisa los paréntesis y los exponentes.');
+    if(degree(p)>MAX_DEGREE) throw new Error(`El grado máximo admitido es ${MAX_DEGREE}.`);
+    return p;
+  }
+  function divide(dividend, divisor) {
+    dividend=trim(dividend); divisor=trim(divisor);
+    if(degree(divisor)<0) throw new Error('El divisor no puede ser el polinomio cero.');
+    let remainder=dividend.slice(), quotient=[ZERO]; const rounds=[];
+    while(degree(remainder)>=degree(divisor) && degree(remainder)>=0) {
+      if(rounds.length>MAX_DEGREE+1) throw new Error('No se ha podido completar la división.');
+      const k=degree(remainder)-degree(divisor), coefficient=remainder.at(-1).div(divisor.at(-1));
+      const monomial=Array(k+1).fill(ZERO); monomial[k]=coefficient;
+      const product=mul(monomial,divisor), after=sub(remainder,product);
+      quotient=add(quotient,monomial);
+      rounds.push({ before:remainder, monomial, product, opposite:neg(product), after, quotient:quotient.slice() });
+      remainder=after;
+    }
+    const rebuilt=add(mul(divisor,quotient),remainder);
+    if(!equal(rebuilt,dividend) || (degree(remainder)>=degree(divisor) && degree(remainder)>=0)) throw new Error('La comprobación interna no ha sido correcta.');
+    return { dividend, divisor, quotient, remainder, rounds, verified:true };
+  }
+  function equal(a,b){ a=trim(a);b=trim(b);return a.length===b.length&&a.every((v,i)=>v.eq(b[i])); }
+  function text(p) {
+    p=trim(p); if(degree(p)<0)return '0'; let out='';
+    for(let k=p.length-1;k>=0;k--){const c=p[k];if(c.zero)continue;const sign=c.n<0n?'-':out?'+':'';const a=c.abs();
+      out+=(out?' '+sign+' ':sign)+(k && a.one?'':a.toString())+(k?'x'+(k>1?'^'+k:''):'');}
+    return out;
+  }
+  const api={Rational,ZERO,ONE,MAX_DEGREE,trim,degree,at,add,neg,sub,mul,power,parse,divide,equal,text};
+  if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  root.EuclidMath=api;
+})(typeof globalThis!=='undefined'?globalThis:this);
+
+</script>
+<script>
+(function () {
+'use strict';
+const M=window.EuclidMath, $=id=>document.getElementById(id);
+const icons={
+ link:'<path d="m10 13 4-4M8 15l-1 1a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0M13 7l1-1a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0"/>',
+ expand:'<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>',
+ collapse:'<path d="M3 8h5V3m13 5h-5V3M3 16h5v5m13-5h-5v5"/>',
+ refresh:'<path d="M20 7a8 8 0 1 0 1 8M20 3v5h-5"/>',
+ left:'<path d="m14 6-6 6 6 6"/>',right:'<path d="m9 6 6 6-6 6"/>',
+ play:'<path d="m8 4 12 8-12 8Z"/>',pause:'<path d="M8 5v14M16 5v14"/>',
+ reset:'<path d="M4 5v14M19 5 7 12l12 7Z"/>',
+ replay:'<path d="M4 8a8 8 0 1 1-1 8M4 3v6h6"/>',
+ bulb:'<path d="M9 18h6m-5 3h4M8 14a6 6 0 1 1 8 0c-1 1-1 2-1 2H9s0-1-1-2Z"/>',
+ check:'<path d="m5 12 4 4L19 6"/>',arrowdown:'<path d="M12 3v17m-5-5 5 5 5-5"/>',
+ pen:'<path d="m15 4 5 5M4 20l5-1L21 7a3 3 0 0 0-4-4L5 15Z"/>'
+};
+const icon=n=>`<svg viewBox="0 0 24 24" aria-hidden="true">${icons[n]||icons.check}</svg>`;
+document.querySelectorAll('[data-icon]').forEach(e=>{e.innerHTML=icon(e.dataset.icon);});
+const phases=['divide','multiply','place','signs','subtract'];
+const examples=[
+ ['2x^3 - 3x^2 + 4x - 5','x - 2'],
+ ['x^3 - 2x^2 - 5x + 6','x - 3'],
+ ['x^4 - 5x^2 + 4','x^2 - 1'],
+ ['x^2 + 1','2x - 1']
+];
+let solution, states=[], index=0, busy=false, playing=false, animationEpoch=0, animations=[], floating=[];
+let autoTimer=null, toastTimer=null, appliedInputs=examples[0].slice();
+const reducedMotion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const speed=()=>Number($('speed').value)||1;
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function remember(key,value){try{localStorage.setItem('EuclidDivision.'+key,JSON.stringify(value));}catch{}}
+function recall(key,fallback){try{const v=JSON.parse(localStorage.getItem('EuclidDivision.'+key));return v??fallback;}catch{return fallback;}}
+function toast(text){clearTimeout(toastTimer);$('toast').textContent=text;$('toast').hidden=false;toastTimer=setTimeout(()=>{$('toast').hidden=true;},4500);}
+function rationalHTML(r){const a=r.abs();return a.d===1n?String(a.n):`<span class="frac"><span class="num">${a.n}</span><span class="den">${a.d}</span></span>`;}
+function powerHTML(k){return k===0?'':`<i>x</i>${k>1?`<sup>${k}</sup>`:''}`;}
+function termHTML(c,k,{first=false,forceSign=false,zero=false}={}) {
+ const sign=c.n<0n?'−':(!first||forceSign)?'+':'';
+ const coeff=c.zero?'0':k>0&&c.abs().one?'':rationalHTML(c);
+ return `${sign?`<span class="sign">${sign}</span>`:''}${coeff}${powerHTML(k)}`;
+}
+function polyHTML(p,{className='',highlightDegree=-2,source=false}={}) {
+ if(M.degree(p)<0)return '<span class="inline-term">0</span>';
+ let first=true;const parts=[];
+ for(let k=p.length-1;k>=0;k--){const c=p[k];if(c.zero)continue;
+  const classes=[source?'source-term':'inline-term',k===highlightDegree?'highlight new-term':'',className].filter(Boolean).join(' ');
+  parts.push(`<span class="${classes}" data-power="${k}">${termHTML(c,k,{first})}</span>`);first=false;
+ }
+ return parts.join(source?'':' ');
+}
+function signedStandalone(c,k){return termHTML(c,k,{first:true});}
+function monomialHTML(p){return polyHTML(p);}
+function gradeHTML(p){return M.degree(p)<0?'no definido':String(M.degree(p));}
+function nonzeroLow(p){for(let i=0;i<p.length;i++)if(!p[i].zero)return i;return 0;}
+function gridRow(p,{id='',className='',product=false,signed=false,hot=-2,cancelFrom=-1,showLine=false,active=false}={}) {
+ const n=Math.max(0,M.degree(solution.dividend)),hi=M.degree(p),lo=product?nonzeroLow(p):0,zeros=$('show-zeros').checked;
+ let first=true,cells='';
+ for(let k=n;k>=0;k--){const c=M.at(p,k);let cls='term-cell',content='',visible=true;
+  if(hi<0&&k===0){content='0';cls+=' zero-result-cell';first=false;}
+  else if(k>hi){if(k<=cancelFrom){content=termHTML(M.ZERO,k,{first:true});cls+=' canceled-zero';}else visible=false;}
+  else if(product&&k<lo)visible=false;
+  else if(c.zero){if(zeros){content=termHTML(c,k,{first});cls+=' is-hole';first=false;}else visible=false;}
+  else{content=termHTML(c,k,{first,forceSign:signed});first=false;}
+  if(!visible)cls+=' empty';
+  if(k===hot&&visible)cls+=' term-highlight';
+  cells+=`<span class="${cls}" data-power="${k}">${content}</span>`;
+ }
+ let brackets='';
+ if(product&&!signed&&hi>=0){const start=n-hi,end=n-lo+1;
+  brackets=`<span class="sub-minus" style="left:calc(var(--gutter) + ${start}*var(--cell) - 35px)">−</span><span class="sub-open" style="left:calc(var(--gutter) + ${start}*var(--cell) - 12px)">(</span><span class="sub-close" style="left:calc(var(--gutter) + ${end}*var(--cell) - 2px)">)</span>`;
+ }
+ return `<div ${id?`id="${id}"`:''} class="polyrow ${className} ${active?'active-result':''}" aria-label="${product?(signed?'Signos cambiados: ':'Restamos: '):''}${M.text(p)}"><div class="cell-grid">${cells}</div>${brackets}${showLine?'<span class="subtraction-rule"></span>':''}</div>`;
+}
+function stopAuto(){playing=false;clearTimeout(autoTimer);autoTimer=null;updateControls();}
+function cancelMotion(){animationEpoch++;animations.forEach(a=>{try{a.cancel();}catch{}});animations=[];floating.forEach(e=>e.remove());floating=[];busy=false;}
+function tween(el,keyframes,duration,delay=0){if(!el)return Promise.resolve();const a=el.animate(keyframes,{duration,delay,easing:'cubic-bezier(.22,.61,.36,1)',fill:'backwards'});animations.push(a);return a.finished.catch(()=>{});}
+function scrollToCurrent(){const scroll=$('board-scroll'),step=states[index];let target=null;
+ if(step.phase==='finished')target=$('result-row-'+(solution.rounds.length-1));
+ else if(step.round>=0)target=$(step.phase==='subtract'?'result-row-'+step.round:(['place','signs'].includes(step.phase)?'product-row-'+step.round:(step.round?'result-row-'+(step.round-1):'dividend-row')));
+ if(target){const top=target.offsetTop;const bottom=top+target.offsetHeight;const needed=bottom-scroll.clientHeight+28;if(needed>scroll.scrollTop)scroll.scrollTop=needed;else if(top<scroll.scrollTop+20)scroll.scrollTop=Math.max(0,top-30);}
+ else scroll.scrollTop=0;
+ $('scroll-hint').hidden=scroll.scrollWidth<=scroll.clientWidth+3;
+}
+function renderBoard(){
+ const step=states[index],phase=step.phase,round=step.round,rank=phases.indexOf(phase),n=Math.max(0,M.degree(solution.dividend));
+ const active=round>=0?solution.rounds[round]:null,final=phase==='finished';
+ const board=$('long-division');board.style.setProperty('--cols',n+1);
+ // Grow the fixed columns for large rational coefficients so columns never overlap.
+ let digits=1;const relevant=[solution.dividend,solution.divisor,solution.quotient,solution.remainder,...solution.rounds.flatMap(r=>[r.product,r.after])];
+ relevant.forEach(p=>p.forEach(c=>{digits=Math.max(digits,c.abs().n.toString().length,c.d.toString().length);}));
+ board.style.setProperty('--cell',`${Math.max(window.innerWidth<=700?95:document.body.classList.contains('projecting')?128:window.innerWidth<=1150?95:108,50+digits*17)}px`);
+ let left=`<div class="column-labels" aria-hidden="true">${Array.from({length:n+1},(_,j)=>`<span>${powerHTML(n-j)||'1'}</span>`).join('')}</div>`;
+ left+=gridRow(solution.dividend,{id:'dividend-row',className:'initial-row',hot:phase==='divide'&&round===0?M.degree(active.before):-2});
+ const upto=final?solution.rounds.length-1:round;
+ for(let i=0;i<=upto;i++){
+  const r=solution.rounds[i],completed=final||i<round,showProduct=completed||rank>=2,showResult=completed||phase==='subtract';
+  if(!showProduct)continue;
+  const signed=completed||rank>=3;
+  left+=`<div class="${completed?'past-round':'current-round'}" data-round="${i}">`;
+  left+=gridRow(signed?r.opposite:r.product,{id:'product-row-'+i,className:signed?'signed-row':'product-row',product:true,signed,showLine:signed});
+  if(showResult)left+=gridRow(r.after,{id:'result-row-'+i,className:'remainder-row',hot:phase==='divide'&&i===round-1?M.degree(active.before):-2,cancelFrom:!completed&&phase==='subtract'?M.degree(r.before):-1,active:!completed&&phase==='subtract'||final&&i===upto});
+  left+='</div>';
+ }
+ const quotient=final?solution.quotient:active?active.quotient:[M.ZERO];
+ const quotientDisplay=phase==='setup'?'<span class="quotient-empty">···</span>':polyHTML(quotient,{highlightDegree:phase==='divide'?M.degree(active.monomial):-2});
+ let right=`<div class="divisor-label">DIVISOR</div><div id="divisor-value" class="divisor-value math">${polyHTML(solution.divisor,{highlightDegree:phase==='divide'?M.degree(solution.divisor):-2})}</div><div class="quotient-label">COCIENTE</div><div id="quotient-value" class="quotient-value math">${quotientDisplay}</div>`;
+ if(active&&rank>=1&&!final){right+=`<div class="work-product"><div class="work-product-label">MONOMIO × DIVISOR</div><div class="multiply-expression math"><span class="c-quotient">${monomialHTML(active.monomial)}</span> · <span class="c-divisor no-wrap">(${polyHTML(solution.divisor)})</span></div><div class="product-arrow">${icon('arrowdown')}</div><div class="product-source math ${rank>=2?'moved':''}" id="product-source">${polyHTML(active.product,{source:true})}</div></div>`;}
+ else if(phase==='setup'){right+=`<div class="operation-placeholder">${icon('pen')}El cociente se construirá aquí, monomio a monomio.</div>`;}
+ board.innerHTML=`<div class="left-operation">${left}</div><div class="right-operation">${right}</div>`;
+ $('round-badge').textContent=final?'Terminada':round>=0?`Vuelta ${round+1} de ${solution.rounds.length}`:'Preparación';
+ $('result-banner').hidden=!final;
+ if(final)$('result-banner').innerHTML=`${icon('check')}<strong>${M.degree(solution.remainder)<0?'División exacta':'División terminada'}</strong><span class="math c-quotient">Q(x) = ${polyHTML(solution.quotient)}</span><span class="math c-remainder">R(x) = ${polyHTML(solution.remainder)}</span>`;
+ requestAnimationFrame(scrollToCurrent);
+}
+function degreeReason(){
+ if(M.degree(solution.remainder)<0)return 'El resto es <strong>cero</strong>. La división es exacta.';
+ return `El resto tiene grado <strong>${gradeHTML(solution.remainder)}</strong>, menor que el grado <strong>${gradeHTML(solution.divisor)}</strong> del divisor. Ya no podemos seguir dividiendo.`;
+}
+function renderExplanation(){const s=states[index],r=s.round>=0?solution.rounds[s.round]:null;let html='';
+ $('step-counter').textContent=s.phase==='setup'?'ANTES DE EMPEZAR':`PASO ${String(index).padStart(2,'0')} DE ${states.length-1}${s.phase==='finished'?' · FIN':''}`;
+ if(s.phase==='setup'){
+  const missing=solution.dividend.some((c,i)=>c.zero&&i<M.degree(solution.dividend));
+  html=`<h2>Ordena y alinea.</h2><p class="instruction">Escribimos los términos de mayor a menor grado. Cada potencia ocupa su propia columna.</p><div class="equation-box math">D(x) = d(x) · Q(x) + R(x)</div><p class="instruction">${solution.rounds.length?'Empezaremos dividiendo el término de mayor grado del dividendo entre el de mayor grado del divisor.':M.degree(solution.dividend)<0?'El dividendo es cero: el cociente y el resto también serán cero.':'El grado del dividendo ya es menor que el del divisor. No hace falta hacer ninguna resta.'}</p>${missing?'<span class="hint-pill">Los huecos también tienen su columna.</span>':''}`;
+ }else if(s.phase==='divide'){
+  const a=M.degree(r.before),b=M.degree(solution.divisor);
+  html=`<h2>Divide los primeros términos.</h2><p class="instruction">${s.round?'Tomamos el término de mayor grado del resto parcial.':'Tomamos el término de mayor grado del dividendo.'} Lo dividimos entre el primero del divisor.</p><div class="equation-box math"><span class="large-fraction"><span class="top">${signedStandalone(r.before[a],a)}</span><span class="bottom">${signedStandalone(solution.divisor[b],b)}</span></span> = <span class="c-quotient">${monomialHTML(r.monomial)}</span></div><p class="instruction">Añadimos <span class="math c-quotient">${monomialHTML(r.monomial)}</span> al cociente.</p><span class="hint-pill">Divide coeficientes y resta exponentes.</span>`;
+ }else if(s.phase==='multiply'){
+  html=`<h2>Multiplica por todo el divisor.</h2><p class="instruction">El nuevo monomio multiplica a <strong>cada término</strong> del divisor, incluidos sus signos.</p><div class="equation-box math"><span class="c-quotient">${monomialHTML(r.monomial)}</span> · (${polyHTML(solution.divisor)})<span class="equation-line">= <span class="c-product">${polyHTML(r.product)}</span></span></div><p class="instruction">Este producto es el polinomio que vamos a restar.</p>`;
+ }else if(s.phase==='place'){
+  html=`<h2>Coloca el producto debajo.</h2><p class="instruction">El producto se desplaza debajo ${s.round?'del resto parcial':'del dividendo'}, alineado por potencias.</p><div class="equation-box math c-negative">− (<span class="c-product">${polyHTML(r.product)}</span>)</div><p class="instruction">Lo encerramos entre paréntesis y ponemos un <strong>menos delante</strong>. Todavía no hemos cambiado los signos.</p>`;
+ }else if(s.phase==='signs'){
+  html=`<h2>Cambia todos los signos.</h2><p class="instruction">Restar un polinomio equivale a sumar su opuesto. El menos de fuera afecta a <strong>todos los términos</strong>.</p><div class="equation-box math"><span class="equation-line">− (${polyHTML(r.product)})</span><span class="equation-line">= <span class="c-negative">${polyHTML(r.opposite)}</span></span></div><p class="instruction">Cada término positivo pasa a negativo, y cada negativo, a positivo.</p>`;
+ }else if(s.phase==='subtract'){
+  let rows='';
+  for(let k=M.degree(r.before);k>=0;k--){const a=M.at(r.before,k),b=M.at(r.opposite,k),c=M.at(r.after,k);
+   if(a.zero&&b.zero&&!$('show-zeros').checked)continue;
+   const aHTML=a.zero?'0':signedStandalone(a,k),bHTML=b.zero?'+ 0':termHTML(b,k,{forceSign:true}),cHTML=c.zero?'0':signedStandalone(c,k);
+   rows+=`<div class="column-calculation math" data-power="${k}">${aHTML} ${bHTML} = <span class="calc-result">${cHTML}</span></div>`;
+  }
+  const done=M.degree(r.after)<M.degree(solution.divisor);
+  html=`<h2>Resta, columna a columna.</h2><p class="instruction">Sumamos los términos después de cambiar los signos. Los de mayor grado se cancelan.</p><div class="calculation-list">${rows}</div><p class="instruction">${done?M.degree(r.after)<0?'El resto es <strong>0</strong>. Hemos terminado.':`El resto <span class="math c-remainder">${polyHTML(r.after)}</span> tiene grado menor que el divisor. Hemos terminado.`:`Queda <span class="math c-remainder">${polyHTML(r.after)}</span>. Repetimos el proceso con este resto parcial.`}</p>`;
+ }else if(s.phase==='finished'){
+  const expanded=M.mul(solution.divisor,solution.quotient);
+  html=`<div class="verified-mark">${icon('check')}Comprobación exacta</div><h2>La división está completa.</h2><p class="instruction">${degreeReason()}</p><div class="equation-box check-identity math"><span class="equation-line"><span class="c-divisor no-wrap">(${polyHTML(solution.divisor)})</span> · <span class="c-quotient no-wrap">(${polyHTML(solution.quotient)})</span>${M.degree(solution.remainder)>=0?` <span class="c-remainder no-wrap">+ (${polyHTML(solution.remainder)})</span>`:' + 0'}</span><span class="equation-line">= ${polyHTML(expanded)}${M.degree(solution.remainder)>=0?` <span class="no-wrap">+ (${polyHTML(solution.remainder)})</span>`:' + 0'}</span><span class="equation-line">= ${polyHTML(solution.dividend)}</span></div><span class="hint-pill">Dividendo = divisor × cociente + resto</span>`;
+ }
+ $('explanation-content').innerHTML=html;
+}
+function updateControls(){if(!states.length)return;
+ const step=states[index],last=states.length-1;
+ $('previous').disabled=index===0;$('next').disabled=index===last||busy;
+ const nextLabel=index===last?'Terminada':states[index+1].phase==='finished'?'Ver resultado':'Siguiente';
+ $('next').innerHTML=`${nextLabel}${icon('right')}`;
+ $('replay').disabled=busy||!['divide','multiply','place','signs','subtract'].includes(step.phase);
+ $('play').setAttribute('aria-pressed',String(playing));$('play').innerHTML=`${icon(playing?'pause':'play')}<span class="play-label">${playing?'Pausar':'Automático'}</span>`;
+ $('play').setAttribute('aria-label',playing?'Pausar reproducción automática':'Reproducir automáticamente');
+ $('progress').max=last;$('progress').value=index;$('progress').setAttribute('aria-valuetext',`Paso ${index} de ${last}`);$('progress-text').textContent=`${index} / ${last}`;
+ const rank=phases.indexOf(step.phase);
+ document.querySelectorAll('[data-phase]').forEach(e=>{const i=phases.indexOf(e.dataset.phase);e.classList.toggle('active',rank===i);e.classList.toggle('complete',rank>i||step.phase==='finished');if(rank===i)e.setAttribute('aria-current','step');else e.removeAttribute('aria-current');});
+ document.body.dataset.phase=step.phase;document.body.dataset.step=index;document.body.dataset.busy=String(busy);
+}
+function render(){renderBoard();renderExplanation();updateControls();}
+async function animateState(epoch){
+ if(reducedMotion())return;
+ const s=states[index],r=s.round>=0?solution.rounds[s.round]:null,unit=speed();
+ if(s.phase==='divide'){
+  const q=$('quotient-value').querySelector('.new-term');
+  await tween(q,[{opacity:0,transform:'translateY(-12px)'},{opacity:1,transform:'translateY(0)'}],500*unit);return;
+ }
+ if(s.phase==='multiply'){
+  const terms=[...document.querySelectorAll('#product-source .source-term')];
+  await Promise.all(terms.map((e,i)=>tween(e,[{opacity:0,transform:'translateY(-15px)',background:'#fff0d3'},{opacity:1,transform:'translateY(0)',background:'transparent'}],540*unit,i*210*unit)));return;
+ }
+ if(s.phase==='place'){
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  if(epoch!==animationEpoch)return;
+  scrollToCurrent();
+  const target=$('product-row-'+s.round),sources=[...document.querySelectorAll('#product-source .source-term')];
+  const brackets=[...target.querySelectorAll('.sub-open,.sub-close,.sub-minus')];brackets.forEach(e=>{e.style.visibility='hidden';});
+  const moves=sources.map((source,i)=>{
+   const destination=target.querySelector(`.term-cell[data-power="${source.dataset.power}"]`);
+   if(!destination)return Promise.resolve();
+   destination.style.visibility='hidden';
+   const a=source.getBoundingClientRect(),b=destination.getBoundingClientRect();
+   const clone=document.createElement('span');clone.className='flying-term';clone.innerHTML=destination.innerHTML;
+   clone.style.fontSize=getComputedStyle(destination).fontSize;document.body.appendChild(clone);floating.push(clone);
+   const c=clone.getBoundingClientRect(),sx=a.left+(a.width-c.width)/2,sy=a.top+(a.height-c.height)/2;
+   const dx=b.left+(b.width-c.width)/2-sx,dy=b.top+(b.height-c.height)/2-sy;
+   clone.style.left=sx+'px';clone.style.top=sy+'px';
+   return tween(clone,[{transform:'translate(0,0) scale(.86)',offset:0},{transform:`translate(${dx*.46}px,${dy*.32-25}px) scale(1.04)`,offset:.48},{transform:`translate(${dx}px,${dy}px) scale(1)`,offset:1}],1250*unit,i*50*unit).then(()=>{clone.remove();if(epoch===animationEpoch)destination.style.visibility='visible';});
+  });
+  await Promise.all(moves);if(epoch!==animationEpoch)return;
+  brackets.forEach(e=>{e.style.visibility='visible';});
+  await Promise.all(brackets.map((e,i)=>tween(e,[{opacity:0,transform:'scale(.75)'},{opacity:1,transform:'scale(1)'}],360*unit,i*90*unit)));return;
+ }
+ if(s.phase==='signs'){
+  const row=$('product-row-'+s.round),cells=[...row.querySelectorAll('.term-cell')].filter(e=>!e.classList.contains('empty')&&!e.classList.contains('is-hole'));
+  const first=M.degree(r.product);const work=cells.map(async(e,i)=>{
+   const finish=e.innerHTML,k=Number(e.dataset.power);e.innerHTML=termHTML(M.at(r.product,k),k,{first:k===first});e.style.color='var(--product)';
+   await sleep(i*140*unit);if(epoch!==animationEpoch)return;
+   await tween(e,[{transform:'scale(1)'},{transform:'scale(.87)',background:'#fff0d3'}],230*unit);if(epoch!==animationEpoch)return;
+   e.innerHTML=finish;e.style.color='var(--negative)';
+   await tween(e,[{transform:'scale(.87)',background:'#f6d2d5'},{transform:'scale(1)',background:'#fcedee'}],420*unit);
+  });
+  await Promise.all(work);if(epoch!==animationEpoch)return;
+  await tween(row.querySelector('.subtraction-rule'),[{transform:'scaleX(0)',transformOrigin:'left'},{transform:'scaleX(1)',transformOrigin:'left'}],350*unit);return;
+ }
+ if(s.phase==='subtract'){
+  await new Promise(resolve=>requestAnimationFrame(resolve));if(epoch!==animationEpoch)return;
+  const result=$('result-row-'+s.round),before=s.round?$('result-row-'+(s.round-1)):$('dividend-row'),product=$('product-row-'+s.round);
+  const cells=[...result.querySelectorAll('.term-cell')].filter(e=>!e.classList.contains('empty'));
+  cells.forEach(e=>{e.style.visibility='hidden';});
+  const calcs=[...document.querySelectorAll('.column-calculation')];calcs.forEach(e=>{e.style.visibility='hidden';});
+  for(let i=0;i<cells.length;i++){
+   if(epoch!==animationEpoch)return;
+   const cell=cells[i],k=cell.dataset.power,calc=calcs.find(e=>e.dataset.power===k);
+   const upper=before.querySelector(`.term-cell[data-power="${k}"]`),lower=product.querySelector(`.term-cell[data-power="${k}"]`);
+   tween(upper,[{background:'#e5ecef'},{background:'transparent'}],430*unit);tween(lower,[{background:'#f7d5d8'},{background:'#fcedee'}],430*unit);
+   cell.style.visibility='visible';tween(cell,[{opacity:0,transform:'translateY(-9px)'},{opacity:1,transform:'translateY(0)'}],380*unit);
+   if(calc){calc.style.visibility='visible';tween(calc,[{opacity:0,transform:'translateX(-6px)'},{opacity:1,transform:'translateX(0)'}],380*unit);}
+   await sleep(310*unit);
+  }
+  await sleep(240*unit);
+ }
+}
+async function goTo(next,{animate=true,keepPlaying=false}={}){
+ if(!states.length)return;if(!keepPlaying)stopAuto();clearTimeout(autoTimer);cancelMotion();
+ index=Math.max(0,Math.min(next,states.length-1));render();
+ const epoch=animationEpoch;
+ if(animate&&phases.includes(states[index].phase)&&!reducedMotion()){
+  busy=true;updateControls();try{await animateState(epoch);}catch(error){console.error('Animación:',error);if(epoch===animationEpoch){cancelMotion();render();return;}}
+  if(epoch!==animationEpoch)return;busy=false;updateControls();
+ }
+ if(index===states.length-1){playing=false;updateControls();}
+ else if(playing)autoTimer=setTimeout(()=>goTo(index+1,{animate:true,keepPlaying:true}),1550*speed());
+}
+function updatePreviews(){['dividend','divisor'].forEach(id=>{try{$(id+'-preview').innerHTML=polyHTML(M.parse($(id).value));}catch{$(id+'-preview').textContent='';}});}
+function startDivision({save=true}={}){
+ stopAuto();cancelMotion();if(solution&&states.length)render();$('input-error').hidden=true;
+ $('dividend').removeAttribute('aria-invalid');$('divisor').removeAttribute('aria-invalid');
+ const raw=[$('dividend').value.trim(),$('divisor').value.trim()];let a,b;
+ try{a=M.parse(raw[0]);}catch(e){showError('Dividendo: '+e.message,'dividend');return false;}
+ try{b=M.parse(raw[1]);if(M.degree(b)<0)throw new Error('El divisor no puede ser el polinomio cero.');}catch(e){showError('Divisor: '+e.message,'divisor');return false;}
+ try{solution=M.divide(a,b);}catch(e){showError(e.message,'dividend');return false;}
+ appliedInputs=raw;states=[{phase:'setup',round:-1}];solution.rounds.forEach((_,round)=>phases.forEach(phase=>states.push({phase,round})));states.push({phase:'finished',round:solution.rounds.length-1});
+ index=0;updatePreviews();render();$('board-scroll').scrollTop=0;$('board-scroll').scrollLeft=0;
+ document.querySelectorAll('[data-example]').forEach(e=>e.classList.toggle('selected',examples[Number(e.dataset.example)].every((x,j)=>x===raw[j])));
+ if(save)remember('inputs',raw);return true;
+}
+function showError(message,id){$('input-error').textContent=message;$('input-error').hidden=false;$(id).setAttribute('aria-invalid','true');$(id).focus();updateControls();}
+$('polynomial-form').addEventListener('submit',e=>{e.preventDefault();startDivision();});
+['dividend','divisor'].forEach(id=>$(id).addEventListener('input',()=>{$(id).removeAttribute('aria-invalid');updatePreviews();document.querySelectorAll('[data-example]').forEach(e=>e.classList.remove('selected'));}));
+document.querySelectorAll('[data-example]').forEach(e=>e.addEventListener('click',()=>{const [a,b]=examples[Number(e.dataset.example)];$('dividend').value=a;$('divisor').value=b;startDivision();}));
+$('next').addEventListener('click',()=>{if(!busy&&index<states.length-1)goTo(index+1);});
+$('previous').addEventListener('click',()=>goTo(index-1,{animate:false}));
+$('reset').addEventListener('click',()=>goTo(0,{animate:false}));
+$('brand-reset').addEventListener('click',e=>{e.preventDefault();goTo(0,{animate:false});});
+$('replay').addEventListener('click',()=>goTo(index,{animate:true}));
+$('progress').addEventListener('input',e=>goTo(Number(e.target.value),{animate:false}));
+$('play').addEventListener('click',()=>{if(playing){stopAuto();return;}playing=true;updateControls();if(busy)return;goTo(index===states.length-1?0:index+1,{animate:true,keepPlaying:true});});
+$('speed').addEventListener('change',()=>remember('speed',$('speed').value));
+$('show-zeros').addEventListener('change',()=>{remember('zeros',$('show-zeros').checked);goTo(index,{animate:false});});
+document.addEventListener('keydown',e=>{
+ if(e.ctrlKey||e.metaKey||e.altKey||e.target.isContentEditable||['INPUT','TEXTAREA','SELECT','SUMMARY'].includes(e.target.tagName))return;
+ if(e.code==='ArrowRight'){e.preventDefault();if(!busy&&index<states.length-1)goTo(index+1);}
+ else if(e.code==='ArrowLeft'){e.preventDefault();if(index>0)goTo(index-1,{animate:false});}
+ else if(e.code==='Space'&&!['BUTTON','A'].includes(e.target.tagName)){e.preventDefault();if(!e.repeat)$('play').click();}
+ else if(e.code==='Home'){e.preventDefault();goTo(0,{animate:false});}
+ else if(e.code==='Escape'&&document.body.classList.contains('projecting')&&!document.fullscreenElement)setProjection(false);
+});
+function setProjection(on){document.body.classList.toggle('projecting',on);$('project').setAttribute('aria-pressed',String(on));$('project-label').textContent=on?'Salir':'Proyectar';$('project').querySelector('[data-icon]').innerHTML=icon(on?'collapse':'expand');goTo(index,{animate:false});}
+$('project').addEventListener('click',async()=>{
+ const on=!document.body.classList.contains('projecting');setProjection(on);
+ try{if(on&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();else if(!on&&document.fullscreenElement)await document.exitFullscreen();}catch{/* El modo de proyección también funciona sin pantalla completa. */}
+});
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('projecting'))setProjection(false);});
+$('share').addEventListener('click',async()=>{
+ if(location.protocol==='file:'){toast('Este archivo está abierto en local. Publícalo para crear un enlace compartido.');return;}
+ const url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('D',appliedInputs[0]);url.searchParams.set('d',appliedInputs[1]);
+ try{await navigator.clipboard.writeText(url.href);toast('Enlace copiado con estos dos polinomios.');}
+ catch{const area=document.createElement('textarea');area.value=url.href;area.style.position='fixed';area.style.left='-9999px';document.body.appendChild(area);area.select();const ok=document.execCommand('copy');area.remove();toast(ok?'Enlace copiado con estos dos polinomios.':'No se ha podido copiar el enlace. Usa la dirección del navegador.');}
+});
+let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(!busy){renderBoard();}},180);});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&playing)stopAuto();});
+$('show-zeros').checked=recall('zeros',true)!==false;const savedSpeed=String(recall('speed','1'));$('speed').value=['1.6','1','0.6'].includes(savedSpeed)?savedSpeed:'1';
+const query=new URLSearchParams(location.search);let initial=recall('inputs',examples[0]);if(!Array.isArray(initial)||initial.length!==2||!initial.every(s=>typeof s==='string'))initial=examples[0];
+if(query.has('D')&&query.has('d'))initial=[query.get('D'),query.get('d')];
+$('dividend').value=initial[0];$('divisor').value=initial[1];
+if(!startDivision({save:false})){const err=$('input-error').textContent;$('dividend').value=examples[0][0];$('divisor').value=examples[0][1];startDivision({save:false});toast('No se pudo cargar la división guardada. '+err);}
+// Pequeña API de diagnóstico: no guarda ni envía información.
+window.EuclidDivision={getState:()=>({index,phase:states[index].phase,round:states[index].round,steps:states.length,playing,busy,quotient:M.text(solution.quotient),remainder:M.text(solution.remainder),verified:solution.verified}),goTo:(n)=>goTo(n,{animate:false})};
+})();
+
+</script>
+</body>
+</html>
