@@ -170,6 +170,7 @@ sprites();initTools();resizeCanvas();setup();makeSideOutputsEditable();centerMai
 
 
 
+
 <!-- REVIEW START --><script>
 // Review layer: keep the existing artwork and object tools, replace inconsistent diagnostics.
 document.title='Gravitación · VConce';
@@ -238,7 +239,7 @@ showMenu=function(o,p){baseShowMenu(o,p);
   if($('spin')){$('spin').max='2';$('spin').step='.01';$('spin').value=o.spin||0;}
   const explanation=document.createElement('p');explanation.className='reviewNote';
   explanation.textContent='Órbita: el punto actual será el apoastro. La excentricidad es aproximada (dos cuerpos y lejos del núcleo suavizado). Otros cuerpos pueden perturbarla. El giro visual se mide por segundo de simulación y no modifica la gravedad.';
-  menu.append(explanation);placeMenu(menu,p,410);
+  menu.append(explanation);gravityPositionControls(o);placeMenu(menu,p,410);
 };
 orbit=function(o,refId,e,dir){const ref=st.objs.find(x=>x.id===refId);if(!ref)return;
   const dx=o.x-ref.x,dy=o.y-ref.y,r=Math.hypot(dx,dy);
@@ -248,10 +249,10 @@ orbit=function(o,refId,e,dir){const ref=st.objs.find(x=>x.id===refId);if(!ref)re
   o.vx=ref.vx+dy/r*dir*speed;o.vy=ref.vy-dx/r*dir*speed;o.fixed=false;o.trail=[];menu.hidden=true;
 };
 const originalAdd=add;
-add=function(type,x,y){const o=originalAdd(type,x,y);o.spin=type==='ship'||type==='small'?0:.06;return o};
+add=function(type,x,y){const o=originalAdd(type,x,y);o.spin=type==='ship'||type==='small'?0:.06;if(!gravitySnapSuspended)snapGravityObject(o);return o};
 st.objs.forEach(o=>o.spin=o.type==='ship'||o.type==='small'?0:.06);
 const originalAddMoon=addMoon;
-addMoon=function(parent){originalAddMoon(parent);updateMoonLocks(0)};
+addMoon=function(parent){gravitySnapSuspended++;try{originalAddMoon(parent);updateMoonLocks(0)}finally{gravitySnapSuspended--}};
 function recordGravityTrail(o,dt){
   if(!ui.trails.checked)return;
   o.trailClock=(o.trailClock||0)+dt;
@@ -339,6 +340,77 @@ draw3=function(){plainDraw3();const span=440/st.view.zoom;
 };
 const standardRender=render;
 render=function(){ui.potential.disabled=st.view3;ui.potential.closest('label').style.opacity=st.view3?'.45':'1';ui.potential.title=st.view3?'El mapa escalar por colores se muestra en 2D.':'';standardRender()};
+
+let gravitySnapSuspended=0;
+st.gridSnap={enabled:false,step:.2,mode:'vertices',origin:{x:mainStar()?.x??0,y:mainStar()?.y??0}};
+const gravitySnapControls=document.createElement('section');
+gravitySnapControls.innerHTML=`<label class="check"><input id="gravitySnap" type="checkbox"> Cuadrícula magnética</label>
+ <div id="gravitySnapOptions" hidden>
+ <label class="gravitySnapRow"><span>Separación</span><input id="gravitySnapStep" type="text" inputmode="decimal" value="0,2" aria-label="Separación de la cuadrícula en ua"><span>ua</span></label>
+ <label class="gravitySnapRow"><span>Ajuste</span><select id="gravitySnapMode" aria-label="Puntos de ajuste"><option value="vertices">Vértices</option><option value="centers">Centros de celda</option></select></label>
+ </div>`;
+ui.field.closest('label').before(gravitySnapControls);
+$('gravitySnap').title='Ajusta la colocación, no la dinámica. Desactiva la opción dinámica para mantener quietas las masas.';
+$('gravitySnap').onchange=e=>{st.gridSnap.enabled=e.target.checked;$('gravitySnapOptions').hidden=!e.target.checked;render()};
+$('gravitySnapMode').onchange=e=>{st.gridSnap.mode=e.target.value;render()};
+$('gravitySnapStep').onchange=e=>{const raw=e.target.value.trim(),n=Number(raw.replace(',','.'));if(!raw||!Number.isFinite(n)||n<.0001||n>10000){e.target.setCustomValidity('Introduce una separación entre 0,0001 y 10000 ua.');e.target.reportValidity();return}e.target.setCustomValidity('');st.gridSnap.step=n;render()};
+$('gravitySnapStep').oninput=e=>e.target.setCustomValidity('');
+$('gravitySnapStep').onkeydown=e=>{if(e.key==='Enter')e.target.blur()};
+reviewStyle.textContent+=`
+ #gravitySnapOptions[hidden]{display:none}.gravitySnapRow{display:flex;gap:6px;align-items:center;margin:6px 0;font-size:.8rem}
+ .gravitySnapRow input,.gravitySnapRow select{min-width:0;width:0;flex:1;padding:5px}
+ .gravityCoordinates{border-top:1px solid #d9e2ec;margin-top:8px;padding-top:8px}.gravityCoordinates h4{margin:0 0 6px;font-size:.85rem}
+ .gravityCoordinates .coordRow{display:flex;align-items:center;gap:6px;font-size:.8rem;margin:6px 0}.coordRow button,.coordRow input{margin-left:auto;width:120px;padding:4px 6px;text-align:right;color:#087f8c}
+ .gravityCoordinates>button{font-size:.8rem;padding:5px 8px}
+`;
+function gravityGridPoint(x,y){const g=st.gridSnap,s=g.step*290,offset=g.mode==='centers'?s/2:0;return{x:g.origin.x+offset+Math.round((x-g.origin.x-offset)/s)*s,y:g.origin.y+offset+Math.round((y-g.origin.y-offset)/s)*s}}
+function snapGravityObject(o){if(st.gridSnap?.enabled)Object.assign(o,gravityGridPoint(o.x,o.y))}
+const snapSetup=setup;
+setup=function(){gravitySnapSuspended++;try{snapSetup();const o=mainStar();if(o)st.gridSnap.origin={x:o.x,y:o.y}}finally{gravitySnapSuspended--}};
+const snapDown=canvas.onpointerdown,snapMove=canvas.onpointermove,snapUp=canvas.onpointerup;
+canvas.onpointerdown=e=>{snapDown(e);if(st.drag?.o){st.drag.snapRaw={x:st.drag.o.x,y:st.drag.o.y};st.drag.snapStart=pt(e);st.drag.snapMoved=false}};
+canvas.onpointermove=e=>{
+ const d=st.drag;
+ if(!st.gridSnap.enabled||!d?.o){snapMove(e);return}
+ const p=pt(e);
+ if(!d.snapMoved&&Math.hypot(p.x-d.snapStart.x,p.y-d.snapStart.y)<3)return;
+ d.snapMoved=true;
+ // Keep continuous drag coordinates so small 3D movements accumulate between grid points.
+ Object.assign(d.o,d.snapRaw);snapMove(e);d.snapRaw={x:d.o.x,y:d.o.y};snapGravityObject(d.o);d.o.vx=0;d.o.vy=0;
+};
+canvas.onpointerup=e=>{const d=st.drag;if(st.gridSnap.enabled&&d?.o&&d.snapMoved){snapGravityObject(d.o);d.o.vx=0;d.o.vy=0;d.vx=0;d.vy=0}snapUp(e)};
+const gridSpace=space,gridLine3=line3;
+space=function(){gridSpace();if(st.gridSnap.enabled)drawGravityPlacementGrid(st.view3)};
+line3=function(a,b,c,w){if(st.gridSnap.enabled&&c==='rgba(72,170,220,.42)')return;gridLine3(a,b,c,w)};
+function drawGravityPlacementGrid(is3){
+ const g=st.gridSnap,s=g.step*290;
+ const span=is3?Math.max(520/st.view.zoom,Math.min(1600,st.objs.reduce((m,o)=>Math.max(m,Math.abs(o.x-st.view.cx),Math.abs(o.y-st.view.cy)),0)+260/st.view.zoom)):0;
+ const b=is3?{x0:st.view.cx-span,x1:st.view.cx+span,y0:st.view.cy-span,y1:st.view.cy+span}:{x0:s2w({x:0,y:0}).x,x1:s2w({x:W,y:0}).x,y0:s2w({x:0,y:0}).y,y1:s2w({x:0,y:H}).y};
+ const stride=Math.max(1,Math.ceil(18/(s*st.view.zoom)),Math.ceil((b.x1-b.x0)/(s*90))),step=s*stride;
+ const xs=Math.ceil((b.x0-g.origin.x)/step)*step+g.origin.x,ys=Math.ceil((b.y0-g.origin.y)/step)*step+g.origin.y;
+ ctx.save();ctx.strokeStyle='rgba(107,192,224,.35)';ctx.lineWidth=1;
+ const segment=(x,y,X,Y)=>{const a=is3?pr(p3(x,y)):w2s(x,y),b=is3?pr(p3(X,Y)):w2s(X,Y);if(![a.x,a.y,b.x,b.y].every(Number.isFinite))return;ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y)};
+ ctx.beginPath();
+ const dy=is3?(b.y1-b.y0)/100:b.y1-b.y0,dx=is3?(b.x1-b.x0)/100:b.x1-b.x0;
+ for(let x=xs;x<=b.x1;x+=step)for(let y=b.y0;y<b.y1-1e-8;y+=dy)segment(x,y,x,Math.min(y+dy,b.y1));
+ for(let y=ys;y<=b.y1;y+=step)for(let x=b.x0;x<b.x1-1e-8;x+=dx)segment(x,y,Math.min(x+dx,b.x1),y);
+ ctx.stroke();
+ if(g.mode==='centers'&&stride===1){ctx.fillStyle='rgba(162,227,247,.8)';ctx.beginPath();for(let x=xs-step/2;x<=b.x1;x+=step)for(let y=ys-step/2;y<=b.y1;y+=step){const p=is3?pr(p3(x,y)):w2s(x,y);ctx.moveTo(p.x+2,p.y);ctx.arc(p.x,p.y,2,0,Math.PI*2)}ctx.fill()}
+ ctx.restore();
+}
+function gravityPositionControls(o){
+ const host=document.createElement('section');host.className='gravityCoordinates';host.innerHTML='<h4>Posición (origen inicial del Sol)</h4>';
+ const buttons={};
+ for(const axis of ['x','y']){const row=document.createElement('div');row.className='coordRow';const label=document.createElement('span');label.textContent=axis==='x'?'X (derecha)':'Y (abajo)';const button=document.createElement('button');button.type='button';button.dataset.gravityCoordinate=axis;button.setAttribute('aria-label','Editar '+axis.toUpperCase()+' en ua');buttons[axis]=button;
+  button.onclick=()=>{const input=document.createElement('input');input.type='text';input.inputMode='decimal';input.setAttribute('aria-label',button.getAttribute('aria-label'));input.value=((o[axis]-st.gridSnap.origin[axis])/290).toLocaleString('es-ES',{useGrouping:false,maximumFractionDigits:8});button.replaceWith(input);input.focus();input.select();let done=false;
+   const finish=save=>{if(done)return;const raw=input.value.trim(),n=Number(raw.replace(',','.'));if(save&&(!raw||!Number.isFinite(n))){input.setCustomValidity('Introduce una coordenada válida.');input.reportValidity();return}done=true;if(save){unlockObject(o);o[axis]=st.gridSnap.origin[axis]+n*290;o.vx=0;o.vy=0;o.trail=[]}input.replaceWith(button);refresh();render()};
+   input.oninput=()=>input.setCustomValidity('');input.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();finish(true)}if(e.key==='Escape'){e.stopPropagation();finish(false)}};input.onblur=()=>finish(true);
+  };row.append(label,button);host.append(row);
+ }
+ const center=document.createElement('button');center.textContent='Centro de la vista';center.onclick=()=>{unlockObject(o);o.x=st.view.cx;o.y=st.view.cy;o.vx=0;o.vy=0;o.trail=[];refresh();render()};host.append(center);
+ function refresh(){for(const axis of ['x','y'])buttons[axis].textContent=((o[axis]-st.gridSnap.origin[axis])/290).toLocaleString('es-ES',{maximumFractionDigits:5})+' ua'}
+ refresh();menu.append(host);
+}
 
 </script><!-- REVIEW END -->
 </body>
