@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lentes delgadas | VConce</title>
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/new-physics/ray-optics-favicon.png">
+  <link rel="stylesheet" href="../shared/katex/katex.min.css"><link rel="stylesheet" href="assets/new-physics/lab.css">
+  <script defer src="../shared/katex/katex.min.js"></script><script defer src="assets/new-physics/lucide.min.js"></script>
+  <script defer src="assets/new-physics/models.js"></script><script defer src="assets/new-physics/lab.js"></script><script defer src="assets/new-physics/ray-optics.js"></script>
+</head>
+<body>
+<header><img src="../electromagnetism/assets/electric/vconce.png" alt="VConce"><div><h1>Lentes delgadas</h1><p>Objeto, focos y formaci&oacute;n de la imagen</p></div></header>
+<main><aside aria-label="Par&aacute;metros &oacute;pticos">
+  <p class="eyebrow">Banco &oacute;ptico</p><h2>Una lente, tres rayos</h2>
+  <label class="select-label" for="type">Tipo de lente</label><select id="type"><option value="converging">Convergente (f &gt; 0)</option><option value="diverging">Divergente (f &lt; 0)</option></select>
+  <div id="controls" class="control-grid"></div><p id="input-error" class="error" role="status"></p>
+  <label class="check"><input type="checkbox" id="extensions" checked>Prolongaciones virtuales</label>
+  <div class="toolbar"><button id="play" class="primary" aria-pressed="false">Iniciar</button><button id="reset" class="icon-button" title="Restablecer banco" aria-label="Restablecer banco"><i data-lucide="rotate-ccw"></i></button></div>
+  <p class="status" id="status">Trazado est&aacute;tico</p>
+  <p class="notice">Lente ideal, delgada y paraxial. Objeto real a la izquierda. El espesor dibujado es simb&oacute;lico; no hay aberraciones ni difracci&oacute;n. Las marcas en movimiento indican el sentido de la luz, no su velocidad.</p>
+</aside><section class="stage">
+  <div class="plot-head"><h2>Diagrama de rayos</h2><p>Posici&oacute;n horizontal en cm</p></div>
+  <canvas id="optics" class="optical" tabindex="0" aria-label="Banco &oacute;ptico. Objeto y lente arrastrables. Los controles num&eacute;ricos ofrecen la misma operaci&oacute;n con teclado.">Diagrama &oacute;ptico con datos num&eacute;ricos debajo.</canvas>
+  <div class="legend"><span><i></i>Paralelo al eje</span><span><i class="teal"></i>Centro &oacute;ptico</span><span><i class="red"></i>Rayo auxiliar</span><span><i class="dashed"></i>Prolongaci&oacute;n, no luz</span></div>
+  <div class="metrics" aria-live="polite">
+    <div class="metric"><span>Distancia del objeto u</span><strong id="u-read"></strong><small>Positiva a la izquierda de la lente</small></div>
+    <div class="metric"><span>Distancia de la imagen v</span><strong id="v-read"></strong><small>Positiva a la derecha</small></div>
+    <div class="metric"><span>Aumento lateral m</span><strong id="m-read"></strong><small>m = h&#8242; / h</small></div>
+    <div class="metric"><span>Altura de la imagen h&#8242;</span><strong id="h-read"></strong><small>Signo negativo: invertida</small></div>
+  </div><p class="outcome" id="outcome"></p>
+  <div class="theory"><h2>De los rayos a la ecuaci&oacute;n</h2>
+    <div class="equation" data-tex="\frac{1}{f}=\frac{1}{u}+\frac{1}{v},\qquad m=-\frac{v}{u}=\frac{h'}{h}"></div>
+    <p>La distancia focal es positiva en una lente convergente y negativa en una divergente. Los dos focos est&aacute;n a la misma distancia de la lente. Un rayo paralelo emerge hacia el foco imagen (o parece proceder de &eacute;l); el rayo que atraviesa el centro no se desv&iacute;a.</p>
+    <p>El rayo auxiliar se refracta con la misma ley paraxial. Si llega a la lente a una altura y, sus pendientes cumplen:</p>
+    <div class="equation" data-tex="\theta_{\mathrm{salida}}\simeq\theta_{\mathrm{entrada}}-\frac{y}{f}"></div>
+    <p>Una imagen real se forma donde se cruzan los rayos emergentes y puede recogerse en una pantalla. En una imagen virtual se cruzan sus prolongaciones hacia atr&aacute;s. Si u = f &gt; 0, los rayos emergentes son paralelos: no hay imagen a distancia finita ni aumento finito.</p>
+    <details><summary>Investiga y contrasta</summary><p>Con f = 40 cm, compara u = 80 cm, 60 cm, 40 cm y 20 cm. Predice el signo de v y el tama&ntilde;o antes de cambiar u. Despu&eacute;s repite con una lente divergente: &iquest;puede producir una imagen real de este objeto real?</p><p>El encuadre es fijo y las escalas vertical y horizontal son independientes. Una imagen puede quedar fuera del campo: sus valores siguen siendo los del modelo, no los de una imagen recortada.</p></details>
+    <p class="sources">Bachillerato: sistemas &oacute;pticos. Ampliaci&oacute;n de la refracci&oacute;n de IB C.3 (no contenido expl&iacute;cito de lentes en la gu&iacute;a 2025). Fuentes: <a href="https://openstax.org/books/university-physics-volume-3/pages/2-4-thin-lenses">OpenStax, lentes delgadas</a>; <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2022-5521">RD 243/2022</a>.</p>
+  </div>
+</section></main><footer>VConce &middot; &Oacute;ptica geom&eacute;trica &middot; Modelo ideal, no instrumento de medida</footer>
+</body></html>

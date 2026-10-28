@@ -1,0 +1,37 @@
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Transitorios RC | VConce</title>
+<link rel="icon" type="image/png" sizes="96x96" href="assets/new-physics/rc-transient-favicon.png"><link rel="stylesheet" href="../shared/katex/katex.min.css"><link rel="stylesheet" href="assets/new-physics/lab.css">
+<script defer src="../shared/katex/katex.min.js"></script><script defer src="assets/new-physics/lucide.min.js"></script><script defer src="assets/new-physics/models.js"></script><script defer src="assets/new-physics/lab.js"></script><script defer src="assets/new-physics/rc-transient.js"></script>
+</head><body>
+<header><img src="../electromagnetism/assets/electric/vconce.png" alt="VConce"><div><h1>Transitorios RC</h1><p>Carga y descarga de un condensador ideal</p></div></header>
+<main><aside aria-label="Par&aacute;metros del circuito">
+<p class="eyebrow">Circuito en serie</p><h2>Una escala de tiempo: RC</h2>
+<div class="segmented" aria-label="Proceso"><button id="charge" aria-pressed="true">Carga</button><button id="discharge" aria-pressed="false">Descarga</button></div>
+<div id="controls" class="control-grid"></div><p id="input-error" class="error" role="status"></p>
+<div class="toolbar"><button id="play" class="primary" aria-pressed="false">Iniciar</button><button id="reset" class="icon-button" title="Volver a t = 0" aria-label="Volver a t = 0"><i data-lucide="rotate-ccw"></i></button></div>
+<p class="status" id="status"></p>
+<p class="notice">Cada cambio de R, C, V o proceso comienza un experimento nuevo. Carga: V<sub>C</sub>(0) = 0. Descarga: V<sub>C</sub>(0) = V, con la fuente desconectada. R y C son constantes y estrictamente positivos.</p>
+</aside><section class="stage">
+<div class="plot-head"><h2 id="circuit-title">Fuente conectada</h2><p>Corriente positiva: hacia la placa superior</p></div>
+<canvas id="circuit" class="circuit" role="img" aria-label="Circuito serie con resistencia y condensador. La fuente est&aacute; conectada solo en carga."></canvas>
+<div class="metrics">
+<div class="metric"><span>Tiempo transcurrido</span><strong id="t-read"></strong><small id="tau-read"></small></div>
+<div class="metric"><span>Carga Q</span><strong id="q-read"></strong><small>Placa superior del condensador</small></div>
+<div class="metric"><span>Tensi&oacute;n V<sub>C</sub></span><strong id="v-read"></strong><small id="energy-read"></small></div>
+<div class="metric"><span>Corriente I</span><strong id="i-read"></strong><small>I = dQ / dt, con signo</small></div>
+</div>
+<div class="two-plots">
+<div><h2>Carga almacenada</h2><canvas id="charge-chart" class="smallplot" role="img" aria-label="Carga en microculombios frente a tiempo en segundos"></canvas></div>
+<div><h2>Tensi&oacute;n del condensador</h2><canvas id="voltage-chart" class="smallplot" role="img" aria-label="Tensi&oacute;n en voltios frente a tiempo en segundos"></canvas></div>
+<div class="full"><h2>Corriente del circuito</h2><canvas id="current-chart" class="smallplot" role="img" aria-label="Corriente en miliamperios frente a tiempo en segundos"></canvas></div>
+</div>
+<p class="cursor-data" id="cursor-data">Curvas anal&iacute;ticas completas; el punto marca el instante seleccionado.</p>
+<p class="outcome" id="outcome"></p>
+<div class="theory"><h2>La misma constante, dos procesos</h2>
+<div class="equation" data-tex="\tau=RC,\qquad V_s=RI+\frac{Q}{C},\qquad I=\frac{\mathrm dQ}{\mathrm dt}"></div>
+<h3>Carga desde cero, fuente de tensi&oacute;n V</h3><div class="equation" data-tex="Q=CV(1-e^{-t/\tau}),\quad V_C=V(1-e^{-t/\tau})"></div><div class="equation" data-tex="I=\frac{V}{R}e^{-t/\tau}"></div>
+<h3>Descarga desde Q(0) = CV, sin fuente</h3><div class="equation" data-tex="Q=CVe^{-t/\tau},\quad V_C=Ve^{-t/\tau},\quad I=-\frac{V}{R}e^{-t/\tau}"></div>
+<p>En una constante de tiempo, la carga alcanza el 63,2 % de su valor final durante la carga, o conserva el 36,8 % de su valor inicial durante la descarga. La corriente de descarga es negativa porque sale de la placa que antes recib&iacute;a carga positiva.</p>
+<details><summary>Investiga y contrasta</summary><p>Duplica R: &iquest;qu&eacute; ocurre con la corriente inicial, con la carga final y con &tau;? Despu&eacute;s duplica C. Comprueba en ambos casos el balance V<sub>s</sub> = RI + V<sub>C</sub>. En descarga, V<sub>s</sub> = 0.</p><p>El reloj recorre 8&tau; y se detiene. La escala de reproducci&oacute;n es 0,5&tau; por segundo de pantalla; el tiempo f&iacute;sico siempre aparece en segundos. No se modelan resistencia interna, fugas, inductancia, ruptura diel&eacute;ctrica ni la conmutaci&oacute;n de un circuito parcialmente cargado.</p></details>
+<p class="sources">Ampliaci&oacute;n de circuitos de corriente continua (IB B.5); los transitorios RC no figuran como contenido expl&iacute;cito en la gu&iacute;a IB 2025. Fuente: <a href="https://openstax.org/books/university-physics-volume-2/pages/10-5-rc-circuits">OpenStax, circuitos RC</a>.</p>
+</div></section></main><footer>VConce &middot; Circuitos &middot; Soluci&oacute;n anal&iacute;tica, sin integraci&oacute;n num&eacute;rica del tiempo</footer></body></html>

@@ -1,0 +1,36 @@
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Desintegraci&oacute;n radiactiva | VConce</title>
+<link rel="icon" type="image/png" sizes="96x96" href="assets/new-physics/radioactive-decay-favicon.png"><link rel="stylesheet" href="../shared/katex/katex.min.css"><link rel="stylesheet" href="assets/new-physics/lab.css">
+<script defer src="../shared/katex/katex.min.js"></script><script defer src="assets/new-physics/lucide.min.js"></script><script defer src="assets/new-physics/models.js"></script><script defer src="assets/new-physics/lab.js"></script><script defer src="assets/new-physics/radioactive-decay.js"></script>
+</head><body>
+<header><img src="../electromagnetism/assets/electric/vconce.png" alt="VConce"><div><h1>Desintegraci&oacute;n radiactiva</h1><p>Una ley predecible, sucesos individuales aleatorios</p></div></header>
+<main><aside aria-label="Par&aacute;metros de la muestra">
+<p class="eyebrow">Muestra simulada</p><h2>Del n&uacute;cleo al conjunto</h2>
+<div id="controls" class="control-grid"></div><p id="input-error" class="error" role="status"></p>
+<label class="check"><input id="band" type="checkbox" checked>Media &plusmn; una desviaci&oacute;n t&iacute;pica</label>
+<div class="toolbar"><button id="play" class="primary" aria-pressed="false">Iniciar</button><button id="reset" class="icon-button" title="Repetir la misma muestra" aria-label="Repetir la misma muestra"><i data-lucide="rotate-ccw"></i></button><button id="new-seed" class="icon-button" title="Otra realizaci&oacute;n (semilla siguiente)" aria-label="Otra realizaci&oacute;n"><i data-lucide="shuffle"></i></button></div>
+<p id="status" class="status"></p>
+<p class="notice">Is&oacute;topo gen&eacute;rico, n&uacute;cleos independientes y descendiente estable. No son medidas experimentales. La semilla fija todos los tiempos de desintegraci&oacute;n; repetirla reproduce exactamente la misma muestra.</p>
+</aside><section class="stage">
+<div class="plot-head"><h2>N&uacute;cleos sin desintegrar</h2><p>Media te&oacute;rica y una realizaci&oacute;n</p></div>
+<canvas id="decay-chart" role="img" aria-label="N&uacute;cleos supervivientes frente a segundos, con media exponencial, banda binomial y muestra escalonada"></canvas>
+<div class="legend"><span><i></i>Media exponencial</span><span><i class="teal"></i>Muestra (escalones)</span><span><i class="band"></i>Media &plusmn; &sigma;</span></div>
+<div class="metrics">
+<div class="metric"><span>Supervivientes de la muestra</span><strong id="n-read"></strong><small id="lost-read"></small></div>
+<div class="metric"><span>Media esperada</span><strong id="mean-read"></strong><small id="sigma-read"></small></div>
+<div class="metric"><span>Actividad media esperada</span><strong id="activity-read"></strong><small>1 Bq = 1 desintegraci&oacute;n/s</small></div>
+<div class="metric"><span>Instante</span><strong id="t-read"></strong><small id="lambda-read"></small></div>
+</div>
+<h2 id="sample-title">N&uacute;cleos de la muestra</h2><canvas id="nuclei" class="nuclei" role="img" aria-label="N&uacute;cleos supervivientes rellenos y n&uacute;cleos ya desintegrados huecos"></canvas>
+<p class="cursor-data" id="sample-caption"></p><p class="outcome" id="outcome"></p>
+<div class="theory"><h2>Probabilidad no significa fecha de caducidad</h2>
+<div class="equation" data-tex="\lambda=\frac{\ln 2}{T_{1/2}},\quad p(t)=e^{-\lambda t},\quad \mathbb E[N]=N_0p(t)"></div>
+<div class="equation" data-tex="N(t)\sim\mathrm{Binomial}(N_0,p),\qquad \sigma_N=\sqrt{N_0p(1-p)}"></div>
+<div class="equation" data-tex="\mathbb E[A(t)]=\lambda N_0e^{-\lambda t}"></div>
+<p>El periodo de semidesintegraci&oacute;n no determina cu&aacute;ndo se desintegra un n&uacute;cleo concreto. Tras un periodo sobrevive, en promedio, la mitad de la muestra. La banda muestra una desviaci&oacute;n t&iacute;pica binomial de N, no un intervalo de confianza ni una incertidumbre instrumental. Se recorta visualmente a [0, N<sub>0</sub>].</p>
+<p>Los tiempos individuales se generan con la distribuci&oacute;n exponencial exacta; no se aproxima la probabilidad de desintegraci&oacute;n por &lambda;&Delta;t. El resultado no depende de la velocidad de reproducci&oacute;n ni de los saltos del reloj.</p>
+<h3>Desintegraciones por intervalo completo</h3><div class="table-wrap"><table><thead><tr><th>Intervalo (s)</th><th>Muestra</th><th>Esperadas</th><th>&sigma; binomial</th></tr></thead><tbody id="counts"></tbody></table></div>
+<p>Solo se muestran recuentos de intervalos ya completados. Son desintegraciones simuladas, no cuentas de un detector: no hay eficiencia, fondo ni tiempo muerto. Las fluctuaciones de distintos intervalos no son independientes.</p>
+<details><summary>Investiga y contrasta</summary><p>Fija N<sub>0</sub> = 20 y t = T<sub>1/2</sub>. Cambia varias veces de semilla y compara el resultado con 10. Repite con N<sub>0</sub> = 2000: &iquest;qu&eacute; ocurre con &sigma;/N? Prueba N<sub>0</sub> = 1 y observa que el descenso es un &uacute;nico salto, no una curva suave.</p><p>La secuencia es pseudoaleatoria reproducible (Mulberry32), no un generador para usos criptogr&aacute;ficos. Se admite N<sub>0</sub> = 1&ndash;5000; el recorrido llega a 8 periodos. La ley continua no implica que una muestra finita conserve siempre alg&uacute;n n&uacute;cleo.</p></details>
+<p class="sources">IB E.3: aleatoriedad y semivida en NM/NS; ley exponencial y constante de desintegraci&oacute;n en el contenido adicional de NS. La banda binomial es una ampliaci&oacute;n estad&iacute;stica. Fuente: <a href="https://www.ibo.org/globalassets/new-structure/university-admission/pdfs/subject-guides/physics-guide.pdf">Gu&iacute;a oficial de F&iacute;sica IB, primera evaluaci&oacute;n 2025</a>.</p>
+</div></section></main><footer>VConce &middot; F&iacute;sica nuclear &middot; Simulaci&oacute;n estad&iacute;stica, no datos de laboratorio</footer></body></html>

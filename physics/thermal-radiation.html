@@ -1,0 +1,36 @@
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Radiaci&oacute;n t&eacute;rmica | VConce</title>
+<link rel="icon" type="image/png" sizes="96x96" href="assets/new-physics/thermal-radiation-favicon.png"><link rel="stylesheet" href="../shared/katex/katex.min.css"><link rel="stylesheet" href="assets/new-physics/lab.css">
+<script defer src="../shared/katex/katex.min.js"></script><script defer src="assets/new-physics/lucide.min.js"></script><script defer src="assets/new-physics/models.js"></script><script defer src="assets/new-physics/lab.js"></script><script defer src="assets/new-physics/thermal-radiation.js"></script>
+</head><body>
+<header><img src="../electromagnetism/assets/electric/vconce.png" alt="VConce"><div><h1>Radiaci&oacute;n t&eacute;rmica</h1><p>Planck, Wien y Stefan-Boltzmann</p></div></header>
+<main><aside aria-label="Par&aacute;metros radiativos">
+<p class="eyebrow">Cuerpo negro y cuerpo gris</p><h2>Temperatura y emisi&oacute;n</h2>
+<div id="controls" class="control-grid"></div><p id="input-error" class="error" role="status"></p>
+<label class="select-label" for="scale">Escala de longitud de onda</label><select id="scale"><option value="log">Logar&iacute;tmica</option><option value="linear">Lineal (adaptada a los picos)</option></select>
+<div class="toolbar"><button id="play" class="primary" aria-pressed="false">Iniciar</button><button id="reset" class="icon-button" title="Volver a la temperatura de referencia" aria-label="Volver a la temperatura de referencia"><i data-lucide="rotate-ccw"></i></button></div>
+<p class="status" id="status"></p>
+<p class="notice">Solo radiaci&oacute;n. Emisividad gris independiente de la longitud de onda. Entorno negro e is&oacute;tropo que rodea por completo al cuerpo (factor de vista 1). El barrido de T es impuesto, no una curva de enfriamiento.</p>
+</aside><section class="stage">
+<div class="plot-head"><h2>Espectro emitido por unidad de superficie</h2><p id="spectrum-label"></p></div>
+<canvas id="spectrum" role="img" aria-label="Exitancia espectral hemisf&eacute;rica por micr&oacute;metro frente a longitud de onda; temperatura actual y referencia"></canvas>
+<div class="legend"><span><i></i>Temperatura actual</span><span><i class="red dashed"></i>Referencia T&#8320;</span><span><i class="band"></i>Visible: 0,38&ndash;0,78 &micro;m</span></div>
+<p class="cursor-data" id="cursor-data">M&lambda; es potencia por unidad de superficie y de longitud de onda, integrada sobre el hemisferio.</p>
+<div class="metrics">
+<div class="metric"><span>Temperatura actual</span><strong id="t-read"></strong><small id="delta-read"></small></div>
+<div class="metric"><span>Pico de emisi&oacute;n &lambda;<sub>max</sub></span><strong id="peak-read"></strong><small>Del espectro por longitud de onda</small></div>
+<div class="metric"><span>Potencia emitida total</span><strong id="power-read"></strong><small>Integral de 0 a infinito</small></div>
+<div class="metric"><span>Potencia neta hacia fuera</span><strong id="net-read"></strong><small id="absorbed-read"></small></div>
+</div><p class="outcome" id="outcome"></p>
+<h2>Comparaci&oacute;n a igual &aacute;rea y emisividad</h2><div class="table-wrap"><table><thead><tr><th>Estado</th><th>T (K)</th><th>P emitida (W)</th><th>P / P&#8320;</th></tr></thead><tbody id="comparison"></tbody></table></div>
+<div class="theory"><h2>Un espectro, dos leyes integradas</h2>
+<div class="equation" data-tex="M_\lambda(T)=\varepsilon\frac{2\pi hc^2}{\lambda^5}\frac{1}{\exp\!\left(\frac{hc}{\lambda k_B T}\right)-1}"></div>
+<p>M<sub>&lambda;</sub> es exitancia espectral, no radiancia por estereorradi&aacute;n. La expresi&oacute;n SI da W m<sup>&minus;3</sup>; la gr&aacute;fica multiplica por 10<sup>&minus;6</sup> para expresar W m<sup>&minus;2</sup> &micro;m<sup>&minus;1</sup>. El factor &pi; procede de integrar sobre el hemisferio de emisi&oacute;n.</p>
+<div class="equation" data-tex="\lambda_{\max}T=b,\qquad b=2.897771955\times10^{-3}\ \mathrm{m\,K}"></div>
+<div class="equation" data-tex="P_{\rm emitida}=A\int_0^\infty M_\lambda\,\mathrm d\lambda=\varepsilon\sigma AT^4"></div>
+<div class="equation" data-tex="P_{\rm neta}=\varepsilon\sigma A(T^4-T_{\rm entorno}^4)"></div>
+<p>La constante &sigma; es aproximadamente 5,670374419 &times; 10<sup>&minus;8</sup> W m<sup>&minus;2</sup> K<sup>&minus;4</sup>. A igual T, duplicar el &aacute;rea duplica la potencia total, pero no cambia M<sub>&lambda;</sub> ni el pico. Duplicar T multiplica la potencia emitida por 16 y divide &lambda;<sub>max</sub> por 2. Esta regla no se aplica directamente a la potencia neta.</p>
+<p>En el eje logar&iacute;tmico, el &aacute;rea geom&eacute;trica bajo la curva no es la potencia: la integral f&iacute;sica se hace respecto a d&lambda;, no a d(log &lambda;). La gr&aacute;fica muestra una ventana finita; las potencias num&eacute;ricas incluyen todo el espectro. Para &epsilon; = 0 no hay emisi&oacute;n ni un pico emitido definible.</p>
+<details><summary>Investiga y contrasta</summary><p>Compara 300 K, 3000 K y 6000 K. &iquest;En qu&eacute; regi&oacute;n espectral est&aacute; el m&aacute;ximo? Cambia A sin cambiar T. Por &uacute;ltimo, fija el entorno a la misma temperatura del cuerpo: se sigue emitiendo y absorbiendo, aunque la potencia neta sea cero.</p><p>Si el entorno est&aacute; m&aacute;s caliente, la potencia neta hacia fuera es negativa. No se incluyen conducci&oacute;n, convecci&oacute;n, masa ni capacidad calor&iacute;fica; por tanto, no se predice T(t). La ley de Planck y el intercambio con entorno son ampliaciones del tratamiento b&aacute;sico de Wien y Stefan-Boltzmann.</p></details>
+<p class="sources">IB B.1: espectro, Wien y Stefan-Boltzmann; emisividad relacionada con B.2. Fuentes: <a href="https://www.ibo.org/globalassets/new-structure/university-admission/pdfs/subject-guides/physics-guide.pdf">Gu&iacute;a oficial IB 2025</a>; <a href="https://openstax.org/books/university-physics-volume-3/pages/6-1-blackbody-radiation">OpenStax, radiaci&oacute;n de cuerpo negro</a>.</p>
+</div></section></main><footer>VConce &middot; Radiaci&oacute;n electromagn&eacute;tica &middot; Temperaturas absolutas en kelvin</footer></body></html>
