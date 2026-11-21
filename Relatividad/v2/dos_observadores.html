@@ -26,7 +26,7 @@
     <section class="controls" aria-label="Controles del experimento">
       <div><label for="velocity">Velocidad del tren</label><input id="velocity" type="range" min="0" max="0.99" value="0.8" step="0.001">
       <div class="entry"><input id="exact" type="text" inputmode="decimal" value="0.8" aria-label="Velocidad exacta"><select id="unit" aria-label="Unidad de velocidad"><option value="c">c</option><option value="ms">m/s</option></select></div></div>
-      <div><label for="rate">Ritmo de Maxwell</label><select id="rate"><option value="1">1 s por segundo real</option><option value="3" selected>3 s por segundo real</option><option value="6">6 s por segundo real</option></select></div>
+      <div><label for="rate">Ritmo de Maxwell</label><select id="rate"><option value="1">1 s por 1 s real</option><option value="3" selected>3 s por 1 s real</option><option value="6">6 s por 1 s real</option></select></div>
       <dl><div><dt>Por cada 10 s del andén</dt><dd><output aria-live="off" id="ratio"></output> en el tren</dd></div><div><dt>Factor γ</dt><dd id="gamma"></dd></div><div><dt>Diferencia acumulada</dt><dd id="gap">0.0 s</dd></div></dl>
       <div class="actions"><button id="pause" type="button">Pausar</button><button id="reset" type="button">Poner a cero</button></div>
     </section>

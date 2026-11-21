@@ -40,7 +40,7 @@ function updateSpeed(value){
   byId('gamma').textContent=(1/fraction).toFixed(3);
 }
 byId('velocity').oninput=e=>updateSpeed(e.target.valueAsNumber);
-byId('exact').onchange=e=>{
+byId('exact').onblur=e=>{
   const raw=e.target.value.trim().replace(',','.');
   const value=Number(raw);
   updateSpeed(raw&&Number.isFinite(value)?value/(byId('unit').value==='ms'?c:1):beta);
