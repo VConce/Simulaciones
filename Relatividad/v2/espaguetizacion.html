@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Espaguetización | Simulación IB</title><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317202f%22%2F%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2230%22%20r%3D%229%22%20fill%3D%22%23fbbf24%22%2F%3E%3Cpath%20d%3D%22M8%2048c12-10%2036-10%2048%200M12%2038c10-8%2030-8%2040%200%22%20fill%3D%22none%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E">
+  <style>
+    :root{--ink:#101827;--muted:#5d6880;--line:#dbe5f2;--blue:#0b63e5;--violet:#7048ff;--cyan:#38d5ff;--red:#e5383b;--card:rgba(255,255,255,.92);--shadow:0 24px 70px rgba(24,38,70,.16)}
+    *{box-sizing:border-box}body{margin:0;font-family:Bahnschrift,"Segoe UI Variable","Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 10% 0%,rgba(56,213,255,.22),transparent 26rem),radial-gradient(circle at 88% 4%,rgba(112,72,255,.18),transparent 32rem),linear-gradient(135deg,#f8fbff,#edf4ff 48%,#f8f3ff)}
+    body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;background-image:linear-gradient(rgba(31,52,91,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(31,52,91,.08) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at 50% 18%,black,transparent 78%)}
+    .page{width:min(1420px,calc(100vw - 28px));margin:18px auto 28px;position:relative}.hero{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:18px;margin-bottom:16px}.title,.panel,.card,.eqGrid article{background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.title{padding:22px 24px}.panel{padding:16px;display:grid;gap:12px}.tag{margin:0 0 9px;color:var(--blue);font-weight:950;text-transform:uppercase;letter-spacing:.08em;font-size:12px}h1{margin:0;font-size:clamp(34px,4vw,58px);line-height:.96;letter-spacing:-.05em}.lead{margin:10px 0 0;color:var(--muted);font-size:17px;line-height:1.42;font-weight:680;max-width:850px}.control{border:1px solid #dde6f3;border-radius:18px;background:rgba(255,255,255,.86);padding:12px}.control label{display:flex;justify-content:space-between;gap:12px;font-weight:950;margin-bottom:8px}.control output{font-variant-numeric:tabular-nums;color:var(--violet)}.control input{width:100%;accent-color:var(--violet);cursor:pointer}.scale{display:flex;justify-content:space-between;color:#718096;font-size:12px;font-weight:800;margin-top:5px}.unitTabs,.presetGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.presetGrid{grid-template-columns:repeat(4,1fr)}button{border:1px solid var(--line);border-radius:14px;padding:9px 11px;font-family:inherit;font-weight:950;background:#eef5ff;color:#24324a;cursor:pointer}.unitTabs button.active,.primary{background:linear-gradient(135deg,var(--blue),var(--violet));color:white;border-color:transparent}.readGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.read{border:1px solid #dde6f3;border-radius:18px;background:#fff;padding:12px}.read span{display:block;color:var(--muted);font-weight:850;font-size:12px}.read strong{font-size:20px;color:var(--blue);font-variant-numeric:tabular-nums}.status{border-radius:18px;padding:12px;background:linear-gradient(135deg,#eef8ff,#fff);border:1px solid rgba(11,99,229,.18)}.status.danger{background:linear-gradient(135deg,#ffe8e8,#fff);border-color:rgba(229,56,59,.35)}.status b{display:block;color:#0b63e5;font-size:12px;text-transform:uppercase;letter-spacing:.08em}.status.danger b{color:#c8191f}.status p{margin:5px 0 0;color:#43516a;font-weight:760}.card{overflow:hidden;padding:14px}.canvasWrap{background:#020617;border:1px solid #111c35;border-radius:24px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}canvas.dragging{cursor:grabbing}.eqGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}.eqGrid article{padding:16px}.eqGrid h3{margin:0 0 8px}.eqGrid p{margin:7px 0 0;color:var(--muted);font-weight:650;line-height:1.38}.math{font-family:Cambria,Georgia,serif;font-size:22px;color:#111827}.hint{font-size:13px;color:#5d6880;font-weight:750;line-height:1.35;margin:0}@media(max-width:980px){.hero{grid-template-columns:1fr}.eqGrid{grid-template-columns:1fr}.readGrid{grid-template-columns:1fr}.presetGrid{grid-template-columns:1fr 1fr}}
+  .vconceLogo{position:fixed;left:14px;top:14px;width:54px;height:54px;object-fit:contain;z-index:10000;pointer-events:none}@media(max-width:900px){.vconceLogo{width:42px;height:42px;left:10px;top:10px}}/* vconce header clearance */body>header{padding-left:max(88px,env(safe-area-inset-left))!important}@media(max-width:900px){body>header{padding-left:64px!important}}</style>
+<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script></head>
+<body><img class="vconceLogo" src="../../electromagnetism/assets/electric/vconce.png" alt="VConce">
+  <main class="page">
+    <section class="hero">
+      <div class="title">
+        <p class="tag">Relatividad general · fuerzas de marea</p>
+        <h1>Espaguetización</h1>
+        <p class="lead">Arrastra a Einstein y suéltalo cerca de un planeta, estrella o agujero negro. Compara la diferencia de aceleración entre dos puntos separados radialmente 1.7 m. La animación termina al alcanzar la superficie o el horizonte.</p>
+      </div>
+      <aside class="panel" aria-label="Controles de espaguetización">
+        <div class="unitTabs" aria-label="Unidades de masa"><button class="active" data-u="kg" type="button">kg</button><button data-u="earth" type="button">M⊕</button><button data-u="solar" type="button">M☉</button></div>
+        <div class="control"><label for="mass">Masa <output id="massOut"></output></label><input id="mass" type="range" min="2" max="25.78" step="0.01" value="24.78" /><div class="scale"><span id="massMin">100 kg</span><span id="massMid">1 M⊕</span><span id="massMax">10 M⊕</span></div></div>
+        <div class="control"><label for="radius">Radio <output id="rOut">6371 km</output></label><input id="radius" type="range" min="1" max="10" step="0.01" value="3.804" /><div class="scale"><span>10 km</span><span>6371 km</span><span>10¹⁰ km</span></div></div>
+        <div class="presetGrid"><button data-p="moon" type="button">Luna</button><button data-p="earth" type="button">Tierra</button><button data-p="sun" type="button">Sol</button><button data-p="garg" type="button">Gargantúa</button></div>
+        <div class="readGrid"><div class="read"><span>Estiramiento visual</span><strong id="stretchOut">1.00×</strong></div><div class="read"><span>Δg en 1.7 m</span><strong id="tidalOut">baja</strong></div><div class="read"><span>Distancia</span><strong id="distOut">--</strong></div></div>
+        <div class="status" id="statusBox"><b>Estado</b><p id="statusOut">Arrastra a Einstein y suéltalo para que empiece la caída.</p></div>
+        <div class="control"><label for="releaseDistance">Soltar desde <output id="releaseOut">3.0 R</output></label><input id="releaseDistance" type="range" min="1" max="5" step=".1" value="3"></div>
+        <button type="button" id="pause">Pausar</button><button class="primary" id="reset" type="button">Soltar desde reposo</button>
+        <p class="hint">R representa la superficie del astro o el horizonte del agujero negro. La caída radial se dibuja en tiempo reescalado según la masa y el radio. El estiramiento visual ilustra la marea, sin modelar la elasticidad del cuerpo.</p>
+      </aside>
+    </section>
+    <section class="card"><div class="canvasWrap"><canvas id="sim" width="1200" height="680"></canvas></div></section>
+    <section class="eqGrid" aria-label="Teoría">
+      <article><h3>Fuerza de marea</h3><div class="math">Δg ≈ 2GML/r³</div><p>L es la longitud del cuerpo. La dependencia con r³ hace que el efecto crezca muy rápido al acercarse.</p></article>
+      <article><h3>Compresión transversal</h3><div class="math">Δg⊥ ≈ −GML/r³</div><p>En un marco local en caída libre, dos partículas se separan en dirección radial y se acercan en las dos direcciones transversales.</p></article>
+      <article><h3>Agujero negro</h3><p>En rₛ = 2GM/c², la marea para una longitud dada decrece como 1/M². Un agujero negro supermasivo puede producir una marea pequeña en su horizonte.</p></article>
+    </section>
+  </main>
+<script>
+(() => {
+  const G = 6.6743e-11, C = 299792458, ME = 5.9722e24, MS = 1.98847e30;
+  const canvas = document.getElementById('sim'), ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const imgs = {
+    bg: load('../assets/espaguetizacion-space-background.png'),
+    einstein: load('../assets/observador-einstein-walking-sprite.png'),
+    earth: load('../assets/earth-blue-marble-sprite.png'),
+    moon: load('../assets/espaguetizacion-moon-sprite.png'),
+    sun: load('../assets/espaguetizacion-sun-sprite.png'),
+    garg: load('../assets/espaguetizacion-gargantua-sprite.png')
+  };
+  function load(src){ const im = new Image(); im.src = src; return im; }
+  const planet = { x: 255, y: 340, visualR: 120 };
+  const state = { unit:'kg', mass:ME, radiusKm:6371, body:'earth', paused:false, drag:false, last:performance.now(), t:0, man:{x:790,y:330,vx:0,vy:0,a:0,stretch:1,crush:1,engulf:0,swallowed:false} };
+  const units = {
+    kg:{base:1,label:'kg',min:2,max:Math.log10(10*ME),minLabel:'100 kg',midLabel:'1 M⊕',maxLabel:'10 M⊕'},
+    earth:{base:ME,label:'M⊕',min:-1,max:Math.log10(.1*MS/ME),minLabel:'0.1 M⊕',midLabel:'1 M⊕',maxLabel:'0.1 M☉'},
+    solar:{base:MS,label:'M☉',min:-1,max:9,minLabel:'0.1 M☉',midLabel:'1 M☉',maxLabel:'10⁹ M☉'}
+  };
+  const presets = {
+    moon:{mass:7.342e22,radiusKm:1737.4,unit:'kg',body:'moon',visualR:95},
+    earth:{mass:ME,radiusKm:6371,unit:'earth',body:'earth',visualR:120},
+    sun:{mass:MS,radiusKm:696340,unit:'solar',body:'sun',visualR:150},
+    garg:{mass:1e8*MS,radiusKm:(2*G*1e8*MS/(C*C))/1000,unit:'solar',body:'garg',visualR:165}
+  };
+  const $ = id => document.getElementById(id);
+  const clamp = (x,a,b) => Math.min(b, Math.max(a,x));
+  const schwarzKm = () => 2*G*state.mass/(C*C)/1000;
+  const isBH = () => state.radiusKm <= schwarzKm() * (1+1e-12);
+  const boundaryKm = () => Math.max(state.radiusKm,schwarzKm());
+  function setUnit(u){ state.unit=u; const cfg=units[u]; const slider=$('mass'); slider.min=cfg.min; slider.max=cfg.max; slider.step='0.01'; slider.value=clamp(Math.log10(state.mass/cfg.base),cfg.min,cfg.max); $('massMin').textContent=cfg.minLabel; $('massMid').textContent=cfg.midLabel; $('massMax').textContent=cfg.maxLabel; document.querySelectorAll('.unitTabs button').forEach(b=>b.classList.toggle('active',b.dataset.u===u)); }
+  function applyPreset(name){ const p=presets[name]; Object.assign(state,{mass:p.mass,radiusKm:p.radiusKm,unit:p.unit,body:p.body}); planet.visualR=p.visualR; setUnit(p.unit); $('radius').value=Math.log10(p.radiusKm); resetMan(); }
+  function resetMan(){ Object.assign(state.man,{x:planet.x+planet.visualR*Number($('releaseDistance').value),y:planet.y,vx:0,vy:0,a:0,stretch:1,crush:1,engulf:0,swallowed:false}); }
+  function fmtMass(){ const cfg=units[state.unit]; const v=state.mass/cfg.base; if(state.unit==='kg') return v.toExponential(2)+' kg'; return v.toLocaleString('es-ES',{maximumFractionDigits:v<10?3:1})+' '+cfg.label; }
+  function fmtRadius(km){ if(km<1000) return km.toFixed(1)+' km'; if(km<1e6) return Math.round(km).toLocaleString('es-ES')+' km'; return km.toExponential(2)+' km'; }
+  function bodyForCurrent(){ if(isBH()) return 'garg'; if(state.mass > .2*MS) return 'sun'; if(state.mass < .2*ME) return 'moon'; return state.body === 'moon' ? 'moon' : 'earth'; }
+  function drawCover(im){ if(!im.complete||!im.naturalWidth){ctx.fillStyle='#030716';ctx.fillRect(0,0,W,H);return;} const s=Math.max(W/im.naturalWidth,H/im.naturalHeight); const dw=im.naturalWidth*s,dh=im.naturalHeight*s; ctx.drawImage(im,(W-dw)/2,(H-dh)/2,dw,dh); }
+  function drawPlanet(){ const body=bodyForCurrent(); const im=imgs[body]; if(!im.complete||!im.naturalWidth)return; const r=planet.visualR; ctx.save(); if(body==='garg'){ ctx.translate(planet.x,planet.y); ctx.rotate(state.t*.08); ctx.drawImage(im,-r*1.95,-r*1.95,r*3.9,r*3.9); ctx.restore(); } else { ctx.drawImage(im,planet.x-r,planet.y-r,r*2,r*2); ctx.restore(); }
+    ctx.save(); ctx.strokeStyle=isBH()?'rgba(255,170,90,.75)':'rgba(141,241,255,.55)'; ctx.lineWidth=2; ctx.setLineDash([8,8]); ctx.beginPath(); ctx.arc(planet.x,planet.y,r,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle='rgba(255,255,255,.9)'; ctx.font='900 15px Bahnschrift, Segoe UI, sans-serif'; ctx.textAlign='center'; ctx.fillText(body==='garg'?'Horizonte de Schwarzschild':body==='sun'?'Sol':body==='moon'?'Luna':'Tierra', planet.x, planet.y+r+26); ctx.restore(); }
+  function localMetrics(){ const m=state.man; const dx=planet.x-m.x, dy=planet.y-m.y; const screenD=Math.max(1,Math.hypot(dx,dy)); const surfaceRatio=screenD/planet.visualR; const physicalR=Math.max(boundaryKm()*1000*surfaceRatio, boundaryKm()*1000); const tidal=2*G*state.mass*1.7/(physicalR*physicalR*physicalR); return {dx,dy,screenD,surfaceRatio,physicalR,tidal}; }
+  function updatePhysics(dt){
+    const m=state.man;
+    if(state.drag||state.paused||m.swallowed)return;
+    const q=localMetrics(),ux=q.dx/q.screenD,uy=q.dy/q.screenD;
+    // In units of R and sqrt(R^3/GM), a radial geodesic from rest satisfies r''=-1/r².
+    // One animation second corresponds to 0.4 natural time units.
+    const accel=.16*planet.visualR/Math.max(1,q.surfaceRatio)**2;
+    m.vx+=ux*accel*dt;m.vy+=uy*accel*dt;
+    m.x+=m.vx*dt;m.y+=m.vy*dt;
+    const direction=Math.atan2(q.dy,q.dx)+Math.PI/2;
+    m.a+=Math.atan2(Math.sin(direction-m.a),Math.cos(direction-m.a))*Math.min(1,4*dt);
+    const visual=1+Math.min(3,Math.log1p(q.tidal/1e-6)/3);
+    m.stretch+=(visual-m.stretch)*Math.min(1,4*dt);
+    m.crush=1/Math.sqrt(m.stretch);
+    if(Math.hypot(m.x-planet.x,m.y-planet.y)<=planet.visualR){
+      m.x=planet.x-ux*planet.visualR; m.y=planet.y-uy*planet.visualR;
+      m.vx=m.vy=0;m.swallowed=true;
+    }
+  }
+  function drawForceLines(){
+    const m=state.man,q=localMetrics(),ux=q.dx/q.screenD,uy=q.dy/q.screenD;
+    ctx.save();ctx.strokeStyle='rgba(255,255,255,.4)';ctx.setLineDash([6,8]);ctx.beginPath();
+    ctx.moveTo(m.x,m.y);ctx.lineTo(planet.x,planet.y);ctx.stroke();ctx.restore();
+    for(const sign of [-1,1]){
+      const x=m.x+sign*ux*45,y=m.y+sign*uy*45;
+      const dx=sign*ux,dy=sign*uy;
+      ctx.strokeStyle='#ffce75';ctx.lineWidth=3;
+      ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx*27,y+dy*27);
+      ctx.lineTo(x+dx*19-dy*4,y+dy*19+dx*4);ctx.moveTo(x+dx*27,y+dy*27);
+      ctx.lineTo(x+dx*19+dy*4,y+dy*19-dx*4);ctx.stroke();
+    }
+  }
+  function drawEinstein(){ const im=imgs.einstein, m=state.man; if(!im.complete||!im.naturalWidth) return; const h=170*(1-.45*m.engulf); const w=h*im.naturalWidth/im.naturalHeight; ctx.save(); ctx.globalAlpha=1-m.engulf*.55; ctx.translate(m.x,m.y); ctx.rotate(m.a); ctx.scale(m.crush,m.stretch); ctx.drawImage(im,-w/2,-h*.58,w,h); ctx.restore(); if(m.engulf>0){ ctx.save(); ctx.globalCompositeOperation='screen'; ctx.fillStyle=`rgba(255,160,70,${m.engulf*.35})`; ctx.beginPath(); ctx.arc(planet.x,planet.y,planet.visualR*(1.08+m.engulf*.18),0,Math.PI*2); ctx.fill(); ctx.restore(); } }
+  function drawHud(){ const q=localMetrics(); $('massOut').textContent=fmtMass(); $('rOut').textContent=fmtRadius(state.radiusKm); $('stretchOut').textContent=state.man.stretch.toFixed(2)+'×'; $('tidalOut').textContent=q.tidal.toExponential(2)+' m/s²'; $('distOut').textContent=q.surfaceRatio.toFixed(2)+' R'; const status=$('statusOut'), box=$('statusBox'); box.classList.toggle('danger',q.surfaceRatio<1.45||isBH()); if(state.man.swallowed) status.textContent=isBH()?'Se ha alcanzado el horizonte.':'Se ha alcanzado la superficie.'; else if(state.drag)status.textContent='Suelta para iniciar la caída radial.';else status.textContent=state.paused?'Caída en pausa.':'Caída radial desde reposo (tiempo propio reescalado).'; }
+  function draw(){ const now=performance.now(), dt=Math.min(.05,(now-state.last)/1000); state.last=now; state.t+=dt; updatePhysics(dt); drawCover(imgs.bg); ctx.fillStyle='rgba(0,0,0,.22)'; ctx.fillRect(0,0,W,H); drawForceLines(); drawPlanet(); drawEinstein(); drawHud(); requestAnimationFrame(draw); }
+  function pointer(e){ const r=canvas.getBoundingClientRect(); return {x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}; }
+  canvas.addEventListener('pointerdown',e=>{ const p=pointer(e), m=state.man; if(Math.hypot(p.x-m.x,p.y-m.y)<95 || state.man.swallowed){ state.drag=true; state.man.swallowed=false; state.man.engulf=0; state.man.vx=0; state.man.vy=0; state.man.x=p.x; state.man.y=p.y; canvas.classList.add('dragging'); canvas.setPointerCapture(e.pointerId); } });
+  canvas.addEventListener('pointermove',e=>{ if(!state.drag)return; const p=pointer(e); state.man.x=p.x; state.man.y=p.y; state.man.vx=0; state.man.vy=0; });
+  function endDrag(e){ if(!state.drag)return; const q=localMetrics(); if(q.surfaceRatio<=1){
+    const dir=q.screenD>1?{x:-q.dx/q.screenD,y:-q.dy/q.screenD}:{x:1,y:0};
+    state.man.x=planet.x+dir.x*planet.visualR;state.man.y=planet.y+dir.y*planet.visualR;
+  } state.drag=false; canvas.classList.remove('dragging'); try{canvas.releasePointerCapture(e.pointerId)}catch{} }
+  canvas.addEventListener('pointerup',endDrag); canvas.addEventListener('pointercancel',endDrag);
+  $('pause').addEventListener('click',()=>{state.paused=!state.paused;$('pause').textContent=state.paused?'Reanudar':'Pausar';});
+  $('releaseDistance').addEventListener('input',()=>{$('releaseOut').textContent=Number($('releaseDistance').value).toFixed(1)+' R';resetMan();});
+  $('mass').addEventListener('input',e=>{ const cfg=units[state.unit]; state.mass=Math.pow(10,Number(e.target.value))*cfg.base; if(isBH()) state.body='garg'; });
+  $('radius').addEventListener('input',e=>{ state.radiusKm=Math.pow(10,Number(e.target.value)); if(isBH()) state.body='garg'; });
+  document.querySelectorAll('.unitTabs button').forEach(b=>b.addEventListener('click',()=>setUnit(b.dataset.u)));
+  document.querySelectorAll('[data-p]').forEach(b=>b.addEventListener('click',()=>applyPreset(b.dataset.p)));
+  $('reset').addEventListener('click',resetMan);
+  setUnit('kg'); $('mass').value=Math.log10(ME); $('radius').value=Math.log10(state.radiusKm); draw();
+})();
+</script>
+</body>
+</html>
