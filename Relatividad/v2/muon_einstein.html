@@ -82,27 +82,13 @@
 button, input[type=range], select {min-height:44px}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #1768a3;outline-offset:3px}
 @media(max-width:680px){main{max-width:100%}.grid,.scenes,.readGrid,.metrics,.eqGrid,.top{min-width:0}.hero,.panel,.control,.card{min-width:0}canvas{max-width:100%}.vconceLogo{position:static!important;display:block;margin:9px 12px 0;width:38px;height:38px}}
-</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.framePicker{margin-left:auto;display:flex;gap:6px;align-items:center;font-weight:700}.framePicker select{border:1px solid #9baebe;border-radius:8px;background:white;padding:0 9px;font:inherit}.distanceRead{display:flex;justify-content:space-between;padding:10px 16px}.readGrid{margin-top:10px}.sceneHead{min-height:44px}.controlCard{align-self:start}@media(max-width:760px){.readGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.read strong{font-size:1.2rem}.framePicker{font-size:.9rem}}</style></head>
 <body>
   <main class="page compact-lab muon_einstein">
-    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Muón cósmico</h1></header><section class="scenes">
-      <article class="sceneCard">
-        <div class="sceneHead">
-          <div><h2>Marco de la Tierra</h2></div>
-          <div class="pill">Marco S</div>
-        </div>
-        <div class="canvasWrap"><canvas id="earthCanvas" width="760" height="520"></canvas></div>
-      </article>
-
-      <article class="sceneCard">
-        <div class="sceneHead">
-          <div><h2>Reloj del muón</h2></div>
-          <div class="pill">Marco S'</div>
-        </div>
-        <div class="canvasWrap"><canvas id="muonCanvas" width="760" height="520"></canvas></div>
-      </article>
-    </section>
-
+    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Muón cósmico</h1><label class="framePicker">Ver desde <select id="reference"><option value="earth">Tierra</option><option value="muon">Muón</option></select></label></header>
+    <div class="experiment-layout"><article class="sceneCard"><div class="sceneHead"><h2 id="sceneTitle">El muón cae hacia la Tierra</h2></div>
+      <div class="canvasWrap"><canvas id="earthCanvas" width="760" height="450" role="img" aria-labelledby="sceneTitle"></canvas></div>
+      <div class="distanceRead"><span id="distanceLabel">Espesor desde la Tierra</span><strong id="distanceOut"></strong></div></article>
     <aside class="controlCard" aria-label="Controles de la simulación">
         <div>
           <label for="beta">Velocidad del muón <output id="betaOut">0.980 c</output></label>
@@ -118,7 +104,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
           <button id="pause" class="primary" type="button">Pausar</button>
           <button id="newMuon" class="primary" type="button">Nuevo muón</button><button id="reset" class="ghost" type="button">Reiniciar</button>
         </div>
-      </aside>
+      </aside></div>
     <section class="readGrid" aria-label="Lecturas principales">
       <div class="read"><span>Probabilidad de llegar al suelo</span><strong id="probability"></strong></div><div class="read"><span>Muón de este ensayo</span><strong id="outcome"></strong></div><div class="read"><span>Factor gamma</span><strong id="gammaOut">5.03</strong></div>
       <div class="read"><span>Tiempo Tierra</span><strong id="earthTimeOut">0.00 μs</strong></div>
@@ -126,9 +112,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     </section>
 
     <div class="lab-intro"><p class="lead">Un muón creado en la alta atmósfera vive muy poco en su propio reloj. La relatividad explica por qué aun así puede llegar hasta la superficie terrestre.</p>
-        <p>El muón cae desde la atmósfera hacia la superficie.</p><p>El reloj de muñeca mide el tiempo propio τ.</p></div><section class="lesson lab-theory">
-      <article class="mini"><h3>En la Tierra</h3><p>La distancia de caída es la altura atmosférica completa. El contador muestra el tiempo coordenado medido por relojes terrestres.</p><div data-tex="">t=h/v</div></article>
-      <article class="mini"><h3>En el muón</h3><p>El reloj que viaja con el muón mide el tiempo propio entre su creación y su desintegración.</p><div data-tex="">\tau=t/\gamma</div></article>
+        <p>Cambia de referencia, incluso en pausa, para comparar el mismo instante del muón. La línea discontinua marca la capa de aire donde se creó. La animación mantiene la misma escala de distancias al cambiar de vista.</p></div><section class="lesson lab-theory">
+      <article class="mini"><h3>Desde la Tierra: un reloj más lento</h3><p>La atmósfera está en reposo. Si el muón llega al suelo, recorre la altura completa en un tiempo terrestre Δt. Su propio reloj solo avanza Δτ durante ese trayecto.</p><div data-tex>\Delta t=\frac{h}{v}=\gamma\,\Delta\tau</div></article>
+      <article class="mini"><h3>Desde el muón: un trayecto más corto</h3><p>El muón está quieto y su reloj marcha a su ritmo habitual. La superficie sube hacia él. La separación entre el suelo y la capa de creación, medida simultáneamente desde el muón, se reduce a h′.</p><div data-tex>h'=\frac{h}{\gamma},\qquad \Delta\tau=\frac{h'}{v}</div></article>
       <article class="mini"><h3>¿Cuántos llegan?</h3><p>Cada ensayo sortea un tiempo propio de desintegración exponencial. La probabilidad de alcanzar el suelo depende de la altura y la velocidad. La vida media propia es de unos 2.197 μs.</p><div data-tex="">P=\exp\!\left(-\frac{h}{\gamma v\tau_0}\right)</div></article>
     </section>
   </main>
@@ -142,9 +128,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     const earthSprite = new Image();
     earthSprite.src = "../assets/earth-blue-marble-sprite.png";
     const earthCanvas = document.getElementById("earthCanvas");
-    const muonCanvas = document.getElementById("muonCanvas");
     const ex = earthCanvas.getContext("2d");
-    const mx = muonCanvas.getContext("2d");
+    const reference = document.getElementById("reference");
     const DEFAULTS = { beta: 0.980, height: 15 };
     const state = { beta: DEFAULTS.beta, height: DEFAULTS.height, phase: 0, paused: false, lifetime:sampleLifetime() };
     const els = {
@@ -182,18 +167,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       els.muonTimeOut.textContent = `${fmt(m.tMuon * state.phase, 2)} μs`;
     }
 
-    function roundRect(ctx, x, y, w, h, r, fill, stroke) {
-      ctx.beginPath();
-      ctx.roundRect(x, y, w, h, r);
-      ctx.fillStyle = fill;
-      ctx.fill();
-      if (stroke) {
-        ctx.strokeStyle = stroke;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      }
-    }
-
     function drawStars(ctx, w, h, shift = 0) {
       ctx.fillStyle = "#071126";
       ctx.fillRect(0, 0, w, h);
@@ -206,10 +179,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       }
     }
 
-    function drawEarth(ctx, w, h, y, label) {
+    function drawEarth(ctx, w, h, y) {
       const size = 540;
       const cx = w / 2;
-      const cy = y + 205;
+      const cy = y + size * (0.5 - 17/1024);
       ctx.save();
       if (earthSprite.complete && earthSprite.naturalWidth) {
         ctx.shadowColor = "rgba(91,210,255,.65)";
@@ -224,14 +197,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
         grd.addColorStop(1, "#0f3f2b");
         ctx.fillStyle = grd;
         ctx.beginPath();
-        ctx.arc(cx, cy, size / 2, 0, Math.PI * 2);
+        ctx.arc(cx, cy, cy - y, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
-      ctx.fillStyle = "#eaf8ff";
-      ctx.font = "900 18px Bahnschrift, Segoe UI, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText(label, cx, h - 28);
     }
 
     function drawSimpleMuon(ctx, x, y, r) {
@@ -286,119 +255,42 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       }
     }
 
-    function drawEarthFrame(progress, m) {
-      const w = earthCanvas.width, h = earthCanvas.height;
-      drawStars(ex, w, h, state.phase * 160);
-      const atmosphere = ex.createLinearGradient(0, 40, 0, h);
-      atmosphere.addColorStop(0, "rgba(107,219,255,.06)");
-      atmosphere.addColorStop(.6, "rgba(107,219,255,.20)");
-      atmosphere.addColorStop(1, "rgba(44,159,255,.08)");
-      ex.fillStyle = atmosphere;
-      ex.fillRect(0, 0, w, h);
-      drawEarth(ex, w, h, h - 172, "Tierra");
-
-      const top = 66, bottom = h - 142;
-      const shownProgress = Math.min(progress, m.decayProgress);
-      const y = top + (bottom - top) * shownProgress;
-      const atmosphereY = bottom - (Math.min(12, state.height) / state.height) * (bottom - top);
-      if (state.height >= 12) {
-        ex.strokeStyle = "rgba(113,226,255,.75)";
-        ex.lineWidth = 2;
-        ex.setLineDash([10, 6]);
-        ex.beginPath(); ex.moveTo(64, atmosphereY); ex.lineTo(w - 64, atmosphereY); ex.stroke();
-        ex.setLineDash([]);
-        ex.fillStyle = "rgba(230,250,255,.92)";
-        ex.font = "900 14px Bahnschrift, Segoe UI, sans-serif";
-        ex.textAlign = "left";
-        ex.fillText("referencia atmosférica: 12 km", 78, atmosphereY - 10);
-      }
-      if (progress < .16) {
-        for (let i = 0; i < 18; i++) {
-          const a = -Math.PI / 2 + (i - 8.5) * .14;
-          const len = 40 + i * 4 + progress * 240;
-          ex.strokeStyle = `rgba(255,218,88,${0.45 - progress * 1.8})`;
-          ex.lineWidth = 2;
-          ex.beginPath(); ex.moveTo(w / 2, top); ex.lineTo(w / 2 + Math.cos(a) * len, top + 20 + Math.sin(a) * len); ex.stroke();
-        }
-      }
-      ex.strokeStyle = "rgba(141,241,255,.35)";
-      ex.setLineDash([8, 8]);
-      ex.lineWidth = 3;
-      ex.beginPath();
-      ex.moveTo(w / 2, top - 26);
-      ex.lineTo(w / 2, bottom + 16);
-      ex.stroke();
-      ex.setLineDash([]);
-      if(progress>=m.decayProgress && m.decayProgress<1)drawExplosion(ex,w/2,y,.8);
-      else drawSimpleMuon(ex,w/2,y,18);
-      ex.fillStyle = "#8df1ff";
-      ex.font = "900 18px Bahnschrift, Segoe UI, sans-serif";
-      ex.textAlign = "center";
-      ex.fillText("μ", w / 2 + 38, y + 7);
-
-      roundRect(ex, w - 259, 24, 235, 74, 18, "rgba(255,255,255,.88)", "rgba(141,241,255,.34)");
-      ex.fillStyle = "#172033";
-      ex.font = "900 14px Bahnschrift, Segoe UI, sans-serif";
-      ex.textAlign = "left";
-      ex.fillText("contador terrestre", w - 239, 50);
-      ex.fillStyle = "#0866e8";
-      ex.font = "950 28px Consolas, monospace";
-      ex.fillText(`${fmt(m.tEarth * progress, 2)} μs`, w - 239, 82);
-
-      ex.fillStyle = "rgba(255,255,255,.82)";
-      ex.font = "800 15px Bahnschrift, Segoe UI, sans-serif";
-      ex.fillText(`altura: ${fmt(state.height, 1)} km`, 44, h - 38);
-    }
-
-    function drawMuonFrame(progress, m) {
-      const w = muonCanvas.width, h = muonCanvas.height;
-      drawStars(mx, w, h, state.phase * 240);
-      const wash = mx.createRadialGradient(w / 2, 150, 0, w / 2, 150, 360);
-      wash.addColorStop(0, "rgba(123,77,255,.20)");
-      wash.addColorStop(1, "rgba(0,0,0,0)");
-      mx.fillStyle = wash;
-      mx.fillRect(0, 0, w, h);
-
-      mx.strokeStyle = "rgba(141,241,255,.16)";
-      mx.lineWidth = 2;
-      for (let i = 0; i < 9; i++) {
-        const x = 120 + i * 70;
-        mx.beginPath();
-        mx.moveTo(x, 110);
-        mx.lineTo(x - 44, h - 70);
-        mx.stroke();
-      }
-
-      const localProgress = Math.min(progress, m.decayProgress);
-      const sway = Math.sin(localProgress * Math.PI * 8);
-      const bob = Math.sin(localProgress * Math.PI * 6) * 6;
-      if (progress >= m.decayProgress && m.decayProgress < 1) drawExplosion(mx, w / 2, h / 2 + 22, .8);
-      else drawMuonSprite(mx, w / 2 + sway * 10, h / 2 + 22 + bob, 232, sway * .045);
-
-      roundRect(mx, 24, 24, 270, 74, 18, "rgba(255,255,255,.9)", "rgba(184,168,255,.38)");
-      mx.fillStyle = "#172033";
-      mx.font = "900 14px Bahnschrift, Segoe UI, sans-serif";
-      mx.textAlign = "left";
-      mx.fillText("contador propio", 44, 50);
-      mx.fillStyle = "#6a42df";
-      mx.font = "950 28px Consolas, monospace";
-      mx.fillText(`${fmt(m.tMuon * progress, 2)} μs`, 44, 82);
-
-      mx.fillStyle = "rgba(255,255,255,.84)";
-      mx.font = "800 15px Bahnschrift, Segoe UI, sans-serif";
-      mx.textAlign = "left";
-      mx.fillText(`distancia contraída: ${fmt(state.height / m.g, 2)} km`, 44, h - 38);
-      mx.fillText(`vida media: ${MUON_LIFETIME_US.toFixed(3)} μs`, w - 210, h - 38);
-    }
-
     function draw() {
-      const m = metrics();
-      const p = Math.min(1, state.phase);
-      drawEarthFrame(p, m);
-      drawMuonFrame(p, m);
+      const m = metrics(), fromMuon = reference.value === 'muon';
+      const w = earthCanvas.width, h = earthCanvas.height;
+      const thickness = fromMuon ? state.height / m.g : state.height;
+      // Use the same spatial scale for the two views of a given experiment.
+      const span = (h - 135) * thickness / state.height;
+      const start = fromMuon ? 60 - span * state.phase : 60;
+      const ground = start + span;
+      const particle = fromMuon ? 60 : start + span * state.phase;
+      drawStars(ex,w,h);
+      const sky = ex.createLinearGradient(0,start,0,ground);
+      sky.addColorStop(0,'rgba(69,159,244,.12)');
+      sky.addColorStop(1,'rgba(64,179,247,.55)');
+      ex.fillStyle = sky; ex.fillRect(0,start,w,span);
+      drawEarth(ex,w,h,ground);
+      ex.save();
+      ex.strokeStyle = '#aee9ff'; ex.lineWidth = 2; ex.setLineDash([9,7]);
+      ex.beginPath(); ex.moveTo(0,start); ex.lineTo(w,start); ex.stroke();
+      ex.setLineDash([]); ex.lineWidth = 3; ex.strokeStyle = '#e5fbff';
+      ex.beginPath(); ex.moveTo(68,start); ex.lineTo(68,ground);
+      for (const y of [start,ground]) { ex.moveTo(60,y); ex.lineTo(76,y); }
+      ex.stroke(); ex.fillStyle = '#fff'; ex.font = 'bold 21px system-ui';
+      ex.fillText(fmt(thickness)+' km',84,Math.max(25,(start+ground)/2+7));
+      ex.restore();
+      if(state.phase>=m.decayProgress && m.decayProgress<1) drawExplosion(ex,w/2,particle,.65);
+      else if(fromMuon) drawMuonSprite(ex,w/2,particle,65);
+      else drawSimpleMuon(ex,w/2,particle,16);
+      document.getElementById('distanceOut').textContent=fmt(thickness)+' km';
       updateUI();
     }
-
+    reference.onchange = () => {
+      const fromMuon = reference.value === 'muon';
+      document.getElementById('sceneTitle').textContent = fromMuon ? 'El suelo se acerca al muón' : 'El muón cae hacia la Tierra';
+      document.getElementById('distanceLabel').textContent = fromMuon ? 'Espesor desde el muón' : 'Espesor desde la Tierra';
+      draw();
+    };
     let lastFrame=performance.now();
     function frame(now) {
       const dt=Math.min(.1,(now-lastFrame)/1000);
