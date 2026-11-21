@@ -21,23 +21,23 @@
   const factor = () => classical() ? 1 : 1 / Math.sqrt(1 - velocity.value ** 2);
   const earthTime = () => altitude.value / (velocity.value * c);
   const travelTime = () => earthTime() / factor();
-  function startBatch() {
-    elapsed = 0;
-    const n = stream() ? 14 : 1, travel = travelTime();
-    const decayMass = classical() ? -Math.expm1(-travel / lifetime) : 1;
-    particles = Array.from({length:n}, (_,i) => {
-      const life = -lifetime * Math.log1p(-Math.random() * decayMass);
-      return {stop:Math.min(life / travel,1), x:left+34+(right-left-68)*(i+Math.random())/n,
-        blinkOffset:Math.random()*2, deposited:false};
-    });
-    emitted += n;
+  const interval = .24;
+  let nextEmission = interval;
+  function emit(born) {
+    const life = -lifetime * Math.log1p(-Math.random());
+    particles.push({born, stop:Math.min(life / travelTime(),1),
+      x:left+34+(right-left-68)*Math.random(), blinkOffset:Math.random()*2, deposited:false});
+    emitted++;
+  }
+  function restartFlight() {
+    elapsed = 0; particles = []; nextEmission = interval; emit(0);
   }
   function setPaused(value) {
     paused = value; byId('pause').textContent = value ? 'Reanudar' : 'Pausar';
   }
   function resetSeries() {
     caught = 0; emitted = 0; ink.clearRect(0,0,deposits.width,depth);
-    startBatch(); draw();
+    restartFlight(); draw();
   }
   function paint(ctx,img,x,y,size,color) {
     if (ready(img)) {
@@ -109,11 +109,10 @@
   }
   function draw() {
     const muonFrame = reference.value === 'muon', g = factor();
-    const lastStop = Math.max(...particles.map(p=>p.stop));
-    const phase = Math.min(elapsed/flightSeconds,lastStop);
+    let phase = stream() ? 0 : Math.min(elapsed/flightSeconds,particles[0].stop);
     const thickness = altitude.value/(muonFrame?g:1);
     const span = 315/(muonFrame?g:1);
-    const start = 60-(muonFrame?span*phase:0), ground=start+span;
+    const start = muonFrame && stream() ? 375-span : 60-(muonFrame?span*phase:0), ground=start+span;
     drawStars(ctx,w,h);
     const sky=ctx.createLinearGradient(0,start,0,ground);
     sky.addColorStop(0,'rgba(69,159,244,.12)');sky.addColorStop(1,'rgba(64,179,247,.55)');
@@ -126,10 +125,17 @@
     basket(ground);
     let active=0;
     for(const p of particles){
-      const age=elapsed-flightSeconds*p.stop;
-      const y=muonFrame ? 60 : start+span*Math.min(phase,p.stop);
+      // In the stream, synchronise both snapshots at the detector. Lorentz simultaneity
+      // shifts creation towards arrival by beta² times the Earth crossing time.
+      const clockScale = muonFrame && stream() ? 1/(g*g) : 1;
+      const sinceBirth = elapsed-p.born-flightSeconds*(1-clockScale);
+      if(sinceBirth<0) continue;
+      const progress = sinceBirth/(flightSeconds*clockScale);
+      const age=sinceBirth-flightSeconds*clockScale*p.stop;
+      const y=muonFrame && !stream() ? 60 : start+span*Math.min(progress,p.stop);
       if(age<0){
         active++;
+        if(stream()) phase=Math.max(phase,progress);
         const eyesClosed=(elapsed+p.blinkOffset)%1.85<.16 && ready(blink);
         paint(ctx,eyesClosed?blink:flying,p.x,y,stream()?42:73,'#749dff');
       } else if(p.stop<1 && age<.62){
@@ -137,7 +143,7 @@
         paint(ctx,flash,p.x,y,26+age*(stream()?70:103),'#ffcf77');ctx.restore();
       }
     }
-    byId('sceneTitle').textContent=muonFrame?'La Tierra se acerca a los muones':stream()?'Chorro de muones hacia la Tierra':'El muón cae hacia la Tierra';
+    byId('sceneTitle').textContent=stream()?(muonFrame?'Chorro desde los muones · cámara en la cesta':'Chorro de muones hacia la Tierra'):muonFrame?'La Tierra se acerca al muón':'El muón cae hacia la Tierra';
     byId('distanceLabel').textContent=muonFrame?'Espesor desde el muón':'Espesor desde la Tierra';
     byId('distanceOut').textContent=thickness.toFixed(2)+' km';
     byId('betaOut').textContent=Number(velocity.value).toFixed(4)+' c';
@@ -146,24 +152,25 @@
     byId('probability').textContent=(100*Math.exp(-travelTime()/lifetime)).toPrecision(3)+' %';
     byId('outcome').textContent=stream()?active+' en vuelo · '+caught+' de '+emitted+' en la cesta':
       (active?'En vuelo':particles[0].stop===1?'Ha llegado':'Se ha desintegrado')+' · Cesta '+caught;
-    byId('earthTimeOut').textContent=(earthTime()*phase).toFixed(2)+' μs';
-    byId('muonTimeOut').textContent=(travelTime()*phase).toFixed(2)+' μs';
+    byId('earthTimeOut').textContent=stream()&&!active?'—':(earthTime()*phase).toFixed(2)+' μs';
+    byId('muonTimeOut').textContent=stream()&&!active?'—':(travelTime()*phase).toFixed(2)+' μs';
   }
   let last = performance.now();
   function frame(now) {
     if (!paused) {
       elapsed += Math.min(.1,(now-last)/1000);
-      for(const p of particles) if(p.stop===1 && !p.deposited && elapsed>=flightSeconds) deposit(p);
-      if(stream() && elapsed > flightSeconds*Math.max(...particles.map(p=>p.stop))+.85) startBatch();
+      if(stream()) while(nextEmission<=elapsed){emit(nextEmission);nextEmission+=interval;}
+      for(const p of particles) if(p.stop===1 && !p.deposited && elapsed>=p.born+flightSeconds) deposit(p);
+      if(stream()) particles=particles.filter(p=>elapsed-p.born<=flightSeconds+.65);
     }
     last=now;draw();requestAnimationFrame(frame);
   }
   byId('pause').onclick=()=>setPaused(!paused);
-  byId('newMuon').onclick=()=>{startBatch();setPaused(false);};
+  byId('newMuon').onclick=()=>{if(stream()) emit(elapsed); else restartFlight();setPaused(false);};
   byId('reset').onclick=()=>{velocity.value=velocity.defaultValue;altitude.value=altitude.defaultValue;setPaused(false);resetSeries();};
   for(const input of [velocity,altitude])input.oninput=resetSeries;
   reference.onchange=draw;
-  model.onchange=()=>{byId('classicNote').hidden=!classical();resetSeries();};
-  beam.onchange=()=>{byId('newMuon').textContent=stream()?'Nueva tanda':'Nuevo muón';resetSeries();};
+  model.onchange=resetSeries;
+  beam.onchange=()=>{byId('newMuon').textContent=stream()?'Emitir otro muón':'Nuevo muón';resetSeries();};
   resetSeries();requestAnimationFrame(frame);
 })();

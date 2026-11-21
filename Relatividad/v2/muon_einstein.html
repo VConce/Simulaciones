@@ -93,7 +93,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <aside class="controlCard" aria-label="Controles de la simulación">
         <label for="model">Modelo <select id="model"><option value="rel">Relatividad especial</option><option value="classic">Física clásica</option></select></label>
         <label for="beam">Emisión <select id="beam"><option value="single">Un solo muón</option><option value="stream">Chorro de muones</option></select></label>
-        <small id="classicNote" hidden>Comparación ilustrativa: en este modo se sortean solo vuelos que terminan antes del suelo. La probabilidad teórica se indica debajo.</small>
         <div>
           <label for="beta">Velocidad del muón <output id="betaOut">0.9800 c</output></label>
           <input id="beta" type="range" min="0.70" max="0.9999" step="0.0001" value="0.9800">
@@ -116,10 +115,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     </section>
 
     <div class="lab-intro"><p class="lead">Un muón creado en la alta atmósfera vive muy poco en su propio reloj. La relatividad explica por qué aun así puede llegar hasta la superficie terrestre.</p>
-        <p>Cambia de referencia, incluso en pausa, para comparar el mismo instante del muón. La línea discontinua marca la capa de aire donde se creó. La animación mantiene la misma escala de distancias al cambiar de vista.</p></div><section class="lesson lab-theory">
+        <p>Cambia de referencia, incluso en pausa, para comparar el mismo instante del muón. La línea discontinua marca la capa de aire donde se creó. La escala de distancias se conserva. En el chorro se emiten muones continuamente. La cámara sigue la cesta y los tiempos corresponden al muón visible más avanzado.</p></div><section class="lesson lab-theory">
       <article class="mini"><h3>Desde la Tierra: un reloj más lento</h3><p>La atmósfera está en reposo. Si el muón llega al suelo, recorre la altura completa en un tiempo terrestre Δt. Su propio reloj solo avanza Δτ durante ese trayecto.</p><div data-tex>\Delta t=\frac{h}{v}=\gamma\,\Delta\tau</div></article>
       <article class="mini"><h3>Desde el muón: un trayecto más corto</h3><p>El muón está quieto y su reloj marcha a su ritmo habitual. La superficie sube hacia él. La separación entre el suelo y la capa de creación, medida simultáneamente desde el muón, se reduce a h′.</p><div data-tex>h'=\frac{h}{\gamma},\qquad \Delta\tau=\frac{h'}{v}</div></article>
-      <article class="mini"><h3>¿Cuántos llegan?</h3><p>La vida media propia es de 2.197 μs. Cada muón tiene un tiempo de desintegración distinto. En relatividad, la probabilidad de llegar es la de la ecuación inferior. En física clásica se toma γ = 1. A 15 km y 0.98c se espera aproximadamente una llegada por cada doce mil millones de muones clásicos. El modo clásico ilustra los vuelos que se desintegran antes del suelo.</p><div data-tex="">P=\exp\!\left(-\frac{h}{\gamma v\tau_0}\right)</div></article>
+      <article class="mini"><h3>¿Cuántos llegan?</h3><p>La vida media propia es de 2.197 μs. Cada muón tiene un tiempo de desintegración distinto. En relatividad, la probabilidad de llegar es la de la ecuación inferior. En física clásica se toma γ = 1. A 15 km y 0.98c se espera aproximadamente una llegada por cada doce mil millones de muones clásicos. También pueden llegar en el modelo clásico si su vida aleatoria supera el tiempo de vuelo.</p><div data-tex="">P=\exp\!\left(-\frac{h}{\gamma v\tau_0}\right)</div></article>
     </section>
   </main>
 

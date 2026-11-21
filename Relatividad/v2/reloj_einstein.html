@@ -16,6 +16,18 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 @media(max-width:680px){main{max-width:100%}.grid,.scenes,.readGrid,.metrics,.eqGrid,.top{min-width:0}.hero,.panel,.control,.card{min-width:0}canvas{max-width:100%}.vconceLogo{position:static!important;display:block;margin:9px 12px 0;width:38px;height:38px}}
 </style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.frame-picker{margin-left:auto;display:flex;align-items:center;gap:6px;font-weight:650}.frame-picker select{border:1px solid #b8c9db;border-radius:8px;background:white;color:#192d40;padding:0 8px;font:inherit}.reloj_einstein .metrics{grid-template-columns:repeat(auto-fit,minmax(min(125px,45%),1fr))}@media(max-width:520px){.frame-picker{display:grid;gap:0;font-size:.8rem}.frame-picker select{font-size:.95rem}}</style></head>
 <body>
+  <style>
+    .reloj_einstein .experiment-layout{grid-template-columns:minmax(0,1fr)}
+    .reloj_einstein .speedPanel{grid-row:1;padding:7px 12px;border-radius:14px}
+    .reloj_einstein .control{display:flex;justify-content:flex-end;align-items:center;gap:18px;flex-wrap:wrap;padding:0;border:0}
+    .reloj_einstein .control label{margin:0;font-size:.88rem}
+    .reloj_einstein .control .scale{margin:0}
+    .reloj_einstein .control select,.reloj_einstein .control button{border:1px solid #b7c9d6;border-radius:8px;background:white;color:#173451;padding:0 10px}
+    .reloj_einstein .control .precision-row{margin:0}
+    .reloj_einstein .canvasWrap{height:clamp(270px,53svh,560px)}
+    .reloj_einstein .experiment-layout .canvasWrap canvas{max-width:none;width:100%;height:100%}
+    @media(max-width:760px){.reloj_einstein .control{display:grid;grid-template-columns:1fr 1fr;gap:6px}.reloj_einstein .canvasWrap{height:clamp(200px,48vw,325px)}}
+  </style>
   <main class="page compact-lab reloj_einstein">
     <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Reloj de Einstein</h1><label class="frame-picker">Ver desde <select id="reference"><option value="ground">Suelo</option><option value="clock">Propio reloj</option></select></label></header><div class="experiment-layout"><section class="card">
       <div class="canvasWrap"><canvas id="sim" width="960" height="450" role="img" aria-label="Trayectoria del pulso entre los dos espejos"></canvas></div>
@@ -29,13 +41,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 
     <aside class="speedPanel" aria-label="Control de velocidad">
         <div class="control">
-          <label for="v">Velocidad del reloj <output id="vOut">0.6000 c</output></label>
+          <div><label for="v">Velocidad del reloj <output id="vOut">0.6000 c</output></label>
           <input id="v" type="range" min="0" max="0.9999" step="0.0001" value="0.6000">
-          <button type="button" id="pauseAnimation" class="primaryButton">Pausar</button><button type="button" id="resetClock">Poner a cero</button><div class="scale"><span>0 c</span><span>0.5 c</span><span>0.9999 c</span></div>
+          <div class="scale"><span>0 c</span><span>0.5 c</span><span>0.9999 c</span></div>
+          </div><div><label for="trail">Rastro de la luz</label><input id="trail" type="range" min="0" max="18" step="0.1" value="5" data-exact-input="true"></div>
+          <div><label for="playback">Escala de los relojes</label>
+          <select id="playback"><option value="1">1 s por segundo real</option><option value="3" selected>3 s por segundo real</option><option value="10">10 s por segundo real</option></select></div>
+          <div><button type="button" id="pauseAnimation" class="primaryButton">Pausar</button> <button type="button" id="resetClock">Poner a cero</button></div>
         </div>
       </aside>
     </div><div class="lab-intro"><p class="lead">Desde el propio reloj, el pulso sube y baja por la misma vertical. Desde el suelo, los espejos avanzan mientras la luz viaja entre ellos y el pulso dibuja un zigzag. En ambos casos la luz viaja a c. Pausa la animación y cambia de vista para comparar el mismo instante del recorrido.</p>
-      </div><section class="eqGrid lab-theory" aria-label="Teoria">
+      <p>El reloj junto a Lorentz mide su tiempo propio. El de la esquina indica la hora que asignan los relojes sincronizados del suelo al mismo instante del viaje. Ambos contadores usan segundos a escala para comparar sus ritmos; los periodos del pulso se indican en nanosegundos.</p></div><section class="eqGrid lab-theory" aria-label="Teoria">
       <article><h3>¿Qué mide Lorentz?</h3><div class="math" data-tex="">\Delta\tau=\frac{2L_0}{c}</div><p>Lorentz viaja sentado junto al espejo inferior. Cuando el pulso sale de ese espejo y regresa a él, los dos sucesos ocurren en el mismo lugar en su marco. Su reloj mide el periodo propio, 2.00 ns para una separación de 0.299792458 m. Una vez agarrado, Einstein viaja con Lorentz y mide el mismo periodo.</p></article>
       <article><h3>Dilatación temporal</h3><div class="math" data-tex="">\Delta t=\gamma\,\Delta\tau</div><p>En el laboratorio, la componente horizontal de la velocidad de la luz es v y la vertical es c/γ. El módulo sigue siendo c.</p></article>
       <article><h3>Factor gamma</h3><div class="math" data-tex="">\gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>Cuando v se aproxima a c, el tiempo entre dos retornos de la luz al mismo espejo aumenta en el marco del suelo.</p></article>
@@ -46,9 +62,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   const canvas = document.getElementById('sim');
   const ctx = canvas.getContext('2d');
   const vSlider = document.getElementById('v');
-  const W = canvas.width, H = canvas.height;
+  let W = canvas.width;
+  const H = canvas.height;
+  new ResizeObserver(() => {
+    if (canvas.clientHeight) W = canvas.width = Math.round(H*canvas.clientWidth/canvas.clientHeight);
+  }).observe(canvas);
   const assets = {
-    face: img('../assets/einstein-face-sprite.png'),
+    einstein: img('einstein-carrera.webp'),
     lorentz: img('lorentz-sentado.webp'),
     space: img('reloj-panorama.webp')
   };
@@ -60,8 +80,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   const cPixels = spacing / HALF_PERIOD;
   let proper = 0, distance = 0, last = performance.now();
   let approach = 0, skyOffset = 0, animationTime = 0;
+  const playback = document.getElementById('playback');
+  let groundSeconds = 0, lorentzSeconds = 0;
   // Store reflection events in ground coordinates, independent of the camera.
-  let reflections = [{x:0, top:false}];
+  const trail = document.getElementById('trail');
+  let trailTime = 0, reflections = [{x:0, fraction:0, time:0}];
   function img(src) { const im = new Image(); im.src = src; return im; }
   function beta() { return Number(vSlider.value); }
   function gamma() { const b = beta(); return 1 / Math.sqrt(1 - b * b); }
@@ -93,34 +116,20 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     ctx.lineTo(x + 39, y - 4); ctx.lineTo(x + 3, y + 1.5); ctx.fill();
     ctx.fillStyle = '#decbb6'; ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2); ctx.fill();
   }
-  function limb(points, color, width) {
-    ctx.beginPath(); ctx.lineWidth = width; ctx.strokeStyle = color;
-    ctx.moveTo(...points[0]); for (const p of points.slice(1)) ctx.lineTo(...p);
-    ctx.stroke();
-  }
   function drawEinstein(g) {
+    const sprite = assets.einstein;
+    if (!sprite.complete || !sprite.naturalWidth) return;
     const t = Math.min(1, approach / 1.65);
     const remaining = (1 - t) ** 2;
-    const stride = Math.sin(approach * 15) * (1 - t);
-    // The origin is the gripping hand, which stays on the lower mirror.
+    const hanging = t >= .82;
+    const frame = hanging ? 3 : [0,1,2,1][Math.floor(approach*10)%4];
+    const bob = hanging ? 0 : 2*Math.abs(Math.sin(approach*15));
     ctx.save();
-    ctx.translate(g.center - 31 - 163 * remaining, g.bottom + 11 + 36 * remaining + Math.abs(stride) * 3);
-    ctx.rotate(.12 + Math.sin(animationTime * 3) * (.035 + .055 * beta()) * t);
-    ctx.lineJoin = ctx.lineCap = 'round';
-    for (const side of [-1, 1]) {
-      const knee = [-14 + side * (5 + stride * 11), 53 - side * stride * 4];
-      const foot = [-18 + side * (7 + stride * 17), 64 - side * stride * 5];
-      limb([[-13 + side * 3, 42], knee, foot], '#565568', 6);
-      limb([foot, [foot[0] + 5, foot[1] + 1]], '#302c35', 5);
-    }
-    limb([[-14,29],[-13,42]], '#a78162', 15);
-    limb([[-19,29],[-26,35],[-28 - stride * 7,29]], '#ba916d', 5);
-    const reach = Math.max(0, Math.min(1, (t - .55) / .45));
-    const handX = (1 - reach) * (4 + 5 * stride);
-    const handY = 2 + (1 - reach) * (23 - 6 * stride);
-    limb([[-8,27],[-3,17 + 14 * (1 - reach)],[handX,handY]], '#c39a74', 6);
-    if (assets.face.complete && assets.face.naturalWidth) ctx.drawImage(assets.face,-29,6,26,26);
-    limb([[handX,handY+1],[handX+1,handY-2]], '#f5cc9d', 5);
+    ctx.translate(g.center-31-163*remaining, g.bottom+11+36*remaining+bob);
+    if (hanging) ctx.rotate(Math.sin(animationTime*3)*(.035+.055*beta())*t);
+    // The top of the raised hand is at (114,4) in the final 180 × 200 cell.
+    const scale = .36;
+    ctx.drawImage(sprite, frame*180, 0, 180, 200, -114*scale, -4*scale, 180*scale, 200*scale);
     ctx.restore();
   }
   function clockGeometry(cx, cy, h) {
@@ -154,15 +163,34 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     ctx.fillStyle = '#43f86e'; ctx.beginPath(); ctx.arc(x, y, 9.5, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
+  function drawWatch(x, y, title, seconds, color) {
+    ctx.save(); ctx.translate(x,y);
+    const small = canvas.clientWidth < 540;
+    const size = small ? 1.38 : 1;
+    ctx.scale(size,size);
+    ctx.fillStyle='rgba(9,20,39,.9)';ctx.beginPath();ctx.roundRect(0,0,143,46,10);ctx.fill();
+    ctx.translate(23,23);
+    ctx.fillStyle='white';ctx.strokeStyle=color;ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(0,0,19,0,2*Math.PI);ctx.fill();ctx.stroke();
+    for(let i=0;i<12;i++){
+      ctx.save();ctx.rotate(i*Math.PI/6);ctx.beginPath();ctx.moveTo(0,-17);ctx.lineTo(0,i%3?-15:-13);ctx.stroke();ctx.restore();
+    }
+    for(const [period,len,width] of [[3600,10,3],[60,15,2]]){
+      ctx.save();ctx.rotate(2*Math.PI*(seconds%period)/period);ctx.lineWidth=width;
+      ctx.beginPath();ctx.moveTo(0,2);ctx.lineTo(0,-len);ctx.stroke();ctx.restore();
+    }
+    ctx.fillStyle='#c9dced';ctx.font='bold 13px system-ui';ctx.fillText(title,26,-3);
+    ctx.fillStyle='#fff';ctx.font='bold 17px monospace';ctx.fillText(seconds.toFixed(2)+' s',26,16,90);ctx.restore();
+  }
   function advance(dt) {
     const rate = 1 / gamma(), speed = beta() * cPixels;
     const next = proper + dt * rate;
     const hit = Math.floor(next / HALF_PERIOD);
     if (hit > Math.floor(proper / HALF_PERIOD)) {
       const untilHit = (hit * HALF_PERIOD - proper) / rate;
-      reflections.push({x:distance + speed * untilHit, top:hit % 2 === 1});
+      reflections.push({x:distance + speed * untilHit, fraction:hit % 2, time:trailTime+untilHit});
     }
-    distance += speed * dt;
+    distance += speed * dt; trailTime += dt;
     proper = next;
     // Keep the path bounded even at rest.
     if (reflections.length > 240) reflections.shift();
@@ -187,16 +215,29 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     ctx.save();
     ctx.lineWidth = 5; ctx.strokeStyle = '#70ff99'; ctx.lineJoin = 'round';
     ctx.setLineDash([]); ctx.beginPath();
-    reflections.forEach((event, i) => {
-      const x = ground ? groundOrigin + event.x : cx;
-      const mirrorY = event.fraction != null ? g.bottom - event.fraction * spacing : event.top ? g.top : g.bottom;
-      if (i === 0) ctx.moveTo(x, mirrorY); else ctx.lineTo(x, mirrorY);
-    });
-    ctx.lineTo(cx, y);
+    const cutoff = trailTime - Number(trail.value);
+    if(Number(trail.value)>0){
+      let prev=reflections[0], started=false;
+      for(const point of [...reflections.slice(1),{x:distance,fraction:pulse.p,time:trailTime}]){
+        if(point.time>cutoff){
+          if(!started){
+            const part=Math.max(0,(cutoff-prev.time)/(point.time-prev.time||1));
+            ctx.moveTo(ground?groundOrigin+prev.x+(point.x-prev.x)*part:cx,
+              g.bottom-spacing*(prev.fraction+(point.fraction-prev.fraction)*part));
+            started=true;
+          }
+          ctx.lineTo(ground?groundOrigin+point.x:cx,g.bottom-spacing*point.fraction);
+        }
+        prev=point;
+      }
+    }
     ctx.strokeStyle = '#123c33'; ctx.lineWidth = 8; ctx.stroke();
     ctx.strokeStyle = '#68ff98'; ctx.lineWidth = 4; ctx.stroke();
     ctx.strokeStyle = '#dbffe6'; ctx.lineWidth = 1.3; ctx.stroke(); ctx.restore();
     drawGreenBall(cx, y);
+    const watchScale = canvas.clientWidth < 540 ? 1.38 : 1;
+    drawWatch(Math.max(3,cx-56-143*watchScale), g.bottom+13,'Lorentz',lorentzSeconds,'#008967');
+    drawWatch(W-147*watchScale, 6,'Suelo',groundSeconds,'#137ab4');
     document.getElementById('vOut').textContent = beta().toFixed(4) + ' c';
     document.getElementById('gammaOut').textContent = gamma().toFixed(2);
     document.getElementById('periodOut').textContent = (PROPER_PERIOD_NS * gamma()).toFixed(2) + ' ns';
@@ -210,19 +251,23 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       animationTime += dt;
       if (b > 0 || approach > 0) approach = Math.min(1.65, approach + dt);
       skyOffset += dt * b * (50 + 185 * b * b) * (reference.value === 'clock' ? 1 : .68);
-      advance(reference.value === 'clock' ? dt * gamma() : dt);
+      const seconds = dt * Number(playback.value);
+      groundSeconds += seconds;
+      lorentzSeconds += seconds / gamma();
+      advance(seconds / 3);
     }
     draw(); requestAnimationFrame(frame);
   }
   document.getElementById('resetClock').addEventListener('click', () => {
     proper = 0; distance = 0; last = performance.now();
     approach = 0; skyOffset = 0; animationTime = 0;
-    reflections = [{x:0, top:false}]; draw();
+    groundSeconds = 0; lorentzSeconds = 0;
+    trailTime=0; reflections = [{x:0, fraction:0, time:0}]; draw();
   });
   vSlider.addEventListener('input', () => {
     // A speed change starts a new straight segment at the current pulse event.
     const p = bounce(proper).p;
-    reflections.push({x:distance, fraction:p});
+    reflections.push({x:distance, fraction:p, time:trailTime});
     if (reflections.length > 240) reflections.shift();
   });
   requestAnimationFrame(frame);
