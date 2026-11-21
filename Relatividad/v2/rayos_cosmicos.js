@@ -20,6 +20,8 @@
     key.append(chip,' '+label);el('legend').append(key);
   }
   const W=900,H=500,ground=465;
+  const balloon = new Image();
+  balloon.src = 'globo-aerostatico.webp';
   const between=(a,b)=>a+(b-a)*Math.random();
   let showers=[],time=0,count=0,rain=false,paused=false,next=0,last=performance.now();
   function shower(beta){
@@ -70,6 +72,11 @@
   function render(){
     const sx=canvas.width/W,sy=canvas.height/H;
     ctx.setTransform(sx,0,0,sy,0,0);ctx.clearRect(0,0,W,H);
+    if (balloon.naturalWidth) {
+      ctx.drawImage(balloon, W*.14, H*.42, 15, 23);
+      ctx.drawImage(balloon, W*.82, H*.60, 18, 27);
+      ctx.drawImage(balloon, W*.26, H*.78, 21, 32);
+    }
     for(const event of showers){
       for(const line of event.tracks){
         if(time<line.start) continue;

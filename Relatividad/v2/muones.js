@@ -16,6 +16,7 @@
   const image = src => Object.assign(new Image(), {src});
   const earthSprite = image('../assets/earth-blue-marble-sprite.png');
   const space = image('reloj-panorama.webp');
+  const balloon = image('globo-aerostatico.webp');
   const flying = image('muon-vuelo.webp'), blink = image('muon-ojos-cerrados.webp');
   const wicker = image('cesta-mimbre.webp'), pace = byId('pace');
   const green = image('muon-verde.webp'), flash = image('muon-destello.webp');
@@ -168,6 +169,10 @@
     const sky=ctx.createLinearGradient(0,start,0,ground);
     sky.addColorStop(0,'rgba(69,159,244,.12)');sky.addColorStop(1,'rgba(64,179,247,.55)');
     ctx.fillStyle=sky;ctx.fillRect(0,start,w,span);drawEarth(ctx,w,h,ground);
+    if (ready(balloon)) {
+      ctx.drawImage(balloon, w*.20, ground-span*.61-26, 17, 26);
+      ctx.drawImage(balloon, w*.86, ground-span*.28-31, 21, 31);
+    }
     if(altitude.value>12){
       const boundary=ground-span*12/altitude.value;
       ctx.fillStyle='rgba(134,118,207,.19)';ctx.fillRect(0,start,w,boundary-start);
