@@ -1,70 +1,16 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Corrimiento al rojo · VConce</title><link rel="icon" href="../../electromagnetism/assets/electric/vconce.png">
-<link rel="stylesheet" href="../../shared/katex/katex.min.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script>
-<style>
-*{box-sizing:border-box}body{margin:0;background:#edf3f7;color:#152d41;font:16px/1.45 system-ui,sans-serif}main{max-width:1440px;margin:auto;padding:10px 14px}header{display:flex;align-items:center;gap:12px;margin-bottom:10px}header img{width:36px}h1{font-size:clamp(21px,3vw,32px);margin:0}h2,h3,p{margin:0}h2{font-size:1.17rem}h3{font-size:1.02rem}
-.lab{display:grid;grid-template-columns:minmax(0,1fr) minmax(235px,290px);gap:12px}.scene,aside,article{border-radius:16px;overflow:hidden;background:white;border:1px solid #cad9e5}.space{position:relative;height:clamp(150px,30vh,290px);overflow:hidden;background:#081321 url(reloj-panorama.webp) center/cover}.body,.ship{position:absolute;object-fit:contain;transform:translate(-50%,-50%)}.body{left:9%;top:53%;width:min(23%,200px);height:93%}.ship{top:53%;width:11%;max-height:50%}.position{position:absolute;right:10px;top:8px;padding:4px 8px;background:#112438e8;border-radius:6px;color:white;font-variant-numeric:tabular-nums}
-.detectors,.theory{display:grid;grid-template-columns:1fr 1fr;gap:10px}.detectors{padding:10px}.detector{padding:10px;border:1px solid #cee0e9;border-radius:10px;min-width:0}.detector small{display:block;color:#47627b}.signal{width:100%;height:70px;background:#0c1929;border-radius:7px;display:block;margin:8px 0}.value{font:700 1.2rem monospace}.band{color:#465a6a}.caption{font-size:.83rem;color:#4a6172;padding:0 12px 10px}aside{display:grid;align-content:space-between;gap:12px;padding:12px}label{display:block;font-weight:650}input,select{width:100%;accent-color:#16678e}select,button{min-height:38px;border:1px solid #afc2ce;border-radius:7px;background:white;padding:5px 8px;font:inherit;color:inherit}output{float:right;font-variant-numeric:tabular-nums}.actions{display:flex;gap:5px}.actions button{flex:1;cursor:pointer}#play{background:#145375;color:white}.theory{grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr));margin-top:12px}.theory article{padding:14px}.theory p{margin-top:.5em}.katex-display{overflow:auto}.detector p{font-variant-numeric:tabular-nums}
-@media(max-width:780px){.lab{grid-template-columns:1fr}aside{grid-template-columns:1fr 1fr}.detectors{gap:5px;padding:5px}.detector{padding:7px}.signal{height:52px}main{padding:6px}.value{font-size:1rem}h2{font-size:1rem}}
-</style></head><body><main><header><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Corrimiento al rojo</h1></header>
-<div class="lab"><section class="scene"><div class="space"><img class="body" id="body" alt=""><img class="ship" id="ship" src="../assets/gemelos-rocket-sprite.png" alt="Nave"><span class="position" id="position"></span></div>
-<div class="detectors"><section class="detector"><small>Nave → exterior</small><h2>Lo que recibe la estación lejana</h2><canvas class="signal" id="outside" role="img" aria-label="Oscilación de la señal recibida en el exterior"></canvas><p class="value" id="outValue"></p><p id="outBand" class="band"></p></section>
-<section class="detector"><small>Exterior → nave</small><h2>Lo que recibe la nave</h2><canvas class="signal" id="inside" role="img" aria-label="Oscilación de la señal recibida en la nave"></canvas><p class="value" id="inValue"></p><p id="inBand" class="band"></p></section></div><p class="caption">Espectroscopios a igual escala temporal, con la oscilación ralentizada. Cada lectura corresponde a la señal que sale de la nave o llega a ella en el radio indicado.</p></section>
-<aside><label>Cuerpo central<select id="source"><option value="hole">Agujero negro · 10 M☉</option><option value="earth">Tierra</option></select></label>
-<label>Movimiento de la nave<select id="mode"><option value="fall">Caída libre desde el infinito</option><option value="static">Suspendida a radio fijo</option></select></label>
-<label>Distancia al centro <output id="radiusOut"></output><input type="range" id="radius" min="1.001" max="10" step=".001" value="4"></label>
-<label>Luz emitida <output id="waveOut"></output><input type="range" id="wave" min="400" max="700" value="500" step="1"></label>
-<label>Ritmo de la caída<select id="speed"><option value=".4">Lento</option><option value="1" selected>Normal</option><option value="3">Rápido</option></select></label><div class="actions"><button id="play">Iniciar caída</button><button id="reset">Reiniciar</button></div></aside></div>
-<section class="theory"><article><h3>El mismo emisor en dos lugares</h3><p>La nave y la estación emiten la misma longitud de onda en sus propios laboratorios. Cada detector analiza la luz del otro. Si aumenta la longitud de onda, baja la frecuencia y los máximos llegan más espaciados.</p><div data-tex>1+z=\frac{\lambda_{\rm rec}}{\lambda_{\rm em}}=\frac{\nu_{\rm em}}{\nu_{\rm rec}}</div></article>
-<article><h3>Primero, suspende la nave</h3><p>La luz que sube pierde frecuencia y la que baja la gana. El efecto depende de la distancia al centro y del radio de Schwarzschild. La estación está idealizada a una distancia muy grande.</p><div data-tex>r_s=\frac{2GM}{c^2},\quad \frac{\nu_\infty}{\nu_{\rm nave,em}}=\sqrt{1-r_s/r}</div></article>
-<article><h3>Ahora, déjala caer</h3><p>La nave se aleja de la estación. Al corrimiento gravitatorio se suma el Doppler. Para luz radial y caída desde el reposo en el infinito, incluso la señal que alcanza a la nave por detrás llega enrojecida. β es su rapidez local en unidades de c.</p><div data-tex>\beta=\sqrt{r_s/r},\quad \frac{\nu_{\rm rec}}{\nu_{\rm em}}=\begin{cases}1-\beta&\text{estación}\\1/(1+\beta)&\text{nave}\end{cases}</div></article>
-<article><h3>Acércate al horizonte</h3><p>La señal saliente tiende a frecuencia cero. La nave aún recibe la señal entrante a la mitad de la frecuencia emitida. La animación recorre radios según el tiempo propio de la nave, con duración de pantalla reescalada. Termina fuera del horizonte o en la superficie terrestre.</p><p><a href="https://the-center-of-gravity.com/documents/348/GR_Lecture_Notes_2023.pdf">Derivación de los dos casos (§ 3.1.5)</a></p></article></section>
-</main><script>
-const get=id=>document.getElementById(id);
-const radius=get('radius'),wave=get('wave'),body=get('source'),mode=get('mode');
-let q=4,running=false,last=performance.now(),phases=[0,0];
-function settings(){
-  const earth=body.value==='earth';
-  return {earth,compactness:earth?2*6.67430e-11*5.9722e24/(299792458**2*6371000):1,
-    unit:earth?'R⊕':'rₛ',min:earth?1:1.001};
-}
-function factors(compactness,r,fall){
-  const b=Math.sqrt(compactness/r),staticRate=Math.sqrt(1-compactness/r);
-  return fall?[(1-compactness/r)/(1+b),1/(1+b)]:[staticRate,1/staticRate];
-}
-function band(nm){return nm<380?'Ultravioleta':nm>780?'Infrarrojo':'Visible'}
-function trace(id,ratio,phase,nm){
-  const el=get(id),ctx=el.getContext('2d'),w=el.clientWidth,h=el.clientHeight,dpr=window.devicePixelRatio||1;
-  if(el.width!==Math.round(w*dpr)||el.height!==Math.round(h*dpr)){el.width=Math.round(w*dpr);el.height=Math.round(h*dpr)}
-  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
-  const hue=nm<450?265:nm<490?220:nm<510?175:nm<570?108:nm<590?52:nm<625?24:3;
-  ctx.strokeStyle=band(nm)==='Visible'?'hsl('+hue+' 88% 65%)':'#aebace';
-  ctx.setLineDash(band(nm)==='Visible'?[]:[5,3]);ctx.lineWidth=2;ctx.beginPath();
-  for(let x=0;x<=w;x++){const y=h*(.5+.32*Math.sin(2*Math.PI*(x/w*4*ratio-phase)));if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}ctx.stroke();
-}
-function refresh(dt){
-  const {earth,compactness,unit,min}=settings(),fall=mode.value==='fall';
-  if(running){q=Math.max(min,Math.pow(Math.max(0,q**1.5-dt*.95*Number(get('speed').value)),2/3));radius.value=q;if(q<=min)running=false}
-  get('ship').style.left=(24+62*(q-min)/(10-min))+'%';
-  get('position').textContent='r = '+q.toFixed(3)+' '+unit;
-  get('radiusOut').textContent=q.toFixed(3)+' '+unit;get('waveOut').textContent=wave.value+' nm';
-  get('play').disabled=!fall;get('speed').disabled=!fall;
-  get('play').textContent=running?'Pausar caída':q<=min?'Repetir caída':'Iniciar caída';
-  factors(compactness,q,fall).forEach((ratio,i)=>{
-    const nm=Number(wave.value)/ratio, relative=ratio*500/Number(wave.value);
-    phases[i]=(phases[i]+dt*relative)%1;
-    const prefix=i?'in':'out';
-    get(prefix+'Value').textContent=nm.toFixed(earth?8:2)+' nm';
-    get(prefix+'Band').textContent=band(nm)+' · z = '+(1/ratio-1).toExponential(3);
-    trace(i?'inside':'outside',relative,phases[i],nm);
-  });
-}
-function reset(){q=4;radius.value=q;radius.min=settings().min;running=false;phases=[0,0];get('body').src=settings().earth?'../assets/earth-blue-marble-sprite.png':'../assets/espaguetizacion-gargantua-sprite.png'}
-body.onchange=reset;mode.onchange=()=>{running=false};
-radius.oninput=()=>{q=Number(radius.value);running=false};
-get('play').onclick=()=>{if(q<=settings().min)reset();running=!running};
-get('reset').onclick=reset;
-function frame(now){refresh(Math.min(.06,(now-last)/1000));last=now;requestAnimationFrame(frame)}
-reset();requestAnimationFrame(frame);
-</script></body></html>
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Corrimiento al rojo · VConce</title><link rel="stylesheet" href="experimento-espacial.css"><link rel="stylesheet" href="../../shared/katex/katex.min.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><script defer src="pulsos.js"></script><link rel="icon" type="image/png" sizes="64x64" href="../../shared/vconce-fisica.png"><link rel="stylesheet" href="../../shared/marca-fisica.css"></head>
+<body><main><header><a class="marca-fisica" href="https://www.vconce.com/simulaciones/f%C3%ADsica" aria-label="Volver a las simulaciones de Física de VConce"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"></a><h1>Corrimiento al rojo</h1></header>
+<div class="space-layout"><section class="observation"><div class="views pulse-views pulse-readouts">
+<figure class="view"><div class="pulse-image" style="background-image:url(cabina-pulsos.webp)"><h2>Vista de la nave</h2><img id="emission" class="light" src="pulso-optico.webp" alt="" style="left:49.5%;top:73%;width:28%"><img id="outgoing" class="light" src="pulso-optico.webp" alt=""><span id="shipClock" class="time"></span></div><figcaption class="screen-info"><small>Última separación entre emisiones</small><strong id="emitGap">—</strong><p class="recent" id="emitCount"></p><canvas id="emissions" class="signal" aria-label="Pulsos emitidos en los últimos ocho segundos de la nave"></canvas><p class="spectrum" id="shipSpectrum"></p></figcaption></figure>
+<figure class="view"><div class="pulse-image" style="background-image:url(reloj-panorama.webp)"><h2>Vista externa</h2><img id="body" alt="" style="left:35%;top:45%;width:76%"><img id="ship" src="nave-pulsos.webp" alt="Nave que se aleja hacia el astro"><img id="reception" class="light" src="pulso-optico.webp" alt=""><span id="extClock" class="time"></span></div><figcaption class="screen-info"><small>Última separación entre llegadas</small><strong id="receiveGap">—</strong><p class="recent" id="receiveCount"></p><canvas id="arrivals" class="signal" aria-label="Pulsos recibidos en los últimos ocho segundos de la estación"></canvas><p id="extSpectrum" class="spectrum"></p></figcaption></figure></div>
+<p class="scene-note" id="note" role="status"></p></section>
+<aside class="controls"><label class="wide">Cuerpo central<select id="source"><option value="intermediate">Agujero negro · 100 000 M☉</option><option value="stellar">Agujero negro · 10 M☉</option><option value="earth">Tierra</option></select></label>
+<label class="wide">Movimiento de la nave<select id="mode"><option value="fall">Caída libre desde el infinito</option><option value="static">Suspendida a radio fijo</option></select></label>
+<label class="wide">Radio inicial <output id="radiusOut"></output><input type="range" id="radius" min="1.001" max="10" step=".001" value="6"></label>
+<label class="wide">Luz emitida <output id="waveOut"></output><input type="range" id="wave" min="400" max="700" step="1" value="500"></label>
+<label class="wide">Ritmo de reproducción<select id="speed"><option value=".4">0.4×</option><option value="1" selected>1×</option><option value="3">3×</option></select></label>
+<div class="actions"><button class="primary" id="play">Iniciar</button><button id="reset">Reiniciar</button></div><p class="fine wide">Las dos franjas muestran los últimos 8 s del reloj correspondiente. Cada marca es un pulso. Ambos relojes parten de cero con el primer destello, al emitirse o al recibirse.</p></aside></div>
+<section class="reading"><h2>Un segundo a bordo, ¿cuánto tiempo en la estación?</h2><div class="columns"><article><h3>El emisor viaja con la nave</h3><p>El transmisor se enciende cada segundo de su tiempo propio. A bordo puedes contar los destellos con un reloj local. A la derecha ves la nave tal como aparece al llegar su luz a una estación muy lejana.</p><div data-tex>\Delta\tau_{\rm em}=1\ \mathrm{s},\qquad 1+z=\frac{\lambda_{\rm rec}}{\lambda_{\rm em}}</div></article>
+<article><h3>Una nave suspendida</h3><p>En reposo a un radio fijo, los pulsos llegan espaciados de manera regular. Cuanto más cerca del horizonte se coloca el emisor, mayor es ese intervalo.</p><div data-tex>\Delta t_{\rm rec}=\frac{\Delta\tau_{\rm em}}{\sqrt{1-r_s/r}},\qquad r_s=\frac{2GM}{c^2}</div></article>
+<article><h3>Una nave en caída libre</h3><p>Al caer radialmente desde el reposo en el infinito, la nave se aleja del receptor. Su movimiento y la gravedad aumentan el intervalo entre llegadas. El contador compara dos llegadas completas; la longitud de onda corresponde al instante observado.</p><div data-tex>\frac{dt_{\rm rec}}{d\tau_{\rm em}}=\frac{1}{1-\sqrt{r_s/r}}</div><p>En esta vista paramos la emisión en la superficie o justo fuera del horizonte. La estación sigue recibiendo la luz que ya salió. <a href="https://jila.colorado.edu/~ajsh/courses/bh/schwp.html">Geometría de Schwarzschild (JILA)</a>.</p></article></div>
+<details><summary>Señal en sentido contrario</summary><p>Si la estación también emite la longitud de onda seleccionada, el detector de la nave recibiría <strong id="incoming"></strong> en su posición actual. El ritmo del transmisor a bordo sigue siendo un pulso por segundo.</p></details></section></main></body></html>

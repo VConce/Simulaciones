@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Muón y rayos cósmicos | Simulación IB</title><link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2214%22%20fill%3D%22%2317202f%22%2F%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2230%22%20r%3D%229%22%20fill%3D%22%23fbbf24%22%2F%3E%3Cpath%20d%3D%22M8%2048c12-10%2036-10%2048%200M12%2038c10-8%2030-8%2040%200%22%20fill%3D%22none%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E">
+  <title>Muón y rayos cósmicos | Simulación IB</title>
   <style>
     :root{
       --ink:#101827;--muted:#637083;--blue:#0866e8;--cyan:#3ddcff;
@@ -84,11 +84,11 @@
 button, input[type=range], select {min-height:44px}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #1768a3;outline-offset:3px}
 @media(max-width:680px){main{max-width:100%}.grid,.scenes,.readGrid,.metrics,.eqGrid,.top{min-width:0}.hero,.panel,.control,.card{min-width:0}canvas{max-width:100%}.vconceLogo{position:static!important;display:block;margin:9px 12px 0;width:38px;height:38px}}
-</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.framePicker{margin-left:auto;display:flex;gap:6px;align-items:center;font-weight:700}.framePicker select{border:1px solid #9baebe;border-radius:8px;background:white;padding:0 9px;font:inherit}.distanceRead{display:flex;justify-content:space-between;padding:10px 16px}.readGrid{margin-top:10px}.sceneHead{min-height:44px}.controlCard{align-self:start}@media(max-width:760px){.readGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.read strong{font-size:1.2rem}.framePicker{font-size:.9rem}}</style><style>#earthCanvas{touch-action:none}</style></head>
+</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.framePicker{margin-left:auto;display:flex;gap:6px;align-items:center;font-weight:700}.framePicker select{border:1px solid #9baebe;border-radius:8px;background:white;padding:0 9px;font:inherit}.distanceRead{display:flex;justify-content:space-between;padding:10px 16px}.readGrid{margin-top:10px}.sceneHead{min-height:44px}.controlCard{align-self:start}@media(max-width:760px){.readGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.read strong{font-size:1.2rem}.framePicker{font-size:.9rem}}</style><style>#earthCanvas{touch-action:none}</style><link rel="icon" type="image/png" sizes="64x64" href="../../shared/vconce-fisica.png"><link rel="stylesheet" href="../../shared/marca-fisica.css"></head>
 <body>
   <style>.muon_einstein .controlCard label:has(select){align-items:center}.controlCard select{min-width:0;padding:0 7px;border-radius:8px;background:white;color:#16263e;font:inherit}.controlCard small{line-height:1.4}</style>
   <main class="page compact-lab muon_einstein">
-    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Muón cósmico</h1><label class="framePicker">Ver desde <select id="reference"><option value="earth">Tierra</option><option value="muon">Muón</option></select></label></header>
+    <header class="lab-heading"><a class="marca-fisica" href="https://www.vconce.com/simulaciones/f%C3%ADsica" aria-label="Volver a las simulaciones de Física de VConce"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"></a><h1>Muón cósmico</h1><label class="framePicker">Ver desde <select id="reference"><option value="earth">Tierra</option><option value="muon">Muón</option></select></label></header>
     <div class="experiment-layout"><article class="sceneCard"><div class="sceneHead"><h2 id="sceneTitle">El muón cae hacia la Tierra</h2></div>
       <div class="atmosphere-layout"><aside class="layers" aria-label="Capas de la atmósfera"><b>Capas</b><small>Altitud aproximada</small>
         <div>Exosfera<small>desde 700 km</small></div><div>Termosfera<small>80–700 km</small></div>

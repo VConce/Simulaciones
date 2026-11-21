@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Observador paseando | Simulación IB</title>
-  <link rel="icon" type="image/png" href="../../electromagnetism/assets/electric/vconce.png">
+
   <style>
     :root{--ink:#101827;--muted:#5d6880;--line:#dbe5f2;--blue:#0b63e5;--violet:#7048ff;--cyan:#38d5ff;--card:rgba(255,255,255,.92);--shadow:0 24px 70px rgba(24,38,70,.16)}
     *{box-sizing:border-box}body{margin:0;font-family:Bahnschrift,"Segoe UI Variable","Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 10% 0%,rgba(56,213,255,.25),transparent 26rem),radial-gradient(circle at 88% 4%,rgba(112,72,255,.18),transparent 32rem),linear-gradient(135deg,#f8fbff,#edf4ff 48%,#f8f3ff)}
@@ -22,10 +22,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .scene-times > div {display:grid;grid-template-columns:auto 1fr;align-items:center;gap:3px}
 .scene-times img {display:block;width:clamp(16px,2.6cqw,25px);height:auto}
 .scene-times dd {margin:0;text-align:right;font:700 clamp(13px,1.85cqw,18px)/1.2 ui-monospace,monospace;white-space:nowrap}
-</style></head>
+</style><link rel="icon" type="image/png" sizes="64x64" href="../../shared/vconce-fisica.png"><link rel="stylesheet" href="../../shared/marca-fisica.css"></head>
 <body>
   <main class="page compact-lab observador_paseando">
-    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Observador paseando</h1></header><section class="card">
+    <header class="lab-heading"><a class="marca-fisica" href="https://www.vconce.com/simulaciones/f%C3%ADsica" aria-label="Volver a las simulaciones de Física de VConce"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"></a><h1>Observador paseando</h1></header><section class="card">
       <div class="comparison">
         <div class="canvasWrap">
           <canvas id="sim" width="1124" height="600" role="img" aria-label="Escenas contiguas de las dos emisiones desde los marcos de Galileo y Einstein"></canvas>

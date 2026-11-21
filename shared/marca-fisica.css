@@ -1,0 +1,4 @@
+a.marca-fisica{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;align-self:center;margin:0;padding:0;background:transparent;border:0;line-height:0;pointer-events:auto!important;cursor:pointer}
+a.marca-fisica img{display:block;object-fit:contain;pointer-events:none}
+a.marca-fisica.vconceLogo img{width:100%;height:100%}
+a.marca-fisica:focus-visible{outline:3px solid #148ed0;outline-offset:2px;border-radius:4px}
