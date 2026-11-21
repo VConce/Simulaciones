@@ -168,7 +168,7 @@ function update(){
 let landscapePattern, landscapeLength;
 function prepareLandscape(){
   const im=assets.landscape;
-  if(!im.naturalWidth || landscapePattern)return;
+  if(landscapePattern || !im.complete || !im.naturalWidth)return;
   const width=Math.max(1920,Math.round(canvas.height*im.naturalWidth/im.naturalHeight));
   const overlap=Math.round(width*.045);
   landscapeLength=width-overlap;
