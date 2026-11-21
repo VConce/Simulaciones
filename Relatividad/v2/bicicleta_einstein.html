@@ -35,12 +35,12 @@
     }
     h1{margin:10px 0 6px;font-size:clamp(34px,5vw,58px);line-height:.92;letter-spacing:-.06em}
     .lead{margin:0;color:#4f6177;font-size:16px;line-height:1.38;font-weight:720;max-width:740px}
-    .eqs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0 16px 16px}
+    .eqs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 16px 16px}
     .eq{
       border:1px solid var(--line);border-radius:18px;background:#f8fbff;padding:14px 16px;
       min-height:96px;
     }
-    .eq span{display:block;color:#708095;font-size:11px;font-weight:950;letter-spacing:.07em;text-transform:uppercase}
+    .eq h3{margin:0;color:#25465f;font-size:1rem}.eq p,.equationsHead p{line-height:1.5}.eq [data-tex]{color:#152e49;text-transform:none;letter-spacing:normal}.eq{min-width:0}
     .math{margin-top:9px;color:#075ee8;font-family:"Cambria Math",Cambria,Georgia,serif;font-size:25px;font-weight:700;line-height:1.15}
     .latex{display:inline-flex;align-items:center;gap:.28em;white-space:nowrap}
     .frac{display:inline-grid;grid-template-rows:auto 2px auto;vertical-align:middle;text-align:center;line-height:1.05}
@@ -119,26 +119,19 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <p class="note" id="note">La suma relativista nunca supera <strong>c</strong>.</p>
     </aside>
   </div>
-  <section class="card equations lab-theory">
-    <div class="equationsHead">
-      <h2>¿Qué velocidad tiene la manzana?</h2>
-      <p>Tomamos como positivo el sentido de avance de la bicicleta. Su velocidad respecto al suelo es <i>v</i>. Einstein mide la velocidad horizontal de la manzana <i>u′</i> desde la bicicleta, y una persona en el suelo mide <i>u</i>. Un lanzamiento hacia atrás tiene <i>u′</i> negativa.</p>
-    </div>
+  <section class="card equations lab-theory" aria-labelledby="apple-theory">
+    <div class="equationsHead"><h2 id="apple-theory">¿Por qué el suelo y Einstein miden velocidades distintas?</h2>
+    <p>Imagina dos fotografías de la manzana durante el vuelo. Para calcular su velocidad horizontal, cada observador divide el desplazamiento entre el tiempo transcurrido. Al cambiar de referencia cambian las dos medidas. Llamamos <i>v</i> a la velocidad de la bicicleta hacia la derecha y usamos primas para las medidas de Einstein.</p></div>
     <div class="eqs">
-      <div class="eq"><span>De la bicicleta al suelo</span>
-        <div class="math" data-tex>u=\frac{u'+v}{1+u'v/c^2}</div>
-        <p>La manzana avanza, retrocede o cae verticalmente respecto al suelo según el signo de <i>u</i>. El trazo azul representa la predicción relativista.</p>
-      </div>
-      <div class="eq"><span>Del suelo a la bicicleta</span>
-        <div class="math" data-tex>u'=\frac{u-v}{1-uv/c^2}</div>
-        <p>Esta transformación recupera la medida de Einstein. Si lanzas hacia atrás con la misma rapidez que lleva la bicicleta, <i>u′ = −v</i> y la velocidad horizontal en el suelo es cero.</p>
-      </div>
-      <div class="eq"><span>Comparación con Galileo</span>
-        <div class="math" data-tex>u_{\rm clásica}=u'+v</div>
-        <p>A velocidades pequeñas frente a <i>c</i>, el denominador de la fórmula relativista se acerca a 1. Con los valores iniciales, la suma clásica da 0.7500 c y la relativista, 0.6757 c. El trazo naranja muestra la suma clásica en la vista del suelo.</p>
-      </div>
+      <article class="eq"><h3>De dos posiciones a una velocidad</h3>
+        <p>Las transformaciones de Lorentz relacionan lo que miden Einstein y la persona en el suelo entre esos dos instantes.</p>
+        <div data-tex>\left\{\begin{aligned}\Delta x &amp;= \gamma(\Delta x' + v\,\Delta t')\\[3pt]\Delta t &amp;= \gamma\!\left(\Delta t' + \frac{v\,\Delta x'}{c^2}\right)\end{aligned}\right.</div>
+        <p>El factor de Lorentz γ es el mismo en ambas filas y se cancela al dividirlas.</p></article>
+      <article class="eq"><h3>¿Qué mide cada observador?</h3>
+        <p>Si Einstein mide <i>u′</i> para la manzana, al dividir la primera fila entre la segunda obtenemos <i>u</i>, su velocidad desde el suelo. El cambio inverso se obtiene cambiando el signo de <i>v</i>.</p>
+        <div data-tex>\left\{\begin{aligned}u &amp;= \frac{u'+v}{1+u'v/c^2} &&\text{(suelo)}\\[5pt]u' &amp;= \frac{u-v}{1-uv/c^2} &&\text{(bicicleta)}\end{aligned}\right.</div></article>
     </div>
-    <div class="equationsHead"><p>La cámara sigue a Einstein en ambas vistas. En la del suelo, el punto de lanzamiento queda fijo en el camino. En la de la bicicleta, queda junto a su mano. Las ecuaciones describen la componente horizontal. La caída vertical es ilustrativa y el paisaje acelera visualmente por encima de 0.9 c.</p></div>
+    <div class="equationsHead"><p><strong>Pruébalo.</strong> Pon la bicicleta a 0.8<i>c</i> y lanza la manzana hacia delante a 0.8<i>c</i> respecto a Einstein. La suma de Galileo da 1.6<i>c</i> (trazo naranja). Desde el suelo, la relatividad predice 1.6<i>c</i>/1.64 ≈ 0.9756<i>c</i> (trazo azul). Si la lanzas hacia atrás a −0.8<i>c</i>, el numerador se anula y desde el suelo la ves caer en vertical. La caída vertical del dibujo es ilustrativa.</p></div>
   </section>
 </main>
 
