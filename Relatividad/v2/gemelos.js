@@ -79,13 +79,27 @@
     scale.value=playback[shipView?'ship':'earth'];
     scene.classList.toggle('ship-view',shipView);
     scene.setAttribute('aria-label',shipView?'Vista desde la nave. La Tierra y la estrella se desplazan respecto al viajero.':'Trayecto de ida y vuelta visto desde la Tierra.');
-    document.querySelector('.clocks').setAttribute('aria-label',shipView?'Lecturas simultáneas según el viajero':'Lecturas simultáneas en el marco terrestre');
-    document.querySelector('.clock abbr').title=shipView?'Diferencia entre las lecturas simultáneas según el viajero':'Diferencia entre las lecturas en el marco de la Tierra';
+    document.querySelector('.clocks').setAttribute('aria-label',shipView?'Lecturas simultáneas desde la nave':'Lecturas simultáneas en el marco terrestre');
+    document.querySelector('.clock abbr').title=shipView?'Diferencia entre las lecturas simultáneas desde la nave':'Diferencia entre las lecturas en el marco de la Tierra';
     write('rate-label',shipView?'Ritmo del viaje (nave)':'Ritmo del reloj terrestre');
     write('earth-label',shipView?'Tierra (asignada)':'Tierra');
     draw();
   };
   get('end').onclick=()=>go(1,true);
+  const figures=[document.querySelector('.rider'),get('young'),get('older'),get('elder')];
+  const original=figures.map(img=>img.getAttribute('src'));
+  const sisters=['viajera','joven','madura','mayor'].map(name=>'gemela-'+name+'.webp');
+  function setCharacters(){
+    const female=get('characters').value==='f';
+    figures.forEach((img,i)=>{img.src=(female?sisters:original)[i];});
+    figures[0].alt=female?'Gemela viajera de pie sobre la nave':'Gemelo viajero de pie sobre la nave';
+    document.querySelector('.portrait').setAttribute('aria-label',female?'Gemela terrestre':'Gemelo terrestre');
+    const title=female?'Paradoja de las gemelas':'Paradoja de los gemelos';
+    document.querySelector('h1').textContent=title;
+    document.title=title+' · VConce';
+  }
+  get('characters').onchange=setCharacters;
+  setCharacters();
   get('progress').oninput=e=>go(e.target.valueAsNumber/100,true);
   get('calendar').onclick=()=>{dates=!dates;document.querySelector('.clocks').classList.toggle('calendar',dates);write('calendar',dates?'Ver duración':'Ver fechas');draw();};
   document.addEventListener('visibilitychange',()=>{last=performance.now();});

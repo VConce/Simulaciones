@@ -50,9 +50,10 @@
     .radicand{border-top:2px solid currentColor;padding:.08em .12em 0}
     .side{padding:12px;display:grid;grid-template-columns:1fr 1.18fr;gap:10px;align-items:stretch}
     .results{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .res{border:1px solid var(--line);border-radius:18px;background:#fff;padding:10px}
+    .res{border:1px solid var(--line);border-radius:18px;background:#fff;padding:10px;min-width:0;container-type:inline-size}
     .res span{display:block;color:#66778c;font-size:11px;font-weight:950;letter-spacing:.07em;text-transform:uppercase}
     .res strong{display:block;margin-top:4px;font-size:27px;line-height:1;font-variant-numeric:tabular-nums}
+    #groundOut.long-reading{font-size:clamp(12px,14cqw,26px)}
     .gal strong{color:var(--red)}.ein strong{color:var(--green)}
     .controlPanel{border:1px solid var(--line);border-radius:20px;background:#fff;padding:10px;display:grid;grid-template-columns:minmax(0,1fr) 128px;gap:10px;align-items:stretch}
     .controls{display:grid;gap:8px}
@@ -111,32 +112,33 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <div class="controlPanel">
         <div class="controls">
           <div><label for="bikeV">Bicicleta respecto al suelo <output id="bikeOut">0.5500 c</output></label><input id="bikeV" type="range" min="0" max="0.9999" step="0.0001" value="0.55"></div>
-          <div><label for="appleV">Manzana respecto a la bicicleta <output id="appleOut">0.20 c</output></label><input id="appleV" type="range" min="-0.80" max="0.80" step="0.01" value="0.20"></div>
+          <div><label for="appleV">Manzana respecto a la bicicleta <output id="appleOut">0.2000 c</output></label><input id="appleV" type="range" min="-0.9999" max="0.9999" step="0.0001" value="0.2000"></div>
         </div>
         <div class="buttons"><button class="primary" id="dropBtn">Soltar manzana</button><button type="button" id="pauseAnimation" class="ghost">Pausar</button><button class="ghost" id="resetBtn">Reiniciar</button></div>
       </div>
       <p class="note" id="note">La suma relativista nunca supera <strong>c</strong>.</p>
     </aside>
-  </div><div class="lab-intro"><p class="lead">Einstein viaja a velocidad <strong>v<sub>E</sub></strong> y lanza una manzana con velocidad <strong>u′</strong> medida en su propio marco. El objetivo es comparar la suma clásica con la suma relativista.</p>
-    <p>La cámara acompaña a Einstein. En la vista del suelo, el inicio del trazo queda en el punto del camino donde soltó la manzana. Desde la bicicleta, queda junto a su mano. Cambia de referencia durante el lanzamiento o en pausa para comparar las trayectorias. La caída vertical es ilustrativa.</p></div><section class="card equations lab-theory">
+  </div>
+  <section class="card equations lab-theory">
     <div class="equationsHead">
-      <h2>Ecuaciones del experimento</h2>
-      <p>Los controles expresan las velocidades como fracciones de la velocidad de la luz <strong>c</strong>. El signo indica el sentido del movimiento.</p>
+      <h2>¿Qué velocidad tiene la manzana?</h2>
+      <p>Tomamos como positivo el sentido de avance de la bicicleta. Su velocidad respecto al suelo es <i>v</i>. Einstein mide la velocidad horizontal de la manzana <i>u′</i> desde la bicicleta, y una persona en el suelo mide <i>u</i>. Un lanzamiento hacia atrás tiene <i>u′</i> negativa.</p>
     </div>
-    <div class="eqs" aria-label="Ecuaciones con formato LaTeX">
-      <div class="eq">
-        <span>Factor de Lorentz</span>
-        <div class="math latex" aria-label="gamma igual a uno partido por raiz cuadrada de uno menos beta al cuadrado" data-tex="">\gamma=\frac{1}{\sqrt{1-v_E^2/c^2}}</div>
+    <div class="eqs">
+      <div class="eq"><span>De la bicicleta al suelo</span>
+        <div class="math" data-tex>u=\frac{u'+v}{1+u'v/c^2}</div>
+        <p>La manzana avanza, retrocede o cae verticalmente respecto al suelo según el signo de <i>u</i>. El trazo azul representa la predicción relativista.</p>
       </div>
-      <div class="eq">
-        <span>Galileo</span>
-        <div class="math latex" aria-label="u igual a velocidad de Einstein mas velocidad propia de la manzana" data-tex="">u=v_E+u^\prime</div>
+      <div class="eq"><span>Del suelo a la bicicleta</span>
+        <div class="math" data-tex>u'=\frac{u-v}{1-uv/c^2}</div>
+        <p>Esta transformación recupera la medida de Einstein. Si lanzas hacia atrás con la misma rapidez que lleva la bicicleta, <i>u′ = −v</i> y la velocidad horizontal en el suelo es cero.</p>
       </div>
-      <div class="eq">
-        <span>Einstein</span>
-        <div class="math latex" aria-label="u igual a fraccion relativista de suma de velocidades" data-tex="">u=\frac{v_E+u^\prime}{1+v_Eu^\prime/c^2}</div>
+      <div class="eq"><span>Comparación con Galileo</span>
+        <div class="math" data-tex>u_{\rm clásica}=u'+v</div>
+        <p>A velocidades pequeñas frente a <i>c</i>, el denominador de la fórmula relativista se acerca a 1. Con los valores iniciales, la suma clásica da 0.7500 c y la relativista, 0.6757 c. El trazo naranja muestra la suma clásica en la vista del suelo.</p>
       </div>
     </div>
+    <div class="equationsHead"><p>La cámara sigue a Einstein en ambas vistas. En la del suelo, el punto de lanzamiento queda fijo en el camino. En la de la bicicleta, queda junto a su mano. Las ecuaciones describen la componente horizontal. La caída vertical es ilustrativa y el paisaje acelera visualmente por encima de 0.9 c.</p></div>
   </section>
 </main>
 
@@ -158,8 +160,10 @@ function $(id){return document.getElementById(id)}
 function update(){
   state.bike=+bikeV.value; state.apple=+appleV.value;
   const ground=relAdd(state.bike,state.apple);
-  $("bikeOut").textContent=fmt(state.bike,4)+" c"; $("appleOut").textContent=fmt(state.apple)+" c";
-  $("groundOut").textContent=fmt(ground,Math.abs(ground)>=.9999?6:4)+" c"; $("riderOut").textContent=fmt(state.apple,4)+" c";
+  $("bikeOut").textContent=fmt(state.bike,4)+" c"; $("appleOut").textContent=fmt(state.apple,4)+" c";
+  const digits=Math.abs(ground)>=0.9999995?9:Math.abs(ground)>=.9999?6:4;
+  $("groundOut").classList.toggle('long-reading',digits>4);
+  $("groundOut").textContent=fmt(ground,digits)+" c"; $("riderOut").textContent=fmt(state.apple,4)+" c";
   $("gammaOut").textContent="γ = "+fmt(gamma(state.bike));
   $("note").textContent="La suma clásica daría "+fmt(state.bike+state.apple,4)+" c desde el suelo (trazo naranja).";
 }
@@ -267,12 +271,15 @@ function drawApple(horizontal,classic,fromBike){
   const x0=hand.x-originShift-state.bike*state.landedFor*pxPerLightSecond;
   const y0=state.releaseY,fall=(roadY-14-y0)*(age/flightDuration)**2;
   function trail(dx,color,dash){
-    ctx.strokeStyle=color;ctx.lineWidth=3;ctx.setLineDash(dash);ctx.beginPath();
-    ctx.moveTo(x0,y0);ctx.quadraticCurveTo(x0+dx/2,y0,x0+dx,y0+fall);ctx.stroke();
+    const path=new Path2D();
+    path.moveTo(x0,y0);path.quadraticCurveTo(x0+dx/2,y0,x0+dx,y0+fall);
+    ctx.save();ctx.setLineDash(dash);ctx.lineCap='round';
+    ctx.strokeStyle='#ffdf32';ctx.lineWidth=8;ctx.stroke(path);
+    ctx.strokeStyle=color;ctx.lineWidth=3.5;ctx.stroke(path);ctx.restore();
   }
   ctx.save();ctx.globalAlpha=Math.min(1,(1.5-state.landedFor)*3);
   if(!fromBike)trail(classic,'#a75212',[7,6]);
-  trail(horizontal,'#075b87',[]);
+  trail(horizontal,'#075b87',[7,6]);
   circle(x0,y0,4,'#075b87');
   if(assets.apple.naturalWidth){
     ctx.drawImage(assets.apple,x0+horizontal-23,y0+fall-22,46,46);
@@ -294,7 +301,8 @@ let lastFrame=performance.now();
 function advance(now){
   const dt=Math.min(.1,Math.max(0,now-lastFrame)/1000);lastFrame=now;
   if(state.paused||document.hidden)return;
-  state.distance+=dt*state.bike*pxPerLightSecond;
+  const boost=state.bike>.9 ? 1.35*Math.log10(.1/(1-state.bike)) : 0;
+  state.distance+=dt*state.bike*pxPerLightSecond*(1+boost);
   if(!state.launched)return;
   if(state.age>=flightDuration){
     state.landedFor+=dt;
