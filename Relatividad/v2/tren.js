@@ -31,8 +31,8 @@ const launch = new Date();
 const startMs = Date.UTC(launch.getFullYear(), launch.getMonth(), launch.getDate(),
   launch.getHours(), launch.getMinutes(), launch.getSeconds(), launch.getMilliseconds());
 const daySeconds = 86400, yearSeconds = 365.25*daySeconds;
-const calendarRates = [[1,'1 s'],[60,'1 min'],[3600,'1 h'],[daySeconds,'1 día'],[yearSeconds,'1 año'],[100*yearSeconds,'100 años']];
 const secondRates = [[1,'1 s'],[3,'3 s'],[6,'6 s']];
+const calendarRates = [...secondRates,[60,'1 min'],[3600,'1 h'],[daySeconds,'1 día'],[yearSeconds,'1 año'],[100*yearSeconds,'100 años']];
 const stopwatch = {station:0, passenger:0, rate:3};
 let calendarClocks;
 let clocks=stopwatch, calendar=false;
@@ -89,7 +89,7 @@ function showClocks(){
 }
 byId('time-view').onclick = () => {
   advance(performance.now());
-  if (!calendarClocks) calendarClocks={...stopwatch,rate:daySeconds};
+  if (!calendarClocks) calendarClocks={...stopwatch,rate:3};
   calendar=!calendar;
   clocks=calendar ? calendarClocks : stopwatch;
   document.body.classList.toggle('calendar',calendar);
@@ -154,4 +154,5 @@ byId('rate').onchange=e=>{advance(performance.now());clocks.rate=Number(e.target
 byId('pause').onclick=e=>{advance(performance.now());paused=!paused;e.target.textContent=paused?'Reanudar':'Pausar';showClocks();};
 byId('reset').onclick=()=>{last=performance.now();clocks.station=0;clocks.passenger=0;distance=0;showClocks();};
 document.addEventListener('visibilitychange',()=>{last=performance.now();});
+byId('rate').value=String(clocks.rate);
 updateSpeed(beta);requestAnimationFrame(frame);

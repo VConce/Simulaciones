@@ -6,7 +6,9 @@
   const hands=document.querySelectorAll('.dial b');
   const scene=document.querySelector('.scene');
   const beforeButton=get('before-turn'), afterButton=get('after-turn');
-  let shipView=false, beforeTurn=false, rate=Number(get('scale').value);
+  const scale=get('scale'), autoScale=scale.querySelector('[value="auto"]');
+  const playback={earth:scale.value,ship:'auto'};
+  let shipView=false, beforeTurn=false;
   let t=0, paused=false, dates=false, last=performance.now();
   function model(){
     const beta=get('v').valueAsNumber, distance=get('distance').valueAsNumber;
@@ -27,7 +29,8 @@
     last=now;
     if(paused||document.hidden)return;
     const {turn,properRate}=model();
-    t=Math.min(2*turn,t+dt*rate/(shipView?properRate:1));
+    const rate=scale.value==='auto' ? turn/8 : Number(scale.value)/(shipView?properRate:1);
+    t=Math.min(2*turn,t+dt*rate);
   }
   function draw(){
     const {beta,distance,properRate,turn}=model(), total=2*turn;
@@ -46,9 +49,12 @@
     afterButton.setAttribute('aria-pressed',String(atTurn&&inbound));
     write('turn-note','Cambio de hora asignada: '+duration(2*beta*distance)+'. El reloj de la nave marca '+duration(turn*properRate)+' a ambos lados del giro.');
     write('phase',home?'Reencuentro en la Tierra':atTurn?(inbound?'Giro · comienzo de la vuelta':'Giro · final de la ida'):inbound?'Vuelta hacia la Tierra':t===0?'Salida desde la Tierra':'Ida hacia la estrella');
-    get('rocket').style.left=(shipView?50:12+76*leg)+'%';
-    scene.style.setProperty('--earth-x',shipView?(50-38*leg)+'%':'12%');
-    scene.style.setProperty('--star-x',shipView?(88-38*leg)+'%':'88%');
+    const span=76, shipX=shipView?88:12+span*leg;
+    const earthX=shipView?shipX-span*leg:12, starX=earthX+span;
+    get('rocket').style.left=shipX+'%';
+    scene.style.setProperty('--earth-x',earthX+'%');
+    scene.style.setProperty('--star-x',starX+'%');
+    scene.classList.toggle('star-offscreen',starX>95);
     get('rocket').style.transform='translate(-50%,-50%) scaleX('+(inbound?-1:1)+')';
     const age=earthReading/total;
     get('older').style.opacity=Math.min(1,Math.max(0,(age-.2)*4));
@@ -65,15 +71,17 @@
   get('turn').onclick=()=>go(.5,true,shipView);
   beforeButton.onclick=()=>go(.5,true,true);
   afterButton.onclick=()=>go(.5,true,false);
-  get('scale').onchange=e=>{advance(performance.now());rate=Number(e.target.value);};
+  scale.onchange=()=>{last=performance.now();playback[shipView?'ship':'earth']=scale.value;};
   get('reference').onchange=e=>{
     advance(performance.now());
     shipView=e.target.value==='ship';
+    autoScale.hidden=!shipView;
+    scale.value=playback[shipView?'ship':'earth'];
     scene.classList.toggle('ship-view',shipView);
     scene.setAttribute('aria-label',shipView?'Vista desde la nave. La Tierra y la estrella se desplazan respecto al viajero.':'Trayecto de ida y vuelta visto desde la Tierra.');
     document.querySelector('.clocks').setAttribute('aria-label',shipView?'Lecturas simultáneas según el viajero':'Lecturas simultáneas en el marco terrestre');
     document.querySelector('.clock abbr').title=shipView?'Diferencia entre las lecturas simultáneas según el viajero':'Diferencia entre las lecturas en el marco de la Tierra';
-    write('rate-label',shipView?'Ritmo del reloj de la nave':'Ritmo del reloj terrestre');
+    write('rate-label',shipView?'Ritmo del viaje (nave)':'Ritmo del reloj terrestre');
     write('earth-label',shipView?'Tierra (asignada)':'Tierra');
     draw();
   };

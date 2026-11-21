@@ -13,6 +13,8 @@
 .destination { top:4%; transform:translateX(-50%); }
 .origin,.earth-world { left:var(--earth-x); }
 .star,.star-world { left:var(--star-x); }
+.star-offscreen .destination.star { left:auto; right:2%; top:18%; transform:none; }
+.star-offscreen .destination.star::after { content:" →"; }
 #phase { left:50%; bottom:2%; transform:translateX(-50%); text-align:center; width:max-content; max-width:90%; }
 .earth-world,.star-world { position:absolute; top:var(--route-y); transform:translate(-50%,-50%); aspect-ratio:1; }
 .earth-world { width:min(18%,25vh,150px); }

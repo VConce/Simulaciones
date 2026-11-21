@@ -8,6 +8,19 @@ header { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:12px; 
 .clock output { display:grid; line-height:1.2; }
 .calendar .clock output { font-size:clamp(.85rem,1.65vw,1.15rem); }
 .calendar .clock output small { font:inherit; font-size:.88em; }
+.calendar .clocks { display:grid; grid-template-columns:13rem 13rem 10rem; grid-auto-rows:5rem; }
+.calendar .clock output { font-variant-numeric:tabular-nums; }
+.calendar .difference output { white-space:normal; line-height:1.1; }
+@media(max-width:960px) {
+  .calendar header { grid-template-columns:1fr auto; }
+  .calendar .clocks { grid-column:1/-1; grid-row:2; }
+  .calendar #time-view { grid-column:2; grid-row:1; }
+}
+@media(max-width:640px) {
+  .calendar .clocks { grid-template-columns:repeat(2,minmax(0,1fr)) minmax(0,.78fr); grid-auto-rows:4.75rem; }
+  .calendar .clock { gap:4px; padding:4px; }
+  .calendar .clock .dial { width:clamp(21px,6vw,35px); height:auto; aspect-ratio:1; }
+}
 #time-view { justify-self:end; font:600 .9rem system-ui,sans-serif; color:#155e85; min-height:44px; }
 .dial[data-clock=max] { --accent:#12639b; }
 .dial[data-clock=ein] { --accent:#087451; }

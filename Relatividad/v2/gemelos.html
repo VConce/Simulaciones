@@ -3,8 +3,8 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Paradoja de los gemelos · VConce</title>
 <link rel="icon" href="../../electromagnetism/assets/electric/vconce.png">
-<link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><link rel="stylesheet" href="escena.css"><link rel="stylesheet" href="gemelos.css?v=ruta-central">
-<script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><script defer src="escena.js"></script><script defer src="gemelos.js?v=gemelos-a-bordo"></script>
+<link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><link rel="stylesheet" href="escena.css"><link rel="stylesheet" href="gemelos.css?v=viaje-visible">
+<script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><script defer src="escena.js"></script><script defer src="gemelos.js?v=viaje-visible"></script>
 </head><body><main class="compact-lab">
 <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Paradoja de los gemelos</h1>
 <div class="clocks" aria-label="Lecturas simultáneas en el marco terrestre">
@@ -27,11 +27,11 @@
 <aside class="panel" aria-label="Controles del viaje">
 <div class="control"><label for="v">Rapidez de la nave (c)</label><input id="v" type="range" min="0.05" max="0.9999" step="0.0001" value="0.8"></div>
 <div class="control"><label for="distance">Distancia de ida (años luz)</label><input id="distance" type="range" min="1" max="25" step="0.1" value="8"></div>
-<label for="scale" id="rate-label">Ritmo del reloj terrestre</label><select id="scale"><option value="0.002737850787">1 día/s</option><option value="0.08213552">30 días/s</option><option selected value="1">1 año/s</option><option value="10">10 años/s</option><option value="50">50 años/s</option></select>
+<label for="scale" id="rate-label">Ritmo del reloj terrestre</label><select id="scale"><option value="auto" hidden>Automático · 8 s por trayecto</option><option value="0.002737850787">1 día/s</option><option value="0.08213552">30 días/s</option><option selected value="1">1 año/s</option><option value="10">10 años/s</option><option value="50">50 años/s</option></select>
 <div class="buttons"><button id="pause">Pausar</button><button id="reset">Reiniciar viaje</button><button id="calendar">Ver fechas</button></div>
 <dl><div><dt>Factor γ</dt><dd id="gamma"></dd></div><div><dt>Duración total en la Tierra</dt><dd id="earth-total"></dd></div><div><dt>Duración total en la nave</dt><dd id="ship-total"></dd></div></dl>
 </aside></div>
-<section class="explanation"><article><h2>Dos relojes que vuelven a encontrarse</h2><p>Los gemelos ponen sus relojes a cero al despedirse. La distancia de ida <i>D</i> se mide en la Tierra. La nave mantiene la misma rapidez en la ida y en la vuelta. Cada esfera da una vuelta por año de su reloj. El selector conserva el instante del viaje en la nave y cambia qué lectura terrestre se considera simultánea. En la vista de la nave, la Tierra y la estrella se mueven y el dibujo se ajusta a la distancia entre ellas.</p>
+<section class="explanation"><article><h2>Dos relojes que vuelven a encontrarse</h2><p>Los gemelos ponen sus relojes a cero al despedirse. La distancia de ida <i>D</i> se mide en la Tierra. La nave mantiene la misma rapidez en la ida y en la vuelta. Cada esfera da una vuelta por año de su reloj. El selector conserva el instante del viaje en la nave y cambia qué lectura terrestre se considera simultánea. Desde la nave, verás a la Tierra alejarse hacia la izquierda en la ida y regresar en la vuelta. La flecha indica dónde queda la estrella mientras está fuera de la pantalla. El ritmo automático dedica 8 segundos de animación a cada trayecto.</p>
 <div data-tex>t_{\rm Tierra}=\frac{2D}{v},\qquad \tau_{\rm nave}=\frac{t_{\rm Tierra}}{\gamma},\qquad \gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>Con 8 años luz de ida y una rapidez de 0.8 c, al reencuentro el reloj de la Tierra marca 20 años y el de la nave, 12. Los dos pueden leer en persona los 8 años de diferencia.</p></article>
 <article><h2>¿Qué cambia al dar la vuelta?</h2><p>Pulsa «Ver el giro». Ambos relojes siguen marcando el tiempo de forma continua. Lo que cambia de golpe, en este modelo de giro instantáneo, es qué suceso lejano de la Tierra considera simultáneo el viajero al pasar del marco de ida al de vuelta.</p><div data-tex>t_{\rm asignado}=t-\frac{u\,x}{c^2},\qquad \Delta t_{\rm asignado,\,giro}=\frac{2vD}{c^2}</div>
 <p>Aquí <i>t</i> y <i>x</i> son el tiempo y la posición de la nave según la Tierra, y <i>u</i> cambia de signo al girar. Con los valores iniciales, el viajero pasa de asignar 3.6 años a la Tierra a asignarle 16.4. Su reloj sigue marcando 6 años. La luz que recibe desde la Tierra llega de forma continua.</p></article></section>
