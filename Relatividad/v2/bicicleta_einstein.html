@@ -110,7 +110,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       </div>
       <div class="controlPanel">
         <div class="controls">
-          <div><label for="bikeV">Bicicleta respecto al suelo <output id="bikeOut">0.55 c</output></label><input id="bikeV" type="range" min="0" max="0.99" step="0.01" value="0.55"></div>
+          <div><label for="bikeV">Bicicleta respecto al suelo <output id="bikeOut">0.5500 c</output></label><input id="bikeV" type="range" min="0" max="0.9999" step="0.0001" value="0.55"></div>
           <div><label for="appleV">Manzana respecto a la bicicleta <output id="appleOut">0.20 c</output></label><input id="appleV" type="range" min="-0.80" max="0.80" step="0.01" value="0.20"></div>
         </div>
         <div class="buttons"><button class="primary" id="dropBtn">Soltar manzana</button><button type="button" id="pauseAnimation" class="ghost">Pausar</button><button class="ghost" id="resetBtn">Reiniciar</button></div>
@@ -158,8 +158,8 @@ function $(id){return document.getElementById(id)}
 function update(){
   state.bike=+bikeV.value; state.apple=+appleV.value;
   const ground=relAdd(state.bike,state.apple);
-  $("bikeOut").textContent=fmt(state.bike)+" c"; $("appleOut").textContent=fmt(state.apple)+" c";
-  $("groundOut").textContent=fmt(ground,4)+" c"; $("riderOut").textContent=fmt(state.apple,4)+" c";
+  $("bikeOut").textContent=fmt(state.bike,4)+" c"; $("appleOut").textContent=fmt(state.apple)+" c";
+  $("groundOut").textContent=fmt(ground,Math.abs(ground)>=.9999?6:4)+" c"; $("riderOut").textContent=fmt(state.apple,4)+" c";
   $("gammaOut").textContent="γ = "+fmt(gamma(state.bike));
   $("note").textContent="La suma clásica daría "+fmt(state.bike+state.apple,4)+" c desde el suelo (trazo naranja).";
 }
