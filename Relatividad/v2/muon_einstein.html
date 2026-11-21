@@ -88,19 +88,23 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <main class="page compact-lab muon_einstein">
     <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Muón cósmico</h1><label class="framePicker">Ver desde <select id="reference"><option value="earth">Tierra</option><option value="muon">Muón</option></select></label></header>
     <div class="experiment-layout"><article class="sceneCard"><div class="sceneHead"><h2 id="sceneTitle">El muón cae hacia la Tierra</h2></div>
-      <div class="canvasWrap"><canvas id="earthCanvas" width="760" height="450" role="img" aria-labelledby="sceneTitle"></canvas></div>
+      <div class="atmosphere-layout"><aside class="layers" aria-label="Capas de la atmósfera"><b>Capas</b><small>Altitud aproximada</small>
+        <div>Exosfera<small>desde 700 km</small></div><div>Termosfera<small>80–700 km</small></div>
+        <div>Mesosfera<small>50–80 km</small></div><div id="strato">Estratosfera<small>12–50 km</small></div>
+        <div class="on-route">Troposfera<small>0–12 km</small></div></aside>
+        <div class="canvasWrap"><canvas id="earthCanvas" width="760" height="450" role="img" aria-labelledby="sceneTitle"></canvas></div></div>
       <div class="distanceRead"><span id="distanceLabel">Espesor desde la Tierra</span><strong id="distanceOut"></strong></div></article>
     <aside class="controlCard" aria-label="Controles de la simulación">
         <label for="model">Modelo <select id="model"><option value="rel">Relatividad especial</option><option value="classic">Física clásica</option></select></label>
         <label for="beam">Emisión <select id="beam"><option value="single">Un solo muón</option><option value="stream">Chorro de muones</option></select></label>
         <div>
-          <label for="beta">Velocidad del muón <output id="betaOut">0.9800 c</output></label>
-          <input id="beta" type="range" min="0.70" max="0.9999" step="0.0001" value="0.9800">
+          <label for="beta">Velocidad del muón <output id="betaOut">0.9997 c</output></label>
+          <input id="beta" type="range" min="0.70" max="0.9999" step="0.0001" value="0.9997">
           <div class="scale"><span>0.70 c</span><span>relativista</span><span>0.9999 c</span></div>
         </div>
         <div>
-          <label for="height">Altura de creación <output id="heightOut">10.0 km</output></label>
-          <input id="height" type="range" min="2" max="25" step="0.5" value="10">
+          <label for="height">Altura de creación <output id="heightOut">12.0 km</output></label>
+          <input id="height" type="range" min="2" max="25" step="0.5" value="12">
           <div class="scale"><span>2 km</span><span>atmósfera</span><span>25 km</span></div>
         </div>
         <div><label for="pace">Velocidad de simulación <output id="paceOut">1×</output></label><input id="pace" type="range" min="1" max="12" step="1" value="1" data-exact-input="true"></div>
@@ -121,7 +125,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <article class="mini"><h3>Desde el muón: un trayecto más corto</h3><p>El muón está quieto y su reloj marcha a su ritmo habitual. La superficie sube hacia él. La separación entre el suelo y la capa de creación, medida simultáneamente desde el muón, se reduce a h′.</p><div data-tex>h'=\frac{h}{\gamma},\qquad \Delta\tau=\frac{h'}{v}</div></article>
       <article class="mini"><h3>¿Cuántos llegan?</h3><p>La vida media propia es de 2.197 μs. Cada muón tiene un tiempo de desintegración distinto. En relatividad, la probabilidad de llegar es la de la ecuación inferior. En física clásica se toma γ = 1. A 15 km y 0.98c se espera aproximadamente una llegada por cada doce mil millones de muones clásicos. También pueden llegar en el modelo clásico si su vida aleatoria supera el tiempo de vuelo.</p><div data-tex="">P=\exp\!\left(-\frac{h}{\gamma v\tau_0}\right)</div></article>
     </section>
+    <article class="mini"><h3>¿Qué cambia en aire real?</h3><p>La animación mantiene fija la velocidad para comparar dos marcos inerciales. Esta estimación adicional incluye la pérdida media de energía de un muón en un descenso vertical por aire seco. Las alturas, energías y direcciones de los muones cósmicos reales varían.</p><p id="airEstimate"></p>
+    <p><a href="https://pdg.lbl.gov/2022/AtomicNuclearProperties/MUE/muE_air_dry_1_atm.pdf">Alcance en aire (PDG)</a> · <a href="https://www2.lbl.gov/abc/cosmic/SKliewer/Cosmic_Rays/StdAtmos.htm">Atmósfera estándar</a> · <a href="https://science.nasa.gov/earth/earth-atmosphere/earths-atmosphere-a-multi-layered-cake/">Capas atmosféricas (NASA)</a></p></article>
   </main>
+  <style>.atmosphere-layout{display:grid;grid-template-columns:minmax(85px,120px) minmax(0,1fr);align-items:center;gap:6px;padding:4px}.layers{font:600 clamp(.7rem,1.1vw,.95rem)/1.2 system-ui;color:#354963}.layers small{display:block;font-size:.78em}.layers div{border-left:3px solid #bdcad8;padding:4px;margin:3px 0}.layers .on-route{border-color:#2871ad;background:#e5f3ff;color:#173e63}@media(max-width:500px){.layers div{padding:2px}.layers small{font-size:.75em}}</style>
 
   <script src="muones.js"></script>
 </body>

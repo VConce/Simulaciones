@@ -15,6 +15,7 @@
   const lifetime = 2.1969811, c = .299792458, flightSeconds = 5;
   const image = src => Object.assign(new Image(), {src});
   const earthSprite = image('../assets/earth-blue-marble-sprite.png');
+  const space = image('reloj-panorama.webp');
   const flying = image('muon-vuelo.webp'), blink = image('muon-ojos-cerrados.webp');
   const wicker = image('cesta-mimbre.webp'), pace = byId('pace');
   const green = image('muon-verde.webp'), flash = image('muon-destello.webp');
@@ -31,6 +32,40 @@
   const factor = () => classical() ? 1 : 1 / Math.sqrt(1 - velocity.value ** 2);
   const earthTime = () => altitude.value / (velocity.value * c);
   const travelTime = () => earthTime() / factor();
+  // PDG CSDA range in dry air: kinetic energy in MeV, range in g/cm².
+  const airRanges = [[0,0],[10,.7862],[20,2.686],[40,8.633],[80,25.35],[140,55.62],
+    [200,88.03],[300,143],[400,197.7],[800,407.4],[1000,507.7],[1400,701.4],
+    [2000,979.6],[3000,1421],[4000,1845],[8000,3440]];
+  function interpolateAir(value,axis) {
+    const i=airRanges.findIndex(row=>row[axis]>=value);
+    if(i<=0) return i===0?0:airRanges.at(-1)[1-axis];
+    const a=airRanges[i-1], b=airRanges[i];
+    return a[1-axis]+(value-a[axis])/(b[axis]-a[axis])*(b[1-axis]-a[1-axis]);
+  }
+  function pressure(z) {
+    if(z<=11) return 101325*(1-6.5*z/288.15)**5.25588;
+    if(z<=20) return 22632.06*Math.exp(-(z-11)/6.34162);
+    return 5474.89*(216.65/(216.65+z-20))**34.1632;
+  }
+  function updateAirEstimate(){
+    const z=Number(altitude.value), mass=105.6583755;
+    const kinetic=mass*(1/Math.sqrt(1-velocity.value**2)-1);
+    const range=interpolateAir(kinetic,0), p0=pressure(z);
+    const remaining=h=>range-(pressure(h)-p0)/98.0665;
+    let result='Con la pérdida media de energía, el muón se detiene antes de alcanzar el suelo.';
+    if(remaining(0)>0){
+      const steps=512, dz=z/steps;
+      let proper=0;
+      for(let i=0;i<steps;i++){
+        const energy=interpolateAir(remaining((i+.5)*dz),1);
+        const betaGamma=Math.sqrt(energy*(energy+2*mass))/mass;
+        proper+=dz/(c*betaGamma);
+      }
+      result='Probabilidad relativista estimada de llegar: '+(100*Math.exp(-proper/lifetime)).toPrecision(3)+' %. Energía cinética al llegar: '+(interpolateAir(remaining(0),1)/1000).toFixed(2)+' GeV.';
+    }
+    byId('airEstimate').textContent='Energía cinética inicial: '+(kinetic/1000).toFixed(2)+' GeV. '+result;
+    byId('strato').className=z>12?'on-route':'';
+  }
   const interval = .24;
   let nextEmission = interval;
   function emit(born) {
@@ -46,6 +81,7 @@
     paused = value; byId('pause').textContent = value ? 'Reanudar' : 'Pausar';
   }
   function resetSeries() {
+    updateAirEstimate();
     caught = 0; emitted = 0; ink.clearRect(0,0,deposits.width,depth);
     restartFlight(); draw();
   }
@@ -62,15 +98,13 @@
     caught++; p.deposited = true;
     paint(ink,green,p.x-left,15+Math.random()*8,35,'#5fea9b');
   }
-    function drawStars(ctx, w, h, shift = 0) {
+    function drawStars(ctx, w, h) {
       ctx.fillStyle = "#071126";
       ctx.fillRect(0, 0, w, h);
-      for (let i = 0; i < 110; i++) {
-        const x = (i * 73 + 31) % w;
-        const y = (i * 47 + shift) % Math.floor(h * 0.72);
-        const a = 0.25 + ((i * 17) % 65) / 100;
-        ctx.fillStyle = `rgba(255,255,255,${a})`;
-        ctx.fillRect(x, y, i % 8 ? 1.5 : 2.7, i % 8 ? 1.5 : 2.7);
+      if(ready(space)){
+        ctx.save(); ctx.globalAlpha=.60;
+        const scale=Math.max(w/space.naturalWidth,h/space.naturalHeight);
+        ctx.drawImage(space,-20,0,space.naturalWidth*scale+20,space.naturalHeight*scale);ctx.restore();
       }
     }
 
@@ -124,6 +158,11 @@
     const sky=ctx.createLinearGradient(0,start,0,ground);
     sky.addColorStop(0,'rgba(69,159,244,.12)');sky.addColorStop(1,'rgba(64,179,247,.55)');
     ctx.fillStyle=sky;ctx.fillRect(0,start,w,span);drawEarth(ctx,w,h,ground);
+    if(altitude.value>12){
+      const boundary=ground-span*12/altitude.value;
+      ctx.fillStyle='rgba(134,118,207,.19)';ctx.fillRect(0,start,w,boundary-start);
+      ctx.fillStyle='#c6c0ea';ctx.fillRect(0,boundary,w,1);
+    }
     ctx.strokeStyle='#aee9ff';ctx.lineWidth=2;ctx.setLineDash([8,7]);
     ctx.beginPath();ctx.moveTo(0,start);ctx.lineTo(w,start);ctx.stroke();ctx.setLineDash([]);
     ctx.strokeStyle='white';ctx.beginPath();ctx.moveTo(36,start);ctx.lineTo(36,ground);
