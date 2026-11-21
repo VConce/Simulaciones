@@ -35,24 +35,26 @@
     .info{margin-top:16px;padding:16px 18px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.mini h3{margin:0 0 5px;font-size:18px}.mini p{margin:0;color:var(--muted);font-weight:650;line-height:1.38}
     @media(max-width:1100px){.hero,.workspace{display:block}.formula{margin-top:12px}.panel{margin-top:16px}.eqGrid,.info{grid-template-columns:1fr}}
   .vconceLogo{position:fixed;left:14px;top:14px;width:54px;height:54px;object-fit:contain;z-index:10000;pointer-events:none}@media(max-width:900px){.vconceLogo{width:42px;height:42px;left:10px;top:10px}}/* vconce header clearance */body>header{padding-left:max(88px,env(safe-area-inset-left))!important}@media(max-width:900px){body>header{padding-left:64px!important}}</style>
-<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>
+.torre_gravitatoria .lab-heading .pill{margin-left:auto}.torre_gravitatoria .canvasWrap{position:relative}.torre_gravitatoria .warp-panel{position:absolute;top:1.5%;right:1.5%;z-index:1;width:min(40%,260px);background:#e3ffec;border:2px solid #40bd72;box-shadow:0 0 12px #62ff9ba8;padding:5px 8px;border-radius:10px}.warp-panel input{min-height:0}.warp-panel .scale{font-size:10px}.warp-panel label{font-size:12px}
+.torre_gravitatoria .panel{margin:0;padding:4px;gap:3px;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.torre_gravitatoria .panel>*{min-width:0}.torre_gravitatoria .panel .control{padding:5px 7px;border-radius:10px}.torre_gravitatoria .panel label,.torre_gravitatoria .towerHeader{display:flex;flex-wrap:wrap;gap:2px 5px;font-size:13px}.torre_gravitatoria .panel .scale{font-size:10px}.torre_gravitatoria .panel button{padding:4px;min-height:28px}.torre_gravitatoria .presetGrid,.torre_gravitatoria .unitTabs{gap:3px}.torre_gravitatoria .panel .horizonWarning,.torre_gravitatoria .panel .deltaBox{grid-column:1/-1}.torre_gravitatoria .info{grid-template-columns:repeat(auto-fit,minmax(min(250px,100%),1fr))}
+.torre_gravitatoria .panel .delta{grid-column:1/-1;padding:6px 10px;display:grid;grid-template-columns:1fr auto;column-gap:10px;align-items:center}.torre_gravitatoria .delta strong{font-size:1.1rem;white-space:nowrap}.torre_gravitatoria .delta p{margin:2px 0;font-size:.77rem}.torre_gravitatoria .panel .actions{grid-column:1/-1}.torre_gravitatoria .warp-panel{max-width:23%}
+@media(min-width:761px){.compact-lab.torre_gravitatoria .workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(315px,30%)}}
+@media(max-width:600px){.torre_gravitatoria .warp-panel{position:static;width:100%;max-width:none;margin-bottom:4px}.warp-panel .scale{display:none}}
+</style></head>
 <body>
   <main class="page compact-lab torre_gravitatoria">
-    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Torre gravitatoria</h1></header><section class="workspace">
+    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Torre gravitatoria</h1><div class="pill" id="modePill"></div></header><section class="workspace">
       <article class="sceneCard">
-        <div class="sceneHead">
-          <div><h2>Relojes en una torre</h2></div>
-          <div class="pill" id="modePill">Tierra ×1.00</div>
-        </div>
-        <div class="canvasWrap"><canvas id="scene" width="900" height="560"></canvas></div>
-      </article>
-
-      <aside class="panel" aria-label="Controles de la simulación">
-        <div class="control">
+        <div class="canvasWrap">        <div class="control warp-panel">
           <label for="warp">Escala temporal reloj 1 <output id="warpOut">1 s/s</output></label>
           <input id="warp" type="range" min="0" max="4" step="0.01" value="0">
           <div class="scale"><span>1 s/s</span><span>1 día/s</span><span>1 década/s</span></div>
-        </div>
+        </div><canvas id="scene" width="900" height="560"></canvas></div>
+      </article>
+
+      <aside class="panel" aria-label="Controles de la simulación">
+
         <div class="control">
           <label for="mass">Masa <output id="massOut">5.97×10²⁴ kg</output></label>
           <div class="unitTabs" aria-label="Unidades de masa">
@@ -67,16 +69,6 @@
           <label for="radius">Radio del planeta <output id="radiusOut">6371 km</output></label>
           <input id="radius" type="range" min="2" max="9" step="0.01" value="3.804">
           <div class="scale"><span>100 km</span><span>6371 km</span><span>10^9 km</span></div>
-        </div>
-        <div class="statusBox" id="gravityStatus">
-          <span>Régimen gravitatorio</span>
-          <strong id="regimeOut">Planeta / estrella</strong>
-          <p id="schwarzOut">rₛ = 8.87 mm · R/rₛ ≫ 1</p>
-        </div>
-        <div class="movieBox" id="movieBox">
-          <span>Escala tipo Interstellar</span>
-          <strong id="movieRatioOut">1 h local → 1.00 h lejos</strong>
-          <p id="movieNote">Activa Gargantúa para rozar el caso 1 h en el planeta = 7 años fuera.</p>
         </div>
         <div class="control">
           <label>Presets físicos</label>
@@ -128,25 +120,17 @@
       </aside>
     </section>
 
-    <div class="lab-intro"><p class="lead">Compara dos relojes situados a distintas alturas. Puedes arrastrarlos por la torre o usar los deslizadores. La simulación empieza en la fecha actual y proyecta la fecha propia de cada reloj.</p>
-        <aside class="formula">
-        <span>Modelo usado</span>
-        <div class="math" data-tex="">d\tau=dt\sqrt{1-\frac{2GM}{c^2r}}</div>
-        <p>Aproximación de Schwarzschild para relojes estáticos, suficiente para comparar alturas cerca de la Tierra.</p>
-      </aside>
-    <p>Arrastra los relojes con el dedo o el ratón para colocarlos a la altura deseada.</p></div><section class="eqGrid lab-theory" aria-label="Ecuaciones de la simulación">
-      <article class="eqCard"><span>Ritmo gravitatorio</span><div class="math small" data-tex="">\frac{d\tau}{dt}=\sqrt{1-\frac{2GM}{c^2r}}</div><p>Reloj estático en el ecuador, a coordenada radial r. El tiempo t corresponde al observador lejano.</p></article>
-      <article class="eqCard"><span>Radio usado</span><div class="math small" data-tex="">r=R+h</div><p>R y h son coordenadas radiales. En campo fuerte h no coincide con la altura medida con una regla.</p></article>
-      <article class="eqCard"><span>Horizonte Kerr</span><div class="math small" data-tex="">r_+=\frac{GM}{c^2}\!\left(1+\sqrt{1-\chi^2}\right)</div><p>χ es el espín adimensional; χ &lt; 1.</p></article>
-      <article class="eqCard"><span>Tiempo propio</span><div class="math small" data-tex="">\tau_i=t\sqrt{1-\frac{2GM}{c^2(R+h_i)}}</div><p>Para posición y masa constantes. Al mover un reloj se acumula el nuevo ritmo desde ese instante. Se idealiza el traslado como instantáneo.</p></article>
-      <article class="eqCard"><span>Diferencia</span><div class="math small" data-tex="">\Delta\tau=\tau_2-\tau_1</div><p>El recuadro rojo muestra esta diferencia acumulada.</p></article>
-    </section>
-
-    <section class="info">
-      <article class="mini"><h3>Idea física</h3><p>A mayor radio gravitatorio, el reloj está menos profundo en el pozo gravitatorio y acumula ligeramente más tiempo propio.</p></article>
-      <article class="mini"><h3>Gargantúa</h3><p>El preset fuerza una dilatación pedagógica extrema: 1 hora local equivale aproximadamente a 7 años lejos del agujero negro.</p></article>
-      <article class="mini"><h3>Uso en clase</h3><p>Deja un reloj en superficie, sube el otro a 200 m, y compara cuánto tarda en acumularse 1 segundo de desfase.</p></article>
-      <article class="factTable"><h3>Desfase esperado en una torre de 200 m</h3><div class="factRows" id="factRows"></div></article>
+<section class="lab-theory"><article class="eqCard mini"><h3>Dos relojes a distinta altura</h3><p>Deja uno en la base y arrastra el otro hacia arriba. Ambos cuentan su tiempo propio. Por cada segundo del reloj de abajo, el de arriba acumula un poco más. La escala verde acelera el transcurso del experimento.</p><div data-tex>\frac{d\tau_2}{d\tau_1}=\sqrt{\frac{1-r_s/r_2}{1-r_s/r_1}}</div></article><article class="eqCard mini"><h3>¿Qué mide un reloj fijo?</h3><p>A distancia radial r de una masa esférica M, un reloj en reposo avanza más despacio que uno muy lejano. Aquí r = R + h. Los relojes deben estar fuera del límite estático.</p><div data-tex>d\tau=\sqrt{1-\frac{r_s}{r}}\,dt,\qquad r_s=\frac{2GM}{c^2}</div></article><article class="eqCard mini"><h3>Una torre en la Tierra</h3><p>Para una diferencia de altura pequeña y un campo débil, el adelanto relativo es proporcional a la altura. A 200 m, el reloj superior gana unos 1.9 ns al día. La diferencia se acumula incluso si luego juntas los relojes.</p><div data-tex>\frac{\Delta\tau_2-\Delta\tau_1}{\Delta\tau_1}\simeq\frac{g(h_2-h_1)}{c^2}</div></article></section><section class="info">        <div class="statusBox" id="gravityStatus">
+          <span>Régimen gravitatorio</span>
+          <strong id="regimeOut">Planeta / estrella</strong>
+          <p id="schwarzOut">rₛ = 8.87 mm · R/rₛ ≫ 1</p>
+        </div>
+        <div class="movieBox" id="movieBox">
+          <span>Escala tipo Interstellar</span>
+          <strong id="movieRatioOut">1 h local → 1.00 h lejos</strong>
+          <p id="movieNote">Activa Gargantúa para rozar el caso 1 h en el planeta = 7 años fuera.</p>
+        </div>
+<article class="eqCard mini"><h3>El caso extremo</h3><p>Gargantúa representa relojes sostenidos a radio fijo en el ecuador, sin orbitar. La rotación cambia el horizonte. En el ecuador el límite estático sigue en el radio de Schwarzschild. Dentro de ese límite un reloj no puede permanecer fijo respecto a las estrellas lejanas.</p><div data-tex>r_+=\frac{GM}{c^2}\left(1+\sqrt{1-\chi^2}\right)</div></article>      <article class="factTable"><h3>Desfase esperado en una torre de 200 m</h3><div class="factRows" id="factRows"></div></article>
     </section>
   </main>
 
@@ -392,12 +376,10 @@
       sec = Math.max(0, sec);
       const years = Math.floor(sec / YEAR_SECONDS);
       const days = Math.floor((sec % YEAR_SECONDS) / 86400);
-      const h = Math.floor(sec / 3600) % 24;
-      const m = Math.floor(sec / 60) % 60;
-      const s = Math.floor(sec % 60);
-      if (years) return `${years} a ${days} d ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-      if (days) return `${days} d ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
-      return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+      const withinYear = Math.floor(sec % YEAR_SECONDS);
+      const hhmmss = [Math.floor(withinYear/3600)%24,Math.floor(withinYear/60)%60,withinYear%60]
+        .map(n=>String(n).padStart(2,"0")).join(":");
+      return years+" a "+String(days).padStart(3,"0")+" d "+hhmmss;
     }
 
     function fmtDateFromTau(tau) {
@@ -453,7 +435,7 @@
       els.regimeOut.textContent = m.blackHole ? "Superficie en el horizonte o en su interior" : state.radiusKm<=m.rsKm ? "Superficie en la ergosfera ecuatorial" : "Superficie exterior al límite estático";
       const ratio = m.rsKm > 0 ? state.radiusKm / m.rsKm : Infinity;
       els.schwarzOut.textContent = `rₛ = ${fmtRadius(m.rsKm)} · R/rₛ = ${ratio >= 1e5 ? formatSci(ratio, 2) : ratio.toFixed(2)}`;
-      els.modePill.textContent = m.blackHole || state.massKg > 1e5 * SOLAR_MASS ? "Entorno: agujero negro" : `Inicio: ${new Intl.DateTimeFormat("es-ES", { dateStyle: "short" }).format(SIM_START)}`;
+      els.modePill.textContent = `Inicio: ${new Intl.DateTimeFormat("es-ES", { dateStyle: "short" }).format(SIM_START)}`;
       if (els.movieRatioOut) els.movieRatioOut.textContent = oneHourLocalFarText(rateAtHeight(0));
       if (els.movieNote) els.movieNote.textContent = state.kerrSpin > 0.9999 ? "Reloj estático ecuatorial muy cerca del límite estático. La órbita de la película es otro modelo." : "La rotación desplaza el horizonte; el ritmo local depende de lo cerca que está el reloj.";
       if (!els.factRows.children.length) updateFactRows();
@@ -612,7 +594,8 @@
       ctx.shadowColor = accent;
       ctx.shadowBlur = 9;
       ctx.font = label === "AÑO" ? "950 24px Consolas, monospace" : "950 25px Consolas, monospace";
-      ctx.fillText(value, x + w / 2, y + 39);
+      ctx.textAlign = "right";
+      ctx.fillText(value, x + w - 10, y + 39);
       ctx.shadowBlur = 0;
     }
 
@@ -631,10 +614,13 @@
       ctx.fillText(title, x + 20, y + 27);
       ctx.fillStyle = "#ffffff";
       ctx.font = "950 22px Consolas, monospace";
-      ctx.fillText(fmtElapsed(tau), x + 20, y + 58);
+      ctx.textAlign = "right";
+      ctx.font = "bold 19px monospace";
+      ctx.fillText(fmtElapsed(tau), x + 308, y + 58);
       drawBackToFutureDate(x + 20, y + 72, tau, accent);
       ctx.fillStyle = "rgba(255,255,255,.70)";
       ctx.font = "800 11px Bahnschrift, Segoe UI, sans-serif";
+      ctx.textAlign = "left";
       ctx.fillText(`desde ${new Intl.DateTimeFormat("es-ES", { dateStyle: "medium" }).format(SIM_START)}`, x + 20, y + 137);
     }
 

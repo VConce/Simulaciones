@@ -10,7 +10,7 @@
     body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.2;background-image:linear-gradient(rgba(31,52,91,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(31,52,91,.08) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at 50% 18%,black,transparent 78%)}
     .page{width:min(1420px,calc(100vw - 28px));margin:18px auto 28px;position:relative}.hero{margin-bottom:16px}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}.title,.panel,.card,.eqGrid article{background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.title{padding:22px 24px}.panel{padding:12px;display:grid;gap:10px}.tag{margin:0 0 9px;color:var(--blue);font-weight:950;text-transform:uppercase;letter-spacing:.08em;font-size:12px}h1{margin:0;font-size:clamp(34px,4vw,58px);line-height:.96;letter-spacing:-.05em}.lead{margin:10px 0 0;color:var(--muted);font-size:17px;line-height:1.42;font-weight:680;max-width:850px}.control{border:1px solid #dde6f3;border-radius:16px;background:rgba(255,255,255,.86);padding:10px}.control label{display:flex;justify-content:space-between;gap:12px;font-weight:950;margin-bottom:8px}.control output{font-variant-numeric:tabular-nums;color:var(--violet)}.control input{width:100%;accent-color:var(--violet);cursor:pointer}.scale{display:flex;justify-content:space-between;color:#718096;font-size:12px;font-weight:800;margin-top:5px}.readGrid{display:grid;grid-template-columns:1fr;gap:8px}.read{border:1px solid #dde6f3;border-radius:18px;background:#fff;padding:12px}.read span{display:block;color:var(--muted);font-weight:850;font-size:12px}.read strong{font-size:22px;color:var(--blue);font-variant-numeric:tabular-nums}.buttons{display:grid;grid-template-columns:1fr;gap:8px}button{border:0;border-radius:15px;padding:11px 12px;font-family:inherit;font-weight:950;cursor:pointer}.primary{color:white;background:linear-gradient(135deg,var(--blue),var(--violet))}.ghost{color:#19233b;background:#edf3ff;border:1px solid #d6e2f1}.card{overflow:hidden;padding:14px}.canvasWrap{background:#020617;border:1px solid #111c35;border-radius:24px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}canvas.dragging{cursor:grabbing}.eqGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}.eqGrid article{padding:16px}.eqGrid h3{margin:0 0 8px}.eqGrid p{margin:7px 0 0;color:var(--muted);font-weight:650;line-height:1.38}.math{font-family:Cambria,Georgia,serif;font-size:22px;color:#111827}.hint{font-size:13px;color:#5d6880;font-weight:750;line-height:1.35;margin:0}.status{border-radius:18px;padding:12px;background:linear-gradient(135deg,#eef8ff,#fff);border:1px solid rgba(11,99,229,.18)}.status b{display:block;color:#0b63e5;font-size:12px;text-transform:uppercase;letter-spacing:.08em}.status p{margin:5px 0 0;color:#43516a;font-weight:760}.legend{display:flex;gap:8px;flex-wrap:wrap}.legend span{border-radius:999px;background:#eef3ff;color:#33415c;padding:6px 8px;font-size:11px;font-weight:900}@media(max-width:980px){.workspace{grid-template-columns:1fr}.eqGrid{grid-template-columns:1fr}.readGrid{grid-template-columns:1fr}}
   .vconceLogo{position:fixed;left:14px;top:14px;width:54px;height:54px;object-fit:contain;z-index:10000;pointer-events:none}@media(max-width:900px){.vconceLogo{width:42px;height:42px;left:10px;top:10px}}/* vconce header clearance */body>header{padding-left:max(88px,env(safe-area-inset-left))!important}@media(max-width:900px){body>header{padding-left:64px!important}}</style>
-<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.lente_gravitacional .workspace{align-items:stretch}.lente_gravitacional .panel{align-content:space-between;gap:6px;padding:8px}.lente_gravitacional .buttons{grid-template-columns:1fr 1fr}.lente_gravitacional .readGrid{grid-template-columns:repeat(auto-fit,minmax(min(215px,100%),1fr));margin-top:8px}.lente_gravitacional .hint{margin-top:6px}.lente_gravitacional .panel .control{padding:7px}.lente_gravitacional .buttons button{padding:6px}</style></head>
 <body>
   <main class="page compact-lab lente_gravitacional">
     <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Lente gravitacional</h1></header><section class="workspace">
@@ -27,23 +27,23 @@
           <div class="scale"><span>×0.35</span><span>×1</span><span>×2.4</span></div>
         </div>
         <div class="control">
-          <label for="fov">Campo de vision <output id="fovOut">1.00x</output></label>
+          <label for="fov">Campo de visión <output id="fovOut">1.00x</output></label>
           <input id="fov" type="range" min="0.65" max="1.8" step="0.01" value="1">
           <div class="scale"><span>cerca</span><span>normal</span><span>amplio</span></div>
         </div>
-        <div class="readGrid">
-          <div class="read"><span>Radio angular de Einstein · S5</span><strong id="thetaOut">82 px</strong></div>
-          <div class="read"><span>Imágenes representadas</span><strong id="imagesOut">0</strong></div>
-        </div>
-        <div class="status"><b>Lectura fisica</b><p id="statusOut">Mueve una estrella cerca del eje lente-observador para ver dos imagenes.</p></div>
-        <div class="legend"><span>Rayos en aproximación de lente delgada</span><span>Linea continua: imagen primaria</span><span>Linea discontinua: imagen secundaria</span><span>Ventana: cielo visto desde la Tierra</span></div>
         <div class="control"><label for="sourceOffset">Separación transversal de S5 <output id="offsetOut"></output></label><input id="sourceOffset" type="range" min="-140" max="140" step="1" value="0"></div>
         <div class="buttons"><button class="primary" id="reset" type="button">Reiniciar</button><button class="ghost" id="align" type="button">Alinear estrella</button></div>
-        <p class="hint">En la vista del observador puedes arrastrar el encabezado para mover la ventana y arrastrar dentro del cielo para mirar alrededor.</p>
       </aside>
     </section>
 
     <div class="lab-intro"><p class="lead">Arrastra estrellas de fondo, el observador Tierra y la ventana de vista. El modelo usa la ecuación de lente delgada para mostrar imagen primaria, imagen secundaria y, en alineación exacta, un anillo de Einstein.</p>
+        <p class="hint">Mueve el recuadro desde el asa superior izquierda. Arrastra un borde o una esquina para cambiar su tamaño, o el interior para explorar el cielo.</p>
+        <div class="readGrid">
+          <div class="read"><span>Radio angular de Einstein · S5</span><strong id="thetaOut">—</strong></div>
+          <div class="read"><span>Imágenes representadas</span><strong id="imagesOut">0</strong></div>
+          <div class="status"><b>Lectura física</b><p id="statusOut"></p></div>
+        </div>
+        <p>La línea continua sigue el rayo de la imagen primaria. La discontinua sigue el de la secundaria.</p>
       </div><section class="eqGrid lab-theory" aria-label="Teoria">
       <article><h3>Ecuación de lente</h3><div class="math" data-tex="">\beta=\theta-\frac{\theta_E^2}{\theta}</div><p>Para una fuente casi alineada con la lente hay dos soluciones: una imagen exterior y otra interior, a lados opuestos del agujero negro.</p></article>
       <article><h3>Radio de Einstein</h3><div class="math" data-tex="">\theta_E=\sqrt{\frac{4GM}{c^2}\frac{D_{ls}}{D_lD_s}}</div><p>Modelo de lente puntual delgada en campo débil. El esquema amplía las distancias transversales. El radio angular de S5 se expresa en segundos de arco.</p></article>
@@ -222,8 +222,7 @@
     ctx.save();
     roundRect(v.x, v.y, v.w, v.h, 18, 'rgba(5,10,25,.92)', 'rgba(141,241,255,.65)');
     roundRect(v.x, v.y, v.w, 34, 18, 'rgba(15,25,55,.95)', 'rgba(255,255,255,.1)');
-    ctx.fillStyle = '#8df1ff'; ctx.font = '950 13px Bahnschrift, Segoe UI, sans-serif'; ctx.textAlign = 'left'; ctx.fillText('Vista del observador: cielo aparente', v.x + 14, v.y + 22);
-    ctx.fillStyle = 'rgba(255,255,255,.72)'; ctx.font = '900 11px Bahnschrift, Segoe UI, sans-serif'; ctx.textAlign = 'right'; ctx.fillText('arrastra aqui', v.x + v.w - 14, v.y + 22);
+    ctx.fillStyle = '#8df1ff'; ctx.font = 'bold 16px system-ui'; ctx.textAlign = 'left'; ctx.fillText('⠿  Cielo del observador', v.x + 14, v.y + 23,v.w-28);
     ctx.beginPath(); ctx.rect(v.x + 12, v.y + 44, v.w - 24, v.h - 58); ctx.clip();
     const sx = (v.w - 24) / (430 * state.fov);
     const sy = (v.h - 58) / (300 * state.fov);
@@ -294,6 +293,14 @@
   }
   function hit(p) {
     const v = state.view;
+    const margin = Math.min(19,6*W/canvas.getBoundingClientRect().width);
+    const right=v.x+v.w, bottom=v.y+v.h;
+    if(p.x>=v.x-margin && p.x<=right+margin && p.y>=v.y-margin && p.y<=bottom+margin){
+      const horiz=Math.abs(p.x-v.x)<=margin?'w':Math.abs(p.x-right)<=margin?'e':'';
+      const vert=Math.abs(p.y-v.y)<=margin?'n':Math.abs(p.y-bottom)<=margin?'s':'';
+      const edge=vert+horiz;
+      if(edge) return {type:'resize',edge,original:{...v},start:p};
+    }
     if (p.x >= v.x && p.x <= v.x + v.w && p.y >= v.y && p.y <= v.y + v.h) {
       return p.y < v.y + 36 ? { type: 'viewMove', dx: p.x - v.x, dy: p.y - v.y } : { type: 'viewPan', x: p.x, y: p.y, startX: v.panX, startY: v.panY };
     }
@@ -309,12 +316,26 @@
     if (state.drag) { canvas.classList.add('dragging'); canvas.setPointerCapture(event.pointerId); }
   });
   canvas.addEventListener('pointermove', event => {
-    if (!state.drag) return;
     const p = pointer(event);
+    if (!state.drag) {
+      const target=hit(p);
+      canvas.style.cursor=target?.type==='resize'?target.edge+'-resize':target?'grab':'default';
+      return;
+    }
     const d = state.drag;
+    canvas.style.cursor=d.type==='resize'?d.edge+'-resize':'grabbing';
+    if(d.type==='resize'){
+      const v=d.original, dx=p.x-d.start.x, dy=p.y-d.start.y;
+      let left=v.x, top=v.y, right=v.x+v.w, bottom=v.y+v.h;
+      if(d.edge.includes('w'))left=clamp(left+dx,8,right-180);
+      if(d.edge.includes('e'))right=clamp(right+dx,left+180,W-8);
+      if(d.edge.includes('n'))top=clamp(top+dy,8,bottom-125);
+      if(d.edge.includes('s'))bottom=clamp(bottom+dy,top+125,H-8);
+      Object.assign(state.view,{x:left,y:top,w:right-left,h:bottom-top});
+    }
     if (d.type === 'star') { state.stars[d.i].x = clamp(p.x, 35, W - 35); state.stars[d.i].y = clamp(p.y, 35, H - 35); }
     if (d.type === 'observer') { state.observer.x = clamp(p.x, 60, W - 60); state.observer.y = clamp(p.y, 60, H - 60); }
-    if (d.type === 'viewMove') { state.view.x = clamp(p.x - d.dx, 16, W - state.view.w - 16); state.view.y = clamp(p.y - d.dy, 16, H - state.view.h - 16); }
+    if (d.type === 'viewMove') { state.view.x = clamp(p.x - d.dx, 8, W - state.view.w - 8); state.view.y = clamp(p.y - d.dy, 8, H - state.view.h - 8); }
     if (d.type === 'viewPan') { state.view.panX = d.startX + (p.x - d.x); state.view.panY = d.startY + (p.y - d.y); }
   });
   function endDrag(event) { if (!state.drag) return; state.drag = null; canvas.classList.remove('dragging'); try { canvas.releasePointerCapture(event.pointerId); } catch {} }

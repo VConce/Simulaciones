@@ -464,7 +464,7 @@
       .pill { white-space: normal; }
     }
   .vconceLogo{position:fixed;left:14px;top:14px;width:54px;height:54px;object-fit:contain;z-index:10000;pointer-events:none}@media(max-width:900px){.vconceLogo{width:42px;height:42px;left:10px;top:10px}}/* vconce header clearance */body>header{padding-left:max(88px,env(safe-area-inset-left))!important}@media(max-width:900px){body>header{padding-left:64px!important}}</style>
-<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.ascensor_einstein .lab-theory article{display:block;background:white;padding:15px;border-radius:14px}.ascensor_einstein .lab-theory h3{margin:0}.ascensor_einstein .lab-theory p{line-height:1.45}</style></head>
 <body>
   <main class="page compact-lab ascensor_einstein">
     <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1 id="title">Ascensor de Einstein</h1></header><section class="lab">
@@ -537,18 +537,7 @@
       </aside>
     </section>
 
-    <div class="lab-intro"><p class="lead">Compara dos situaciones localmente indistinguibles: un ascensor acelerando en el espacio y un laboratorio en reposo dentro de un campo gravitatorio uniforme.</p>
-        <aside class="formulaCard">
-        <small>Idea física</small>
-        <span class="formula" data-tex="">|\vec a|=|\vec g|</span>
-        <p>La trayectoria visible del rayo está amplificada para que el alumnado pueda ver cómo aumenta la curvatura al subir la aceleración o la gravedad.</p>
-      </aside>
-    <p id="subtitle">La cabina acelera hacia arriba; el rayo parece doblarse hacia el suelo.</p>
-          </div><section class="equivalence lab-theory" aria-label="Guía de interpretación">
-      <article class="mini"><span>1</span><h3>Localmente iguales</h3><p>Si el laboratorio es pequeño, una aceleración hacia arriba produce los mismos efectos que una gravedad hacia abajo.</p></article>
-      <article class="mini"><span>2</span><h3>Rayo amplificado</h3><p>Durante el cruce, la luz recorre la anchura del ascensor. La caída se expresa en femtómetros y está ampliada en el dibujo.</p><div data-tex="">t\simeq L/c,\qquad |\Delta y|\simeq\frac{aL^2}{2c^2},\qquad aL/c^2\ll1</div></article>
-      <article class="mini"><span>3</span><h3>Más g, más curva</h3><p>Al aumentar el valor de a o g, el rayo tarda lo mismo en cruzar, pero la cabina o el campo producen mayor desviación aparente.</p></article>
-    </section>
+<section class="lab-theory" aria-label="El principio de equivalencia"><article class="eqCard mini"><h3>¿Por qué llega más abajo?</h3><p>El emisor lanza un pulso horizontal. En un marco inercial que al principio acompaña a la cabina, la luz sigue recta. Durante el cruce, la cabina acelera hacia arriba. La pared intercepta el pulso por debajo de la altura de emisión.</p><div data-tex>t_{\rm cruce}\simeq L/c</div></article><article class="eqCard mini"><h3>La trayectoria desde dentro</h3><p>Tomamos el origen en el emisor y la vertical positiva hacia arriba. Mientras la luz recorre x, la cabina sube aproximadamente la distancia indicada. Duplicar la anchura cuadruplica la caída. El dibujo amplía solo la desviación.</p><div data-tex>y(x)\simeq-\frac{a x^2}{2c^2},\qquad aL/c^2\ll1</div></article><article class="eqCard mini"><h3>¿Y en un planeta?</h3><p>En un laboratorio pequeño sostenido sobre la superficie se obtiene la misma caída local al sustituir a por g. En caída libre desaparece este efecto local. Las diferencias del campo entre puntos alejados limitan la equivalencia.</p><div data-tex>|\Delta y|\simeq\frac{gL^2}{2c^2}</div></article></section>
   </main>
 
   <script>
@@ -557,13 +546,14 @@
     const einsteinFace = new Image();
     einsteinFace.src = "../assets/einstein-face-sprite.png";
     const spaceBackground = new Image();
-    spaceBackground.src = "../assets/elevator-space-stars.png";
+    spaceBackground.src = "ascensor-cielo-vertical.webp";
     const planetBackground = new Image();
     planetBackground.src = "../assets/elevator-planet-mountains-river.png";
 
     const state = {
       mode: "elevator",
       g: 9.81,
+      skyY: 0, skySpeed: 0,
       vConst: 0,
       speed: 1,
       paused: false,
@@ -592,7 +582,6 @@
       sliderLabel: document.getElementById("sliderLabel"),
       pauseBtn: document.getElementById("pauseBtn"),
       resetBtn: document.getElementById("resetBtn"),
-      subtitle: document.getElementById("subtitle"),
       modeBadge: document.getElementById("modeBadge"),
       explainBox: document.getElementById("explainBox")
     };
@@ -660,11 +649,6 @@
       els.modeBadge.textContent = constantVelocityMode
         ? `a = 0, v = ${state.vConst >= 0 ? "+" : ""}${fmt(state.vConst, 2)} c`
         : `${isElevator ? "a" : "g"} = ${fmt(state.g, 2)} m/s²`;
-      els.subtitle.textContent = isElevator
-        ? constantVelocityMode
-          ? "Desde la cabina, el rayo horizontal llega a la misma altura."
-          : "La cabina acelera hacia arriba; el rayo parece doblarse hacia el suelo."
-        : "El laboratorio está sobre un planeta; el fondo cambia, pero la desviación local coincide.";
       els.explainBox.innerHTML = isElevator
         ? constantVelocityMode
           ? "<strong>Velocidad constante.</strong> En la cabina el rayo es horizontal. Desde el exterior inercial, su componente vertical de velocidad coincide con la de la cabina. Ambos observadores miden c."
@@ -679,13 +663,11 @@
     }
 
     function backgroundSpace() {
-      if (drawCoverImage(spaceBackground)) {
-        const shade = ctx.createRadialGradient(640, 330, 80, 640, 330, 520);
-        shade.addColorStop(0, "rgba(0,0,0,.18)");
-        shade.addColorStop(.55, "rgba(4,8,20,.08)");
-        shade.addColorStop(1, "rgba(0,0,0,.22)");
-        ctx.fillStyle = shade;
-        ctx.fillRect(0, 0, 1280, 720);
+      if (spaceBackground.complete && spaceBackground.naturalWidth) {
+        const tileHeight = Math.ceil(1280 * spaceBackground.naturalHeight / spaceBackground.naturalWidth);
+        const offset = ((state.skyY % tileHeight) + tileHeight) % tileHeight;
+        for(let y=Math.round(offset)-tileHeight; y<720; y+=tileHeight)
+          ctx.drawImage(spaceBackground,0,y,1280,tileHeight);
         return;
       }
       const gradient = ctx.createLinearGradient(0, 0, 0, 720);
@@ -918,8 +900,9 @@
     }
 
     function drawElevator() {
-      const bob = state.mode === "elevator" ? (Math.abs(state.g) >= 0.005 ? Math.sin(state.t * 2.3) * 8 : 0) : Math.sin(state.t * 0.8) * 1.5;
-      const e = { x: 345, y: 105 + bob, w: 590, h: 500 };
+      const widthM = Number(document.getElementById("cabinWidth").value);
+      const w = 116 + widthM*225;
+      const e = { x:(1280-w)/2, y:105, w, h:500 };
 
       ctx.save();
       ctx.shadowColor = "rgba(0,0,0,.42)";
@@ -989,10 +972,10 @@
     }
 
     function beamPoint(e, t) {
-      const sag = 175 * (state.g / 25) * (Number(document.getElementById("cabinWidth").value) / 4) ** 2;
+      const sag = 228 * (state.g / 25) * (Number(document.getElementById("cabinWidth").value) / 4) ** 2;
       const startX = e.x + 38;
       const endX = e.x + e.w - 38;
-      const startY = e.y + 232;
+      const startY = e.y + 197;
       return {
         x: startX + (endX - startX) * t,
         y: startY + sag * t * t
@@ -1000,7 +983,7 @@
     }
 
     function drawBeam(e) {
-      const sag = 175 * (state.g / 25) * (Number(document.getElementById("cabinWidth").value) / 4) ** 2;
+      const sag = 228 * (state.g / 25) * (Number(document.getElementById("cabinWidth").value) / 4) ** 2;
       const start = beamPoint(e, 0);
       const end = beamPoint(e, 1);
 
@@ -1064,7 +1047,7 @@
 
       ctx.save();
       const labelText = Math.abs(state.g) < 0.005 && state.mode === "elevator" ? "rayo horizontal en la cabina" : "si a = g = 0, el rayo es recto";
-      const labelX = e.x + e.w + 24;
+      const labelX = Math.min(994,e.x + e.w + 24);
       const labelY = start.y - 58;
       fillRoundRect(labelX, labelY, 274, 40, 16, state.mode === "elevator" ? "rgba(6,18,38,.78)" : "rgba(255,255,255,.78)", state.mode === "elevator" ? "rgba(97,219,255,.55)" : "rgba(43,91,130,.28)", 2);
       ctx.font = "900 17px Bahnschrift, Segoe UI, sans-serif";
@@ -1103,7 +1086,14 @@
 
     let lastFrame=performance.now();
     function render(now) {
-      if (!state.paused) state.t += Math.min(.1,(now-lastFrame)/1000)*state.speed;
+      if (!state.paused) {
+        const dt = Math.min(.1,(now-lastFrame)/1000)*state.speed;
+        state.t += dt;
+        if (state.mode === "elevator") {
+          state.skySpeed = state.g ? Math.min(200,state.skySpeed + state.g*dt*2) : state.vConst*230;
+          state.skyY += state.skySpeed*dt;
+        }
+      }
       lastFrame=now;
       if (state.mode === "elevator") backgroundSpace();
       else backgroundPlanet();
@@ -1140,7 +1130,7 @@
     els.resetBtn.addEventListener("click", () => {
       state.mode = "elevator";
       state.g = 9.81;
-      document.getElementById("cabinWidth").value=2; state.t=0;
+      document.getElementById("cabinWidth").value=2; state.t=0; state.skySpeed=0; state.skyY=0;
       state.vConst = 0;
       state.speed = 1;
       state.paused = false;
