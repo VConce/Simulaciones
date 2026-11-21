@@ -14,16 +14,16 @@
 button, input[type=range], select {min-height:44px}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #1768a3;outline-offset:3px}
 @media(max-width:680px){main{max-width:100%}.grid,.scenes,.readGrid,.metrics,.eqGrid,.top{min-width:0}.hero,.panel,.control,.card{min-width:0}canvas{max-width:100%}.vconceLogo{position:static!important;display:block;margin:9px 12px 0;width:38px;height:38px}}
-</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.frame-picker{margin-left:auto;display:flex;align-items:center;gap:6px;font-weight:650}.frame-picker select{border:1px solid #b8c9db;border-radius:8px;background:white;color:#192d40;padding:0 8px;font:inherit}.reloj_einstein .metrics{grid-template-columns:repeat(auto-fit,minmax(min(125px,45%),1fr))}@media(max-width:520px){.frame-picker{display:grid;gap:0;font-size:.8rem}.frame-picker select{font-size:.95rem}}</style></head>
 <body>
   <main class="page compact-lab reloj_einstein">
-    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Reloj de Einstein</h1></header><div class="experiment-layout"><section class="card">
-      <div class="canvasWrap"><canvas id="sim" width="1200" height="585"></canvas></div>
-      <div class="metrics" aria-label="Lecturas de la simulacion">
+    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Reloj de Einstein</h1><label class="frame-picker">Ver desde <select id="reference"><option value="ground">Suelo</option><option value="clock">Propio reloj</option></select></label></header><div class="experiment-layout"><section class="card">
+      <div class="canvasWrap"><canvas id="sim" width="960" height="450" role="img" aria-label="Trayectoria del pulso entre los dos espejos"></canvas></div>
+      <div class="metrics" aria-label="Lecturas de la simulación">
         <div class="metric"><span>Factor gamma</span><strong id="gammaOut">1.25</strong></div>
-        <div class="metric"><span>Periodo en el laboratorio</span><strong id="periodOut">2.50 ns</strong></div>
-        <div class="metric green"><span>Toques reposo</span><strong id="leftHitsOut">0</strong></div>
-        <div class="metric green"><span>Toques movimiento</span><strong id="rightHitsOut">0</strong></div>
+        <div class="metric"><span>Periodo desde el suelo</span><strong id="periodOut">2.50 ns</strong></div>
+        <div class="metric green"><span>Periodo propio</span><strong>2.00 ns</strong></div>
+        <div class="metric green"><span>Rebotes del pulso</span><strong id="rightHitsOut">0</strong></div>
       </div>
     </section>
 
@@ -34,11 +34,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
           <button type="button" id="pauseAnimation" class="primaryButton">Pausar</button><button type="button" id="resetClock">Poner a cero</button><div class="scale"><span>0 c</span><span>0.5 c</span><span>0.99 c</span></div>
         </div>
       </aside>
-    </div><div class="lab-intro"><p class="lead">A la izquierda, el reloj en su propio marco. A la derecha, Einstein observa el mismo reloj desplazarse: la luz sigue una trayectoria diagonal y el ritmo observado se dilata por el factor gamma.</p>
+    </div><div class="lab-intro"><p class="lead">Desde el propio reloj, el pulso sube y baja por la misma vertical. Desde el suelo, los espejos avanzan mientras la luz viaja entre ellos y el pulso dibuja un zigzag. En ambos casos la luz viaja a c. Pausa la animación y cambia de vista para comparar el mismo instante del recorrido.</p>
       </div><section class="eqGrid lab-theory" aria-label="Teoria">
       <article><h3>Tiempo propio</h3><div class="math" data-tex="">\Delta\tau=\frac{2L_0}{c}</div><p>Con espejos separados 0.299792458 m, el periodo propio de ida y vuelta es 2.00 ns. Cada toque cuenta medio periodo.</p></article>
       <article><h3>Dilatación temporal</h3><div class="math" data-tex="">\Delta t=\gamma\,\Delta\tau</div><p>En el laboratorio, la componente horizontal de la velocidad de la luz es v y la vertical es c/γ. El módulo sigue siendo c.</p></article>
-      <article><h3>Factor gamma</h3><div class="math" data-tex="">\gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>Cuando v se aproxima a c, el reloj movil parece latir mas despacio.</p></article>
+      <article><h3>Factor gamma</h3><div class="math" data-tex="">\gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>Cuando v se aproxima a c, el tiempo entre dos retornos de la luz al mismo espejo aumenta en el marco del suelo.</p></article>
     </section>
   </main>
 <script>
@@ -52,18 +52,18 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     clock: img('../assets/reloj-light-clock-frame.png'),
     space: img('../assets/reloj-space-background.png')
   };
-  const panels = {
-    rest: { x: 28, y: 54, w: 302, h: 480, title: 'Reloj en reposo', accent: 'rgba(55,215,255,.82)' },
-    moving: { x: 356, y: 54, w: 816, h: 480, title: 'Reloj visto por Einstein', accent: 'rgba(112,72,255,.82)' }
-  };
+  const reference = document.getElementById('reference');
   const HALF_PERIOD = 0.9;
-  const PROPER_PERIOD_NS = 2.0;
-  const state = { t: 0, proper:0, distance:0, last: performance.now(), trail: [], lastRightBounce: -1, lastWrap: -1 };
-
+  const PROPER_PERIOD_NS = 2;
+  const height = 300;
+  const spacing = height * .73;
+  const cPixels = spacing / HALF_PERIOD;
+  let proper = 0, distance = 0, last = performance.now();
+  // Store reflection events in ground coordinates, independent of the camera.
+  let reflections = [{x:0, top:false}];
   function img(src) { const im = new Image(); im.src = src; return im; }
   function beta() { return Number(vSlider.value); }
   function gamma() { const b = beta(); return 1 / Math.sqrt(1 - b * b); }
-  function clipPanel(s) { ctx.beginPath(); ctx.roundRect(s.x, s.y, s.w, s.h, 24); ctx.clip(); }
   function drawCover(im, x, y, w, h, offset = 0) {
     if (!im.complete || !im.naturalWidth) {
       const g = ctx.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, '#020617'); g.addColorStop(1, '#0b1430'); ctx.fillStyle = g; ctx.fillRect(x, y, w, h); return;
@@ -73,12 +73,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     let start = x + ((-offset % dw) + dw) % dw - dw;
     const baseY = y + (h - dh) / 2;
     for (; start < x + w + dw; start += dw) ctx.drawImage(im, start, baseY, dw, dh);
-  }
-  function drawPanel(s, moving = false) {
-    ctx.save(); clipPanel(s); drawCover(assets.space, s.x, s.y, s.w, s.h, moving ? state.t * (12 + beta() * 45) : 0); ctx.restore();
-    ctx.strokeStyle = s.accent; ctx.lineWidth = 3; ctx.beginPath(); ctx.roundRect(s.x, s.y, s.w, s.h, 24); ctx.stroke();
-    ctx.fillStyle = 'rgba(4,10,24,.78)'; ctx.beginPath(); ctx.roundRect(s.x + 16, s.y + 14, Math.min(285, s.w - 32), 38, 14); ctx.fill();
-    ctx.fillStyle = '#fff'; ctx.font = '950 16px Bahnschrift, Segoe UI, sans-serif'; ctx.textAlign = 'left'; ctx.fillText(s.title, s.x + 30, s.y + 39);
   }
   function drawSprite(im, cx, bottom, h) {
     if (!im.complete || !im.naturalWidth) return;
@@ -109,87 +103,60 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     ctx.fillStyle = '#43f86e'; ctx.beginPath(); ctx.arc(x, y, 9.5, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
-  function drawCounter(s, label, value, x, y) {
-    ctx.save();
-    ctx.fillStyle = 'rgba(4,10,24,.84)'; ctx.beginPath(); ctx.roundRect(x, y, 190, 60, 16); ctx.fill();
-    ctx.strokeStyle = 'rgba(69,243,106,.55)'; ctx.lineWidth = 1.5; ctx.stroke();
-    ctx.fillStyle = '#b9f8ff'; ctx.font = '900 11px Bahnschrift, Segoe UI, sans-serif'; ctx.fillText(label, x + 14, y + 22);
-    ctx.fillStyle = '#45f36a'; ctx.font = '950 28px Consolas, monospace'; ctx.fillText(String(value).padStart(3, '0'), x + 14, y + 50);
-    ctx.restore();
-  }
-  function drawRestClock() {
-    const s = panels.rest;
-    const b = bounce(state.t);
-    const g = drawClockFrame(s.x + s.w / 2, s.y + 253, 315);
-    const y = g.bottom - b.p * (g.bottom - g.top);
-    ctx.save(); ctx.strokeStyle = 'rgba(69,243,106,.46)'; ctx.lineWidth = 4; ctx.setLineDash([9, 10]);
-    ctx.beginPath(); ctx.moveTo(g.center, g.bottom); ctx.lineTo(g.center, g.top); ctx.stroke(); ctx.restore();
-    drawGreenBall(g.center, y);
-    drawCounter(s, 'Toques', b.hit, s.x + 55, s.y + s.h - 82);
-    return b.hit;
-  }
-  function drawMovingClock() {
-    const s = panels.moving;
-    const b = beta(); const gma = gamma();
-    // In this drawing c is one mirror spacing per rest-frame half period.
-    const startX = s.x + 255;
-    const travel = s.w - 380;
-    const wrap = Math.floor(state.distance / travel);
-    const cx = startX + (state.distance % travel);
-    const proper = state.proper;
-    const bo = bounce(proper);
-    if (bo.hit !== state.lastRightBounce || wrap !== state.lastWrap) {
-      state.trail = [];
-      state.lastRightBounce = bo.hit;
-      state.lastWrap = wrap;
+  function advance(dt) {
+    const rate = 1 / gamma(), speed = beta() * cPixels;
+    const next = proper + dt * rate;
+    const hit = Math.floor(next / HALF_PERIOD);
+    if (hit > Math.floor(proper / HALF_PERIOD)) {
+      const untilHit = (hit * HALF_PERIOD - proper) / rate;
+      reflections.push({x:distance + speed * untilHit, top:hit % 2 === 1});
     }
-    const g = drawClockFrame(cx, s.y + 260, 315);
-    const y = g.bottom - bo.p * (g.bottom - g.top);
-    if(!window.simPaused)state.trail.push({ x: g.center, y });
-    if (state.trail.length > 120) state.trail.shift();
-    ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    for (let i = 1; i < state.trail.length; i++) {
-      const a = i / state.trail.length;
-      ctx.strokeStyle = `rgba(80,255,115,${0.03 + Math.pow(a, 1.55) * 0.62})`;
-      ctx.lineWidth = 1.4 + Math.pow(a, 1.25) * 5.1;
-      ctx.beginPath(); ctx.moveTo(state.trail[i-1].x, state.trail[i-1].y); ctx.lineTo(state.trail[i].x, state.trail[i].y); ctx.stroke();
-    }
-    ctx.restore();
-    drawGreenBall(g.center, y);
-    drawCounter(s, 'Toques movil', bo.hit, s.x + s.w - 220, s.y + s.h - 82);
-    return bo.hit;
-  }
-  function drawFrameTitles() {
-    ctx.fillStyle = '#eaf1ff'; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = '#172033'; ctx.font = '950 21px Bahnschrift, Segoe UI, sans-serif'; ctx.textAlign = 'left';
-    ctx.fillText('1. El reloj en su propio marco', 38, 33);
-    ctx.fillText('2. Einstein observa desde fuera', 366, 33);
-  }
-  function updateReadouts(leftHits, rightHits) {
-    const b = beta(), g = gamma();
-    document.getElementById('vOut').textContent = `${b.toFixed(2)} c`;
-    document.getElementById('gammaOut').textContent = g.toFixed(2);
-    document.getElementById('periodOut').textContent = `${(PROPER_PERIOD_NS * g).toFixed(2)} ns`;
-    document.getElementById('leftHitsOut').textContent = leftHits;
-    document.getElementById('rightHitsOut').textContent = rightHits;
+    distance += speed * dt;
+    proper = next;
+    // Keep the path bounded even at rest.
+    if (reflections.length > 120) reflections.shift();
   }
   function draw() {
-    drawFrameTitles();
-    drawPanel(panels.rest, false);
-    drawPanel(panels.moving, true);
-    const leftHits = drawRestClock();
-    drawSprite(assets.einstein, panels.moving.x + 98, panels.moving.y + panels.moving.h - 18, 255);
-    const rightHits = drawMovingClock();
-    updateReadouts(leftHits, rightHits);
+    const ground = reference.value === 'ground';
+    const cx = ground ? Math.min(W * .65, W * .24 + distance) : W / 2;
+    const groundOrigin = cx - distance;
+    const g = clockGeometry(cx, H * .51, height);
+    const pulse = bounce(proper);
+    const y = g.bottom - pulse.p * spacing;
+    drawCover(assets.space, 0, 0, W, H, ground ? W * .24 - groundOrigin : distance);
+    if (ground) drawSprite(assets.einstein, groundOrigin - 116, H - 10, 160);
+    drawClockFrame(cx, H * .51, height);
+    ctx.save();
+    ctx.lineWidth = 5; ctx.strokeStyle = '#70ff99'; ctx.lineJoin = 'round';
+    ctx.setLineDash([9, 5]); ctx.beginPath();
+    reflections.forEach((event, i) => {
+      const x = ground ? groundOrigin + event.x : cx;
+      const mirrorY = event.fraction != null ? g.bottom - event.fraction * spacing : event.top ? g.top : g.bottom;
+      if (i === 0) ctx.moveTo(x, mirrorY); else ctx.lineTo(x, mirrorY);
+    });
+    ctx.lineTo(cx, y); ctx.stroke(); ctx.restore();
+    drawGreenBall(cx, y);
+    document.getElementById('vOut').textContent = beta().toFixed(2) + ' c';
+    document.getElementById('gammaOut').textContent = gamma().toFixed(2);
+    document.getElementById('periodOut').textContent = (PROPER_PERIOD_NS * gamma()).toFixed(2) + ' ns';
+    document.getElementById('rightHitsOut').textContent = pulse.hit;
   }
   function frame(now) {
-    const dt = Math.min(.05, (now - state.last) / 1000);
-    state.last = now;
-    if(!window.simPaused){state.t+=dt;state.proper+=dt/gamma();state.distance+=dt*beta()*(315*.73/HALF_PERIOD);}
+    const dt = Math.min(.05, (now - last) / 1000);
+    last = now;
+    if (!window.simPaused) advance(reference.value === 'clock' ? dt * gamma() : dt);
     draw(); requestAnimationFrame(frame);
   }
-  document.getElementById('resetClock').addEventListener('click',()=>{state.t=0;state.proper=0;state.distance=0;state.trail=[];state.last=performance.now()});
-  vSlider.addEventListener('input', () => { state.trail = []; state.lastRightBounce = -1; });
+  document.getElementById('resetClock').addEventListener('click', () => {
+    proper = 0; distance = 0; last = performance.now();
+    reflections = [{x:0, top:false}]; draw();
+  });
+  vSlider.addEventListener('input', () => {
+    // A speed change starts a new straight segment at the current pulse event.
+    const p = bounce(proper).p;
+    reflections.push({x:distance, fraction:p});
+    if (reflections.length > 120) reflections.shift();
+  });
   requestAnimationFrame(frame);
 })();
 </script><script>document.getElementById("pauseAnimation").addEventListener("click",function(){window.simPaused=!window.simPaused;this.textContent=window.simPaused?"Reanudar":"Pausar";});</script>

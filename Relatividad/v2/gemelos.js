@@ -49,7 +49,7 @@
     afterButton.setAttribute('aria-pressed',String(atTurn&&inbound));
     write('turn-note','Cambio de hora asignada: '+duration(2*beta*distance)+'. El reloj de la nave marca '+duration(turn*properRate)+' a ambos lados del giro.');
     write('phase',home?'Reencuentro en la Tierra':atTurn?(inbound?'Giro · comienzo de la vuelta':'Giro · final de la ida'):inbound?'Vuelta hacia la Tierra':t===0?'Salida desde la Tierra':'Ida hacia la estrella');
-    const span=76, shipX=shipView?88:12+span*leg;
+    const span=76, shipX=shipView?50:12+span*leg;
     const earthX=shipView?shipX-span*leg:12, starX=earthX+span;
     get('rocket').style.left=shipX+'%';
     scene.style.setProperty('--earth-x',earthX+'%');
