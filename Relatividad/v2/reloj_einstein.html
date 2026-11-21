@@ -22,7 +22,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <div class="metrics" aria-label="Lecturas de la simulación">
         <div class="metric"><span>Factor gamma</span><strong id="gammaOut">1.25</strong></div>
         <div class="metric"><span>Periodo desde el suelo</span><strong id="periodOut">2.50 ns</strong></div>
-        <div class="metric green"><span>Periodo propio</span><strong>2.00 ns</strong></div>
+        <div class="metric green"><span>Periodo propio (Lorentz)</span><strong>2.00 ns</strong></div>
         <div class="metric green"><span>Rebotes del pulso</span><strong id="rightHitsOut">0</strong></div>
       </div>
     </section>
@@ -36,7 +36,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       </aside>
     </div><div class="lab-intro"><p class="lead">Desde el propio reloj, el pulso sube y baja por la misma vertical. Desde el suelo, los espejos avanzan mientras la luz viaja entre ellos y el pulso dibuja un zigzag. En ambos casos la luz viaja a c. Pausa la animación y cambia de vista para comparar el mismo instante del recorrido.</p>
       </div><section class="eqGrid lab-theory" aria-label="Teoria">
-      <article><h3>Tiempo propio</h3><div class="math" data-tex="">\Delta\tau=\frac{2L_0}{c}</div><p>Con espejos separados 0.299792458 m, el periodo propio de ida y vuelta es 2.00 ns. Cada toque cuenta medio periodo.</p></article>
+      <article><h3>¿Qué mide Lorentz?</h3><div class="math" data-tex="">\Delta\tau=\frac{2L_0}{c}</div><p>Lorentz viaja sentado junto al espejo inferior. Cuando el pulso sale de ese espejo y regresa a él, los dos sucesos ocurren en el mismo lugar en su marco. Su reloj mide el periodo propio, 2.00 ns para una separación de 0.299792458 m. Una vez agarrado, Einstein viaja con Lorentz y mide el mismo periodo.</p></article>
       <article><h3>Dilatación temporal</h3><div class="math" data-tex="">\Delta t=\gamma\,\Delta\tau</div><p>En el laboratorio, la componente horizontal de la velocidad de la luz es v y la vertical es c/γ. El módulo sigue siendo c.</p></article>
       <article><h3>Factor gamma</h3><div class="math" data-tex="">\gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>Cuando v se aproxima a c, el tiempo entre dos retornos de la luz al mismo espejo aumenta en el marco del suelo.</p></article>
     </section>
@@ -48,8 +48,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   const vSlider = document.getElementById('v');
   const W = canvas.width, H = canvas.height;
   const assets = {
-    einstein: img('../assets/reloj-einstein-back-sprite.png'),
-    space: img('../assets/reloj-space-background.png')
+    face: img('../assets/einstein-face-sprite.png'),
+    lorentz: img('lorentz-sentado.webp'),
+    space: img('reloj-panorama.webp')
   };
   const reference = document.getElementById('reference');
   const HALF_PERIOD = 0.9;
@@ -58,6 +59,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   const spacing = height * .73;
   const cPixels = spacing / HALF_PERIOD;
   let proper = 0, distance = 0, last = performance.now();
+  let approach = 0, skyOffset = 0, animationTime = 0;
   // Store reflection events in ground coordinates, independent of the camera.
   let reflections = [{x:0, top:false}];
   function img(src) { const im = new Image(); im.src = src; return im; }
@@ -69,14 +71,57 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     }
     const scale = Math.max(w / im.naturalWidth, h / im.naturalHeight);
     const dw = im.naturalWidth * scale, dh = im.naturalHeight * scale;
-    let start = x + ((-offset % dw) + dw) % dw - dw;
     const baseY = y + (h - dh) / 2;
-    for (; start < x + w + dw; start += dw) ctx.drawImage(im, start, baseY, dw, dh);
+    // Alternate the orientation so both ends meet their exact edge pixels.
+    const first = Math.floor(offset / dw);
+    for (let tile = first; x + tile * dw - offset < x + w; tile++) {
+      const left = Math.round(x + tile * dw - offset);
+      const right = Math.round(x + (tile + 1) * dw - offset);
+      const flipped = tile % 2 !== 0;
+      ctx.save(); ctx.translate(flipped ? right : left, baseY);
+      ctx.scale(flipped ? -1 : 1, 1);
+      ctx.drawImage(im, 0, 0, right - left, dh); ctx.restore();
+    }
   }
-  function drawSprite(im, cx, bottom, h) {
-    if (!im.complete || !im.naturalWidth) return;
-    const w = h * im.naturalWidth / im.naturalHeight;
-    ctx.drawImage(im, cx - w / 2, bottom - h, w, h);
+  function drawMeteor() {
+    const span = W + 200;
+    const progress = ((160 + skyOffset * 1.7 + animationTime * 31) % span) / span;
+    const x = W + 82 - progress * span, y = 24 + progress * 72;
+    const trail = ctx.createLinearGradient(x, y, x + 39, y - 4);
+    trail.addColorStop(0, '#eacdab'); trail.addColorStop(1, 'transparent');
+    ctx.fillStyle = trail; ctx.beginPath(); ctx.moveTo(x - 2, y);
+    ctx.lineTo(x + 39, y - 4); ctx.lineTo(x + 3, y + 1.5); ctx.fill();
+    ctx.fillStyle = '#decbb6'; ctx.beginPath(); ctx.arc(x, y, 2, 0, Math.PI * 2); ctx.fill();
+  }
+  function limb(points, color, width) {
+    ctx.beginPath(); ctx.lineWidth = width; ctx.strokeStyle = color;
+    ctx.moveTo(...points[0]); for (const p of points.slice(1)) ctx.lineTo(...p);
+    ctx.stroke();
+  }
+  function drawEinstein(g) {
+    const t = Math.min(1, approach / 1.65);
+    const remaining = (1 - t) ** 2;
+    const stride = Math.sin(approach * 15) * (1 - t);
+    // The origin is the gripping hand, which stays on the lower mirror.
+    ctx.save();
+    ctx.translate(g.center - 31 - 163 * remaining, g.bottom + 11 + 36 * remaining + Math.abs(stride) * 3);
+    ctx.rotate(.12 + Math.sin(animationTime * 3) * (.035 + .055 * beta()) * t);
+    ctx.lineJoin = ctx.lineCap = 'round';
+    for (const side of [-1, 1]) {
+      const knee = [-14 + side * (5 + stride * 11), 53 - side * stride * 4];
+      const foot = [-18 + side * (7 + stride * 17), 64 - side * stride * 5];
+      limb([[-13 + side * 3, 42], knee, foot], '#565568', 6);
+      limb([foot, [foot[0] + 5, foot[1] + 1]], '#302c35', 5);
+    }
+    limb([[-14,29],[-13,42]], '#a78162', 15);
+    limb([[-19,29],[-26,35],[-28 - stride * 7,29]], '#ba916d', 5);
+    const reach = Math.max(0, Math.min(1, (t - .55) / .45));
+    const handX = (1 - reach) * (4 + 5 * stride);
+    const handY = 2 + (1 - reach) * (23 - 6 * stride);
+    limb([[-8,27],[-3,17 + 14 * (1 - reach)],[handX,handY]], '#c39a74', 6);
+    if (assets.face.complete && assets.face.naturalWidth) ctx.drawImage(assets.face,-29,6,26,26);
+    limb([[handX,handY+1],[handX+1,handY-2]], '#f5cc9d', 5);
+    ctx.restore();
   }
   function clockGeometry(cx, cy, h) {
     const w = h * 260 / 440;
@@ -129,9 +174,16 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     const g = clockGeometry(cx, H * .51, height);
     const pulse = bounce(proper);
     const y = g.bottom - pulse.p * spacing;
-    drawCover(assets.space, 0, 0, W, H, ground ? W * .24 - groundOrigin : distance);
-    if (ground) drawSprite(assets.einstein, groundOrigin - 116, H - 10, 160);
+    drawCover(assets.space, 0, 0, W, H, skyOffset);
+    drawMeteor();
+    if (assets.lorentz.complete && assets.lorentz.naturalWidth) {
+      const h = 82, w = h * assets.lorentz.naturalWidth / assets.lorentz.naturalHeight;
+      const right = cx - 47, base = g.bottom + 8;
+      ctx.fillStyle = '#71879a'; ctx.fillRect(right - w, base, w + 5, 4);
+      ctx.drawImage(assets.lorentz, right - w, base - h, w, h);
+    }
     drawClockFrame(cx, H * .51, height);
+    drawEinstein(g);
     ctx.save();
     ctx.lineWidth = 5; ctx.strokeStyle = '#70ff99'; ctx.lineJoin = 'round';
     ctx.setLineDash([]); ctx.beginPath();
@@ -153,11 +205,18 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   function frame(now) {
     const dt = Math.min(.05, (now - last) / 1000);
     last = now;
-    if (!window.simPaused) advance(reference.value === 'clock' ? dt * gamma() : dt);
+    if (!window.simPaused) {
+      const b = beta();
+      animationTime += dt;
+      if (b > 0 || approach > 0) approach = Math.min(1.65, approach + dt);
+      skyOffset += dt * b * (50 + 185 * b * b) * (reference.value === 'clock' ? 1 : .68);
+      advance(reference.value === 'clock' ? dt * gamma() : dt);
+    }
     draw(); requestAnimationFrame(frame);
   }
   document.getElementById('resetClock').addEventListener('click', () => {
     proper = 0; distance = 0; last = performance.now();
+    approach = 0; skyOffset = 0; animationTime = 0;
     reflections = [{x:0, top:false}]; draw();
   });
   vSlider.addEventListener('input', () => {
