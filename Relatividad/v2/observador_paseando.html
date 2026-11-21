@@ -15,7 +15,20 @@
 button, input[type=range], select {min-height:44px}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #1768a3;outline-offset:3px}
 @media(max-width:680px){main{max-width:100%}.grid,.scenes,.readGrid,.metrics,.eqGrid,.top{min-width:0}.hero,.panel,.control,.card{min-width:0}canvas{max-width:100%}.vconceLogo{position:static!important;display:block;margin:9px 12px 0;width:38px;height:38px}}
-</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js?v=estrellas"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css?v=escenas-juntas"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.simControls .role-swap{background:#fff;color:#154564;border:1px solid #92acc3;border-radius:12px;font-weight:700;cursor:pointer}</style></head>
+</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js?v=estrellas"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css?v=escenas-juntas"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.simControls .role-swap{background:#fff;color:#154564;border:1px solid #92acc3;border-radius:12px;font-weight:700;cursor:pointer}
++.scene-time-pair {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:3px 3px 0;container-type:inline-size}
++.scene-times {margin:0;padding:6px 9px;border-radius:12px;background:#111d32;color:white}
++.scene-times > div {display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:0 6px;padding:3px 0}
++.scene-times > div + div {border-top:1px solid #384761}
++.scene-times dt {display:flex;align-items:center;gap:5px;font-size:.84rem}
++.scene-times img {width:26px;height:26px;flex:none;object-fit:contain}
++.scene-times dd {margin:0;font:700 1rem/1.2 ui-monospace,monospace;white-space:nowrap}
++@container (max-width:560px) {
++  .scene-times > div {grid-template-columns:1fr}
++  .scene-times dt {font-size:.75rem}
++  .scene-times dd {margin-left:31px}
++}
++</style></head>
 <body>
   <main class="page compact-lab observador_paseando">
     <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Observador paseando</h1></header><section class="card">
@@ -23,6 +36,16 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
         <div class="canvasWrap">
           <canvas id="sim" width="1124" height="600" role="img" aria-label="Escenas contiguas de las dos emisiones desde los marcos de Galileo y Einstein"></canvas>
           <button id="restartOverlay" class="restartOverlay" type="button" hidden>Reiniciar</button>
+          <div class="scene-time-pair">
+            <dl class="scene-times" aria-label="Tiempos en el marco de la playa">
+              <div><dt><img src="../assets/observador-star-orange-real.png" alt="">Hasta la naranja</dt><dd class="first-countdown">3.0 s</dd></div>
+              <div><dt><img src="../assets/observador-star-blue-real.png" alt="">De naranja a azul</dt><dd id="beach-interval">0.00 s</dd></div>
+            </dl>
+            <dl class="scene-times" aria-label="Tiempos en el marco del caminante">
+              <div><dt><img src="../assets/observador-star-orange-real.png" alt="">Hasta la naranja</dt><dd class="first-countdown">3.0 s</dd></div>
+              <div><dt><img src="../assets/observador-star-blue-real.png" alt="">De naranja a azul</dt><dd id="walker-interval">0.00 s</dd></div>
+            </dl>
+          </div>
         </div>
         <div class="simControls" aria-label="Controles de reproduccion y velocidad">
           <button type="button" id="pauseAnimation" class="primaryButton">Iniciar</button>
@@ -43,7 +66,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
             <div class="scale"><span>1 a.l.</span><span>100 a.l.</span><span>10 000 a.l.</span></div>
           </div>
           <div class="distanceRead"><span>Distancia a los observadores</span><strong id="observerDistanceOut">21.0 años luz</strong></div>
-          <div class="speedDelta"><span id="deltaLabel">Desfase medido por Einstein</span><strong id="inlineDeltaOut">0.00 s</strong></div>
         </div>
       </div>
       <div class="readoutPanel" aria-label="Lecturas de la simulacion">
@@ -66,7 +88,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   const ctx = canvas.getContext('2d');
   const restartButton = document.getElementById('restartOverlay');
   const restartPanel = document.getElementById('restartPanel');
-  const inlineDeltaOut = document.getElementById('inlineDeltaOut');
+  const countdowns = document.querySelectorAll('.first-countdown');
+  const walkerInterval = document.getElementById('walker-interval');
   const vSlider = document.getElementById('v');
   const speedValue = document.getElementById('speedValue');
   const speedUnit = document.getElementById('speedUnit');
@@ -187,13 +210,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   function starPositions(s) {
     return [{ x: s.x + 142, y: s.y + 118, im: assets.blueStar, tint: '#8fd3ff', label: 'azul' }, { x: s.x + s.w - 142, y: s.y + 118, im: assets.yellowStar, tint: '#ff9b3a', label: 'naranja' }];
   }
-  function drawCountdown(s, timeToFirst, activeText) {
-    ctx.save();
-    ctx.fillStyle = 'rgba(4,10,24,.80)'; ctx.beginPath(); ctx.roundRect(s.x + s.w - 154, s.y + 14, 130, 56, 16); ctx.fill();
-    ctx.fillStyle = '#8df1ff'; ctx.font = '900 11px Bahnschrift, Segoe UI, sans-serif'; ctx.textAlign = 'center'; ctx.fillText(activeText, s.x + s.w - 89, s.y + 32);
-    ctx.fillStyle = '#fff'; ctx.font = '950 27px Consolas, monospace'; ctx.fillText(`${Math.max(0, timeToFirst).toFixed(1)} s`, s.x + s.w - 89, s.y + 59);
-    ctx.restore();
-  }
   function drawFastClock(s, firstTime, secondTime) {
     if (physicalDelaySeconds() <= 5 || state.t < firstTime + .2 || state.t >= secondTime) return;
     const fadeIn = Math.min(1, (state.t - firstTime - .2) / .45);
@@ -231,6 +247,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     return `${Math.round(x).toLocaleString('es-ES')} años luz`;
   }
   function formatDurationFromYears(years) {
+    if (years === 0) return '0.00 s';
     const seconds = years * 365.25 * 24 * 3600;
     if (seconds < 1e-6) return `${(seconds * 1e9).toFixed(2)} ns`;
     if (seconds < 1e-3) return `${(seconds * 1e6).toFixed(2)} μs`;
@@ -257,10 +274,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     syncSpeedControls();
     updateReadouts();
   }
-  function updateEinsteinDeltaTimer(firstTime, secondTime) {
-    const span = Math.max(1e-9, secondTime - firstTime);
-    const progress = Math.max(0, Math.min(1, (state.t - firstTime) / span));
-    inlineDeltaOut.textContent = formatDurationFromYears(physicalDelayYears() * progress);
+  function showEventTimes(intervalOnScreen) {
+    const remaining = Math.ceil(Math.max(0, COUNTDOWN - state.t) * 10) / 10;
+    const countdown = remaining.toFixed(1) + ' s';
+    for (const output of countdowns) {
+      if (output.textContent !== countdown) output.textContent = countdown;
+    }
+    const elapsed = Math.max(0, state.t - COUNTDOWN);
+    const progress = intervalOnScreen > 0 ? Math.min(1, elapsed / intervalOnScreen) : 0;
+    const reading = formatDurationFromYears(progress * physicalDelayYears());
+    if (walkerInterval.textContent !== reading) walkerInterval.textContent = reading;
+    // In the beach frame both emissions occur at COUNTDOWN; its interval is always zero.
   }
   function drawExplosion(x, y, progress, color) {
     const p = Math.max(0, Math.min(1, progress));
@@ -302,7 +326,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     const stars = starPositions(s);
     stars.forEach(st => drawStarOrExplosion(st, COUNTDOWN));
     drawCharacter(state.swapped ? assets.einsteinStill : assets.galileo, s.x + 280, s.y + s.h - 18, 230, Math.sin(state.t * 2) * 1.5);
-    drawCountdown(s, COUNTDOWN - state.t, 'cuenta atras');
     drawSceneFrame(s, 'rgba(141,241,255,.65)');
   }
   function drawEinsteinScene() {
@@ -318,8 +341,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     drawStarOrExplosion(stars[1], rightTime);
     drawFastClock(s, rightTime, leftTime);
     drawCharacter(state.swapped ? assets.galileoWalking : assets.einstein, s.x + s.w / 2, s.y + s.h - 18, 220, b>0 ? Math.sin(state.t * 7.2)*6 : 0);
-    drawCountdown(s, Math.min(leftTime, rightTime) - state.t, 'proxima explosion');
-    updateEinsteinDeltaTimer(Math.min(leftTime, rightTime), Math.max(leftTime, rightTime));
+    showEventTimes(d);
     drawSceneFrame(s, 'rgba(207,196,255,.72)');
   }
   function updateReadouts() {
@@ -367,7 +389,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     scenes.galileo.title=stillName()+': playa en reposo';
     scenes.einstein.title=walkingName()+': paseo a velocidad v';
     document.getElementById('speedLabel').textContent='Velocidad de '+walkingName();
-    document.getElementById('deltaLabel').textContent='Desfase medido por '+walkingName();
     reset();
   };
   restartButton.onclick=restartPanel.onclick=()=>reset(true);
