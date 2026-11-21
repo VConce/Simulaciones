@@ -70,13 +70,17 @@ function drawClock(view, elapsed) {
     second.style.transform='rotate('+((dialSeconds%60)*6)+'deg)';
   }
 }
+const durationUnits = [[yearSeconds,'año','años'],[daySeconds,'día','días'],[3600,'h'],[60,'min']];
+function formatDuration(seconds) {
+  const [size,unit,plural=unit]=durationUnits.find(([size])=>seconds>=size) || [1,'s'];
+  const value=(seconds/size).toFixed(size===1 ? 1 : 2);
+  return value+' '+(Number(value)===1 ? unit : plural);
+}
 function showClocks(){
   const {station,passenger}=clocks;
   drawClock(clockViews[0],station);
   drawClock(clockViews[1],passenger);
-  const gap = station-passenger;
-  const value = calendar && gap>=daySeconds ? (gap/daySeconds).toFixed(2)+' días' : gap.toFixed(1)+' s';
-  setText(byId('gap'),value);
+  setText(byId('gap'),formatDuration(Math.abs(station-passenger)));
 }
 byId('time-view').onclick = () => {
   advance(performance.now());

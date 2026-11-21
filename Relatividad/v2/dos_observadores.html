@@ -5,9 +5,9 @@
   <title>Dos observadores · El tren de Einstein</title>
   <link rel="icon" href="../../electromagnetism/assets/electric/vconce.png">
   <link rel="stylesheet" href="../../shared/katex/katex.min.css">
-  <link rel="stylesheet" href="tren.css?v=calendario">
+  <link rel="stylesheet" href="tren.css?v=diferencia">
   <script defer src="../../shared/katex/katex.min.js"></script>
-  <script defer src="tren.js?v=tiempos-independientes"></script>
+  <script defer src="tren.js?v=diferencia"></script>
 </head>
 <body>
 <main>
@@ -16,6 +16,7 @@
     <div class="clocks">
       <section class="clock max"><div class="dial" data-clock="max" aria-hidden="true"></div><div><h2>Maxwell · andén</h2><output aria-live="off" id="max-time">0.0 s</output></div></section>
       <section class="clock ein"><div class="dial" data-clock="ein" aria-hidden="true"></div><div><h2>Einstein · tren</h2><output aria-live="off" id="ein-time">0.0 s</output></div></section>
+      <section class="clock difference" aria-label="Diferencia absoluta de tiempo"><div><h2><abbr title="Diferencia absoluta entre los tiempos de Maxwell y Einstein">Δt</abbr></h2><output aria-label="Diferencia absoluta de tiempo" aria-live="off" id="gap">0.0 s</output></div></section>
     </div>
     <button type="button" id="time-view" aria-controls="max-time ein-time">fecha</button>
   </header>
@@ -28,7 +29,7 @@
       <div><label for="velocity">Velocidad del tren</label><input id="velocity" type="range" min="0" max="0.9999" value="0.8" step="0.0001">
       <div class="entry"><input id="exact" type="text" inputmode="decimal" value="0.8" aria-label="Velocidad exacta"><select id="unit" aria-label="Unidad de velocidad"><option value="c">c</option><option value="ms">m/s</option></select></div></div>
       <div><label for="rate">Ritmo de Maxwell</label><select id="rate"><option value="1">1 s por 1 s real</option><option value="3" selected>3 s por 1 s real</option><option value="6">6 s por 1 s real</option></select></div>
-      <dl><div><dt>Por cada 10 s del andén</dt><dd><output aria-live="off" id="ratio"></output> en el tren</dd></div><div><dt>Factor γ</dt><dd id="gamma"></dd></div><div><dt>Diferencia acumulada</dt><dd id="gap">0.0 s</dd></div></dl>
+      <dl><div><dt>Por cada 10 s del andén</dt><dd><output aria-live="off" id="ratio"></output> en el tren</dd></div><div><dt>Factor γ</dt><dd id="gamma"></dd></div></dl>
       <div class="actions"><button id="pause" type="button">Pausar</button><button id="reset" type="button">Poner a cero</button></div>
     </section>
   </div>
