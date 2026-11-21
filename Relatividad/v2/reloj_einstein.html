@@ -51,13 +51,15 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
           <input id="v" type="range" min="0" max="0.9999" step="0.0001" value="0.6000">
           <div class="scale"><span>0 c</span><span>0.5 c</span><span>0.9999 c</span></div>
           </div><div><label for="trail">Rastro de la luz</label><input id="trail" type="range" min="0" max="18" step="0.1" value="5" data-exact-input="true"></div>
-          <div><label for="playback">Escala de los relojes</label>
+          <div><label for="timebase">Ritmo según el reloj de</label>
+          <select id="timebase"><option value="proper" selected>Lorentz</option><option value="exterior">Exterior</option></select></div>
+          <div><label for="playback">Escala de reproducción</label>
           <select id="playback"><option value="1">1 s por segundo real</option><option value="3" selected>3 s por segundo real</option><option value="10">10 s por segundo real</option></select></div>
           <div><button type="button" id="pauseAnimation" class="primaryButton">Pausar</button> <button type="button" id="resetClock">Poner a cero</button></div>
         </div>
       </aside>
     </div><div class="lab-intro"><p class="lead">Desde el exterior, los espejos avanzan y la luz dibuja un zigzag. Desde el propio reloj, el pulso sube y baja por la misma vertical. En ambos marcos la luz viaja a c.</p>
-      <p>Las dos viñetas siguen el mismo pulso. Al volver al espejo inferior, fíjate en cuánto ha avanzado cada reloj desde la salida. Lorentz mide el tiempo propio porque el pulso sale y regresa al mismo lugar en su marco. En el marco exterior, el espejo se ha desplazado entre esos dos sucesos y ha transcurrido más tiempo. Los relojes muestran segundos a escala y los periodos del pulso se indican en nanosegundos.</p></div><section class="eqGrid lab-theory" aria-label="Teoria">
+      <p>Las dos viñetas siguen el mismo rebote. Con el ritmo de Lorentz, la luz tarda siempre 2.00 ns en volver al espejo inferior en su marco. Al aumentar la velocidad, el observador exterior mide más tiempo entre esos mismos sucesos y la trayectoria se hace más horizontal. Si eliges el ritmo exterior, verás cuánto tarda ese viaje según su reloj. Los contadores muestran segundos a escala y los periodos físicos se indican en nanosegundos.</p></div><section class="eqGrid lab-theory" aria-label="Teoria">
       <article><h3>¿Qué mide Lorentz?</h3><div class="math" data-tex="">\Delta\tau=\frac{2L_0}{c}</div><p>Lorentz viaja sentado junto al espejo inferior. Cuando el pulso sale de ese espejo y regresa a él, los dos sucesos ocurren en el mismo lugar en su marco. Su reloj mide el periodo propio, 2.00 ns para una separación de 0.299792458 m. Una vez agarrado, Einstein viaja con Lorentz y mide el mismo periodo.</p></article>
       <article><h3>Dilatación temporal</h3><div class="math" data-tex="">\Delta t=\gamma\,\Delta\tau</div><p>En el marco del observador externo, la componente horizontal de la velocidad de la luz es v y la vertical es c/γ. El módulo sigue siendo c.</p></article>
       <article><h3>Factor gamma</h3><div class="math" data-tex="">\gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>Cuando v se aproxima a c, el tiempo entre dos retornos de la luz al mismo espejo aumenta en el marco del observador externo.</p></article>
@@ -85,9 +87,10 @@ function clockScene(canvas, ground) {
   let proper = 0, distance = 0;
   let approach = 0, skyOffset = 0, animationTime = 0;
   const playback = document.getElementById('playback');
+  const timebase = document.getElementById('timebase');
   // Store reflection events in ground coordinates, independent of the camera.
   const trail = document.getElementById('trail');
-  let trailTime = 0, reflections = [{x:0, fraction:0, time:0}];
+  let trailTime = 0, reflections = [{x:0, fraction:0, time:0, proper:0}];
   function img(src) { const im = new Image(); im.src = src; return im; }
   function beta() { return Number(vSlider.value); }
   function gamma() { const b = beta(); return 1 / Math.sqrt(1 - b * b); }
@@ -191,7 +194,7 @@ function clockScene(canvas, ground) {
     const hit = Math.floor(next / HALF_PERIOD);
     if (hit > Math.floor(proper / HALF_PERIOD)) {
       const untilHit = (hit * HALF_PERIOD - proper) / rate;
-      reflections.push({x:distance + speed * untilHit, fraction:hit % 2, time:trailTime+untilHit});
+      reflections.push({x:distance + speed * untilHit, fraction:hit % 2, time:trailTime+untilHit, proper:hit*HALF_PERIOD});
     }
     distance += speed * dt; trailTime += dt;
     proper = next;
@@ -217,13 +220,14 @@ function clockScene(canvas, ground) {
     ctx.save();
     ctx.lineWidth = 5; ctx.strokeStyle = '#70ff99'; ctx.lineJoin = 'round';
     ctx.setLineDash([]); ctx.beginPath();
-    const cutoff = trailTime - Number(trail.value);
+    const trailClock = timebase.value === 'proper' ? 'proper' : 'time';
+    const cutoff = (trailClock==='proper'?proper:trailTime) - Number(trail.value);
     if(Number(trail.value)>0){
       let prev=reflections[0], started=false;
-      for(const point of [...reflections.slice(1),{x:distance,fraction:pulse.p,time:trailTime}]){
-        if(point.time>cutoff){
+      for(const point of [...reflections.slice(1),{x:distance,fraction:pulse.p,time:trailTime,proper}]){
+        if(point[trailClock]>cutoff){
           if(!started){
-            const part=Math.max(0,(cutoff-prev.time)/(point.time-prev.time||1));
+            const part=Math.max(0,(cutoff-prev[trailClock])/(point[trailClock]-prev[trailClock]||1));
             ctx.moveTo(ground?groundOrigin+prev.x+(point.x-prev.x)*part:cx,
               g.bottom-spacing*(prev.fraction+(point.fraction-prev.fraction)*part));
             started=true;
@@ -254,19 +258,19 @@ function clockScene(canvas, ground) {
       const widthsPerSecond = .2*b + 1.6*b*b + .25*Math.max(0,Math.log10(.1/(1-b)));
       skyOffset += dt * W * widthsPerSecond * (ground ? .68 : 1);
       const seconds = dt * Number(playback.value);
-      advance(seconds / 3);
+      advance(seconds / 3 * (timebase.value==='proper'?gamma():1));
     }
     draw();
   }
   document.getElementById('resetClock').addEventListener('click', () => {
     proper = 0; distance = 0;
     approach = 0; skyOffset = 0; animationTime = 0;
-    trailTime=0; reflections = [{x:0, fraction:0, time:0}]; draw();
+    trailTime=0; reflections = [{x:0, fraction:0, time:0, proper:0}]; draw();
   });
   vSlider.addEventListener('input', () => {
     // A speed change starts a new straight segment at the current pulse event.
     const p = bounce(proper).p;
-    reflections.push({x:distance, fraction:p, time:trailTime});
+    reflections.push({x:distance, fraction:p, time:trailTime, proper});
     if (reflections.length > 240) reflections.shift();
   });
   return frame;
