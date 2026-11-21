@@ -69,6 +69,7 @@ function clockScene(canvas, ground) {
   const vSlider = document.getElementById('v');
   let W = canvas.width;
   const H = canvas.height;
+  const sceneScale = ground ? .8 : 1;
   new ResizeObserver(() => {
     if (canvas.clientHeight) W = canvas.width = Math.round(H*canvas.clientWidth/canvas.clientHeight);
   }).observe(canvas);
@@ -217,9 +218,9 @@ function clockScene(canvas, ground) {
     proper = next;
     // Keep the path bounded even at rest.
     if (reflections.length > 240) reflections.shift();
+    return speed * dt;
   }
   function draw() {
-    const sceneScale = ground ? .8 : 1;
     const trackWidth = W/sceneScale;
     // Allow the trailing chair and the leading mirror to clear opposite edges.
     const lap = trackWidth + 220;
@@ -289,21 +290,23 @@ function clockScene(canvas, ground) {
     document.getElementById('periodOut').textContent = (PROPER_PERIOD_NS * gamma()).toFixed(2) + ' ns';
     document.getElementById(ground ? 'exteriorHits' : 'lorentzHits').textContent = pulse.hit;
   }
-  function frame(dt) {
+  function frame(dt, exteriorStepPx = 0) {
+    let travelPx = 0;
     if (!window.simPaused) {
       const b = beta();
       animationTime += dt;
       if (b > 0 || approach > 0) approach = Math.min(1.65, approach + dt);
-      const widthsPerSecond = .2*b + 1.6*b*b + .25*Math.max(0,Math.log10(.1/(1-b)));
-      if (!ground) skyOffset += dt * W * widthsPerSecond;
       const elapsedNs = dt * Number(playback.value);
       if (ground) {
         clockTimes.exterior += elapsedNs;
         clockTimes.lorentz += elapsedNs / gamma();
       }
-      advance(elapsedNs * (2 * HALF_PERIOD / PROPER_PERIOD_NS) * (ground ? 1 : gamma()));
+      const step = advance(elapsedNs * (2 * HALF_PERIOD / PROPER_PERIOD_NS) * (ground ? 1 : gamma()));
+      if (ground) travelPx = step * sceneScale * canvas.clientWidth / W;
+      else if (canvas.clientWidth) skyOffset += exteriorStepPx * W / canvas.clientWidth;
     }
     draw();
+    return travelPx;
   }
   document.getElementById('resetClock').addEventListener('click', () => {
     clockTimes.exterior = clockTimes.lorentz = 0;
@@ -325,7 +328,9 @@ const onboardScene = clockScene(document.getElementById('onboard'),false);
 let previousFrame = performance.now();
 function animateScenes(now) {
   const dt = Math.min(.05,(now-previousFrame)/1000);
-  previousFrame=now; exteriorScene(dt); onboardScene(dt);
+  previousFrame=now;
+  const exteriorStepPx = exteriorScene(dt);
+  onboardScene(dt, exteriorStepPx);
   requestAnimationFrame(animateScenes);
 }
 requestAnimationFrame(animateScenes);
