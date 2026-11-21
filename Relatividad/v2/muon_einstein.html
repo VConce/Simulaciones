@@ -91,9 +91,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <div class="distanceRead"><span id="distanceLabel">Espesor desde la Tierra</span><strong id="distanceOut"></strong></div></article>
     <aside class="controlCard" aria-label="Controles de la simulación">
         <div>
-          <label for="beta">Velocidad del muón <output id="betaOut">0.980 c</output></label>
-          <input id="beta" type="range" min="0.70" max="0.999" step="0.001" value="0.980">
-          <div class="scale"><span>0.70 c</span><span>relativista</span><span>0.999 c</span></div>
+          <label for="beta">Velocidad del muón <output id="betaOut">0.9800 c</output></label>
+          <input id="beta" type="range" min="0.70" max="0.9999" step="0.0001" value="0.9800">
+          <div class="scale"><span>0.70 c</span><span>relativista</span><span>0.9999 c</span></div>
         </div>
         <div>
           <label for="height">Altura de creación <output id="heightOut">15.0 km</output></label>
@@ -158,7 +158,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 
     function updateUI() {
       const m = metrics();
-      els.betaOut.textContent = `${fmt(state.beta, 3)} c`;
+      els.betaOut.textContent = `${fmt(state.beta, 4)} c`;
       els.heightOut.textContent = `${fmt(state.height, 1)} km`;
       els.gammaOut.textContent = fmt(m.g, 2);
       document.getElementById('probability').textContent=(100*m.survival).toPrecision(3)+' %';
