@@ -99,10 +99,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
           <div class="scale"><span>0.70 c</span><span>relativista</span><span>0.9999 c</span></div>
         </div>
         <div>
-          <label for="height">Altura de creación <output id="heightOut">15.0 km</output></label>
-          <input id="height" type="range" min="2" max="25" step="0.5" value="15">
+          <label for="height">Altura de creación <output id="heightOut">10.0 km</output></label>
+          <input id="height" type="range" min="2" max="25" step="0.5" value="10">
           <div class="scale"><span>2 km</span><span>atmósfera</span><span>25 km</span></div>
         </div>
+        <div><label for="pace">Velocidad de simulación <output id="paceOut">1×</output></label><input id="pace" type="range" min="1" max="12" step="1" value="1" data-exact-input="true"></div>
         <div class="actions">
           <button id="pause" class="primary" type="button">Pausar</button>
           <button id="newMuon" class="primary" type="button">Nuevo muón</button><button id="reset" class="ghost" type="button">Reiniciar</button>

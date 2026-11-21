@@ -2,19 +2,29 @@
   const byId = id => document.getElementById(id);
   const canvas = byId('earthCanvas'), ctx = canvas.getContext('2d');
   const {width:w, height:h} = canvas;
+  new ResizeObserver(()=>{
+    const scale=Math.max(1,Math.min(4,canvas.clientWidth*(window.devicePixelRatio||1)/w));
+    const width=Math.round(w*scale), height=Math.round(h*scale);
+    if(canvas.width!==width || canvas.height!==height){
+      canvas.width=width; canvas.height=height; ctx.setTransform(width/w,0,0,height/h,0,0);
+      ctx.imageSmoothingQuality='high';
+    }
+  }).observe(canvas);
   const velocity = byId('beta'), altitude = byId('height'), reference = byId('reference');
   const model = byId('model'), beam = byId('beam');
   const lifetime = 2.1969811, c = .299792458, flightSeconds = 5;
   const image = src => Object.assign(new Image(), {src});
   const earthSprite = image('../assets/earth-blue-marble-sprite.png');
-  const flying = image('../assets/muon-character-sprite.png'), blink = image('muon-parpadeo.webp');
+  const flying = image('muon-vuelo.webp'), blink = image('muon-ojos-cerrados.webp');
+  const wicker = image('cesta-mimbre.webp'), pace = byId('pace');
   const green = image('muon-verde.webp'), flash = image('muon-destello.webp');
   const left = 170, right = 540, depth = 44;
   let particles = [], elapsed = 0, caught = 0, emitted = 0, paused = false;
   // A fixed-size detector image preserves every landing without retaining an unbounded particle list.
   const deposits = document.createElement('canvas');
-  deposits.width = right-left; deposits.height = depth;
+  deposits.width = (right-left)*3; deposits.height = depth*3;
   const ink = deposits.getContext('2d');
+  ink.scale(3,3);
   const stream = () => beam.value === 'stream';
   const classical = () => model.value === 'classic';
   const ready = img => img.complete && img.naturalWidth;
@@ -50,7 +60,7 @@
   }
   function deposit(p) {
     caught++; p.deposited = true;
-    paint(ink,green,p.x-left,17+Math.random()*12,31,'#5fea9b');
+    paint(ink,green,p.x-left,15+Math.random()*8,35,'#5fea9b');
   }
     function drawStars(ctx, w, h, shift = 0) {
       ctx.fillStyle = "#071126";
@@ -90,18 +100,15 @@
 
 
   function basket(y) {
-    ctx.save(); ctx.translate(left,y);
     const bw = right-left;
-    ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(bw,0); ctx.lineTo(bw-17,depth);
-    ctx.lineTo(17,depth); ctx.closePath(); ctx.fillStyle='#684632'; ctx.fill(); ctx.clip();
-    ctx.strokeStyle='#9d7151'; ctx.lineWidth=2;
-    ctx.beginPath(); for(let i=-depth;i<bw+depth;i+=15){
-      ctx.moveTo(i,0);ctx.lineTo(i+depth,depth);ctx.moveTo(i,0);ctx.lineTo(i-depth,depth);
-    } ctx.stroke(); ctx.drawImage(deposits,0,0); ctx.restore();
-    ctx.strokeStyle='#eac298';ctx.lineCap='round';ctx.lineWidth=5;ctx.beginPath();
-    ctx.moveTo(left,y);ctx.lineTo(left+17,y+depth);ctx.lineTo(right-17,y+depth);
-    ctx.lineTo(right,y);ctx.stroke();
-    ctx.fillStyle='#ddac79'; ctx.fillRect(left-3,y-2,bw+6,4);
+    const top=y-8, basketHeight=71;
+    if(ready(wicker)) ctx.drawImage(wicker,left,top,bw,basketHeight);
+    ctx.drawImage(deposits,left,y-9,bw,depth);
+    if(ready(wicker)){
+      const rim=.38, cut=Math.round(wicker.naturalHeight*rim);
+      ctx.drawImage(wicker,0,cut,wicker.naturalWidth,wicker.naturalHeight-cut,
+        left,top+basketHeight*rim,bw,basketHeight*(1-rim));
+    }
     ctx.fillStyle='#152a3d';ctx.beginPath();ctx.roundRect(right+10,y-4,175,51,9);ctx.fill();
     ctx.fillStyle='#a4f2c4';ctx.font='bold 21px system-ui';
     ctx.fillText('En la cesta',right+18,y+15);
@@ -137,7 +144,7 @@
         active++;
         if(stream()) phase=Math.max(phase,progress);
         const eyesClosed=(elapsed+p.blinkOffset)%1.85<.16 && ready(blink);
-        paint(ctx,eyesClosed?blink:flying,p.x,y,stream()?42:73,'#749dff');
+        paint(ctx,eyesClosed?blink:flying,p.x,y,stream()?49:86,'#749dff');
       } else if(p.stop<1 && age<.62){
         ctx.save();ctx.globalAlpha=Math.min(1,(.62-age)/.23);
         paint(ctx,flash,p.x,y,26+age*(stream()?70:103),'#ffcf77');ctx.restore();
@@ -158,7 +165,7 @@
   let last = performance.now();
   function frame(now) {
     if (!paused) {
-      elapsed += Math.min(.1,(now-last)/1000);
+      elapsed += Math.min(.1,(now-last)/1000)*Number(pace.value);
       if(stream()) while(nextEmission<=elapsed){emit(nextEmission);nextEmission+=interval;}
       for(const p of particles) if(p.stop===1 && !p.deposited && elapsed>=p.born+flightSeconds) deposit(p);
       if(stream()) particles=particles.filter(p=>elapsed-p.born<=flightSeconds+.65);
@@ -167,7 +174,8 @@
   }
   byId('pause').onclick=()=>setPaused(!paused);
   byId('newMuon').onclick=()=>{if(stream()) emit(elapsed); else restartFlight();setPaused(false);};
-  byId('reset').onclick=()=>{velocity.value=velocity.defaultValue;altitude.value=altitude.defaultValue;setPaused(false);resetSeries();};
+  pace.oninput=()=>{byId('paceOut').textContent=pace.value+'×';};
+  byId('reset').onclick=()=>{velocity.value=velocity.defaultValue;altitude.value=altitude.defaultValue;pace.value=pace.defaultValue;pace.oninput();setPaused(false);resetSeries();};
   for(const input of [velocity,altitude])input.oninput=resetSeries;
   reference.onchange=draw;
   model.onchange=resetSeries;

@@ -25,17 +25,23 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     .reloj_einstein .control select,.reloj_einstein .control button{border:1px solid #b7c9d6;border-radius:8px;background:white;color:#173451;padding:0 10px}
     .reloj_einstein .control .precision-row{margin:0}
     .reloj_einstein .canvasWrap{height:clamp(270px,53svh,560px)}
+    .clock-scenes{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:8px}
+    .clock-scenes h2{font:700 1rem system-ui;margin:0 0 5px}
+    @media(max-width:620px){.clock-scenes{grid-template-columns:1fr}.reloj_einstein .clock-scenes .canvasWrap{height:clamp(135px,21svh,200px)}}
     .reloj_einstein .experiment-layout .canvasWrap canvas{max-width:none;width:100%;height:100%}
     @media(max-width:760px){.reloj_einstein .control{display:grid;grid-template-columns:1fr 1fr;gap:6px}.reloj_einstein .canvasWrap{height:clamp(200px,48vw,325px)}}
   </style>
   <main class="page compact-lab reloj_einstein">
-    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Reloj de Einstein</h1><label class="frame-picker">Ver desde <select id="reference"><option value="ground">Exterior</option><option value="clock">Propio reloj</option></select></label></header><div class="experiment-layout"><section class="card">
-      <div class="canvasWrap"><canvas id="sim" width="960" height="450" role="img" aria-label="Trayectoria del pulso entre los dos espejos"></canvas></div>
+    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Reloj de Einstein</h1></header><div class="experiment-layout"><section class="card">
+      <div class="clock-scenes">
+        <section><h2>Desde el exterior</h2><div class="canvasWrap"><canvas id="sim" width="960" height="450" role="img" aria-label="Trayectoria de la luz desde el exterior"></canvas></div></section>
+        <section><h2>Desde el propio reloj</h2><div class="canvasWrap"><canvas id="onboard" width="480" height="450" role="img" aria-label="Trayectoria vertical de la luz desde el propio reloj"></canvas></div></section>
+      </div>
       <div class="metrics" aria-label="Lecturas de la simulación">
         <div class="metric"><span>Factor gamma</span><strong id="gammaOut">1.25</strong></div>
         <div class="metric"><span>Periodo desde el exterior</span><strong id="periodOut">2.50 ns</strong></div>
         <div class="metric green"><span>Periodo propio (Lorentz)</span><strong>2.00 ns</strong></div>
-        <div class="metric green"><span>Rebotes del pulso</span><strong id="rightHitsOut">0</strong></div>
+        <div class="metric green"><span>Rebotes (exterior / propio reloj)</span><strong><span style="display:inline;font:inherit;color:inherit" id="rightHitsOut">0</span> / <span style="display:inline;font:inherit;color:inherit" id="onboardHits">0</span></strong></div>
       </div>
     </section>
 
@@ -50,16 +56,15 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
           <div><button type="button" id="pauseAnimation" class="primaryButton">Pausar</button> <button type="button" id="resetClock">Poner a cero</button></div>
         </div>
       </aside>
-    </div><div class="lab-intro"><p class="lead">Desde el propio reloj, el pulso sube y baja por la misma vertical. Para el observador externo, los espejos avanzan mientras la luz viaja entre ellos y el pulso dibuja un zigzag. En ambos casos la luz viaja a c. Pausa la animación y cambia de vista para comparar el mismo instante del recorrido.</p>
-      <p>Cada observador ve avanzar su propio reloj al ritmo elegido y asigna al reloj en movimiento un ritmo menor, por un factor γ. Los dos pueden hacerlo porque cada marco define de forma distinta qué sucesos distantes son simultáneos. Al cambiar de vista se conservan los segundos acumulados para comparar los ritmos a partir de ese momento. Los periodos del pulso se indican en nanosegundos.</p></div><section class="eqGrid lab-theory" aria-label="Teoria">
+    </div><div class="lab-intro"><p class="lead">Desde el exterior, los espejos avanzan y la luz dibuja un zigzag. Desde el propio reloj, el pulso sube y baja por la misma vertical. En ambos marcos la luz viaja a c.</p>
+      <p>Las dos vistas arrancan juntas y muestran igual tiempo transcurrido para su respectivo observador. Por eso los rebotes pueden producirse en momentos distintos de la animación. Cada observador mide su propio tiempo al ritmo elegido y asigna al reloj en movimiento un ritmo menor, por un factor γ. Esto es posible porque los dos marcos definen de forma distinta qué sucesos distantes son simultáneos. El desplazamiento del fondo está exagerado a velocidades altas para que se aprecie el movimiento.</p></div><section class="eqGrid lab-theory" aria-label="Teoria">
       <article><h3>¿Qué mide Lorentz?</h3><div class="math" data-tex="">\Delta\tau=\frac{2L_0}{c}</div><p>Lorentz viaja sentado junto al espejo inferior. Cuando el pulso sale de ese espejo y regresa a él, los dos sucesos ocurren en el mismo lugar en su marco. Su reloj mide el periodo propio, 2.00 ns para una separación de 0.299792458 m. Una vez agarrado, Einstein viaja con Lorentz y mide el mismo periodo.</p></article>
       <article><h3>Dilatación temporal</h3><div class="math" data-tex="">\Delta t=\gamma\,\Delta\tau</div><p>En el marco del observador externo, la componente horizontal de la velocidad de la luz es v y la vertical es c/γ. El módulo sigue siendo c.</p></article>
       <article><h3>Factor gamma</h3><div class="math" data-tex="">\gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>Cuando v se aproxima a c, el tiempo entre dos retornos de la luz al mismo espejo aumenta en el marco del observador externo.</p></article>
     </section>
   </main>
 <script>
-(() => {
-  const canvas = document.getElementById('sim');
+function clockScene(canvas, ground) {
   const ctx = canvas.getContext('2d');
   const vSlider = document.getElementById('v');
   let W = canvas.width;
@@ -72,13 +77,12 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     lorentz: img('lorentz-sentado.webp'),
     space: img('reloj-panorama.webp')
   };
-  const reference = document.getElementById('reference');
   const HALF_PERIOD = 0.9;
   const PROPER_PERIOD_NS = 2;
   const height = 300;
   const spacing = height * .73;
   const cPixels = spacing / HALF_PERIOD;
-  let proper = 0, distance = 0, last = performance.now();
+  let proper = 0, distance = 0;
   let approach = 0, skyOffset = 0, animationTime = 0;
   const playback = document.getElementById('playback');
   let groundSeconds = 0, lorentzSeconds = 0;
@@ -125,7 +129,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     const frame = hanging ? 3 : [0,1,2,1][Math.floor(approach*10)%4];
     const bob = hanging ? 0 : 2*Math.abs(Math.sin(approach*15));
     ctx.save();
-    ctx.translate(g.center-31-163*remaining, g.bottom+11+36*remaining+bob);
+    ctx.translate(g.center-31-Math.min(163,Math.max(0,g.center-70))*remaining, g.bottom+11+36*remaining+bob);
     if (hanging) ctx.rotate(Math.sin(animationTime*3)*(.035+.055*beta())*t);
     // The top of the raised hand is at (114,4) in the final 180 × 200 cell.
     const scale = .36;
@@ -196,8 +200,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     if (reflections.length > 240) reflections.shift();
   }
   function draw() {
-    const ground = reference.value === 'ground';
-    const cx = ground ? Math.min(W * .79, W * .24 + distance) : W / 2;
+    const center = W/2 + Math.min(55,W*.07);
+    const cx = ground ? center - Math.max(0,Math.min(W*.10,95)-distance) : center;
     const groundOrigin = cx - distance;
     const g = clockGeometry(cx, H * .51, height);
     const pulse = bounce(proper);
@@ -214,7 +218,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     ctx.save();
     ctx.lineWidth = 5; ctx.strokeStyle = '#70ff99'; ctx.lineJoin = 'round';
     ctx.setLineDash([]); ctx.beginPath();
-    const cutoff = trailTime - Number(trail.value);
+    const cutoff = trailTime - Number(trail.value) * (ground ? 1 : gamma());
     if(Number(trail.value)>0){
       let prev=reflections[0], started=false;
       for(const point of [...reflections.slice(1),{x:distance,fraction:pulse.p,time:trailTime}]){
@@ -241,28 +245,26 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     document.getElementById('vOut').textContent = beta().toFixed(4) + ' c';
     document.getElementById('gammaOut').textContent = gamma().toFixed(2);
     document.getElementById('periodOut').textContent = (PROPER_PERIOD_NS * gamma()).toFixed(2) + ' ns';
-    document.getElementById('rightHitsOut').textContent = pulse.hit;
+    document.getElementById(ground?'rightHitsOut':'onboardHits').textContent = pulse.hit;
   }
-  function frame(now) {
-    const dt = Math.min(.05, (now - last) / 1000);
-    last = now;
+  function frame(dt) {
     if (!window.simPaused) {
       const b = beta();
       animationTime += dt;
       if (b > 0 || approach > 0) approach = Math.min(1.65, approach + dt);
-      skyOffset += dt * b * (50 + 185 * b * b) * (reference.value === 'clock' ? 1 : .68);
+      const widthsPerSecond = .2*b + 1.6*b*b + .25*Math.max(0,Math.log10(.1/(1-b)));
+      skyOffset += dt * W * widthsPerSecond * (ground ? .68 : 1);
       const seconds = dt * Number(playback.value);
-      const fromGround = reference.value === 'ground';
       const dilation = gamma();
-      groundSeconds += fromGround ? seconds : seconds / dilation;
-      lorentzSeconds += fromGround ? seconds / dilation : seconds;
+      groundSeconds += ground ? seconds : seconds / dilation;
+      lorentzSeconds += ground ? seconds / dilation : seconds;
       // The light path is integrated in ground coordinates along Lorentz's clock.
-      advance(seconds / 3 * (fromGround ? 1 : dilation));
+      advance(seconds / 3 * (ground ? 1 : dilation));
     }
-    draw(); requestAnimationFrame(frame);
+    draw();
   }
   document.getElementById('resetClock').addEventListener('click', () => {
-    proper = 0; distance = 0; last = performance.now();
+    proper = 0; distance = 0;
     approach = 0; skyOffset = 0; animationTime = 0;
     groundSeconds = 0; lorentzSeconds = 0;
     trailTime=0; reflections = [{x:0, fraction:0, time:0}]; draw();
@@ -273,8 +275,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     reflections.push({x:distance, fraction:p, time:trailTime});
     if (reflections.length > 240) reflections.shift();
   });
-  requestAnimationFrame(frame);
-})();
+  return frame;
+}
+const exteriorScene = clockScene(document.getElementById('sim'),true);
+const onboardScene = clockScene(document.getElementById('onboard'),false);
+let previousFrame = performance.now();
+function animateScenes(now) {
+  const dt = Math.min(.05,(now-previousFrame)/1000);
+  previousFrame=now; exteriorScene(dt); onboardScene(dt);
+  requestAnimationFrame(animateScenes);
+}
+requestAnimationFrame(animateScenes);
 </script><script>document.getElementById("pauseAnimation").addEventListener("click",function(){window.simPaused=!window.simPaused;this.textContent=window.simPaused?"Reanudar":"Pausar";});</script>
 </body>
 </html>
