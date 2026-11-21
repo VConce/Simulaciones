@@ -89,16 +89,18 @@
 button, input[type=range], select {min-height:44px}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #1768a3;outline-offset:3px}
 @media(max-width:680px){main{max-width:100%}.grid,.scenes,.readGrid,.metrics,.eqGrid,.top{min-width:0}.hero,.panel,.control,.card{min-width:0}canvas{max-width:100%}.vconceLogo{position:static!important;display:block;margin:9px 12px 0;width:38px;height:38px}}
-</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script></head>
-<body><img class="vconceLogo" src="../../electromagnetism/assets/electric/vconce.png" alt="VConce">
-<main class="wrap">
-  <section class="top">
-    <article class="card theory">
-      <span class="tag">Relatividad especial · suma de velocidades</span>
-      <h1>La bicicleta de Einstein</h1>
-      <p class="lead">Einstein viaja a velocidad <strong>v<sub>E</sub></strong> y lanza una manzana con velocidad <strong>u′</strong> medida en su propio marco. El objetivo es comparar la suma clásica con la suma relativista.</p>
-    </article>
-    <aside class="card side">
+</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+<body>
+<main class="wrap compact-lab bicicleta_einstein">
+  <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>La bicicleta de Einstein</h1></header><div class="experiment-layout"><section class="card sim">
+    <div class="simHead">
+      <div><h2>Simulación</h2></div>
+      <div class="gamma" id="gammaOut">γ = 1.20</div>
+    </div>
+    <div class="canvasBox"><canvas id="scene" width="1280" height="500"></canvas></div>
+  </section>
+
+  <aside class="card side">
       <div class="results">
         <div class="res gal"><span>Según Galileo</span><strong id="galOut">0.75 c</strong></div>
         <div class="res ein"><span>Según Einstein</span><strong id="einOut">0.68 c</strong></div>
@@ -112,17 +114,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       </div>
       <p class="note" id="note">La suma relativista nunca supera <strong>c</strong>.</p>
     </aside>
-  </section>
-
-  <section class="card sim">
-    <div class="simHead">
-      <div><h2>Simulación</h2><p>La cámara sigue a la bicicleta desde el suelo. Los valores indican velocidades horizontales respecto al suelo. La caída vertical es ilustrativa.</p></div>
-      <div class="gamma" id="gammaOut">γ = 1.20</div>
-    </div>
-    <div class="canvasBox"><canvas id="scene" width="1280" height="500"></canvas></div>
-  </section>
-
-  <section class="card equations">
+  </div><div class="lab-intro"><p class="lead">Einstein viaja a velocidad <strong>v<sub>E</sub></strong> y lanza una manzana con velocidad <strong>u′</strong> medida en su propio marco. El objetivo es comparar la suma clásica con la suma relativista.</p>
+    <p>La cámara sigue a la bicicleta desde el suelo. Los valores indican velocidades horizontales respecto al suelo. La caída vertical es ilustrativa.</p></div><section class="card equations lab-theory">
     <div class="equationsHead">
       <h2>Ecuaciones del experimento</h2>
       <p>Las velocidades se expresan en unidades de <strong>c</strong>; por eso no aparece explícitamente en las fórmulas.</p>
@@ -130,21 +123,15 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     <div class="eqs" aria-label="Ecuaciones con formato LaTeX">
       <div class="eq">
         <span>Factor de Lorentz</span>
-        <div class="math latex" aria-label="gamma igual a uno partido por raiz cuadrada de uno menos beta al cuadrado">
-          <span>γ =</span>
-          <span class="frac"><span>1</span><span class="bar"></span><span class="sqrt"><span class="radicand">1 − v<sub>E</sub><sup>2</sup></span></span></span>
-        </div>
+        <div class="math latex" aria-label="gamma igual a uno partido por raiz cuadrada de uno menos beta al cuadrado" data-tex="">\gamma=\frac{1}{\sqrt{1-v_E^2/c^2}}</div>
       </div>
       <div class="eq">
         <span>Galileo</span>
-        <div class="math latex" aria-label="u igual a velocidad de Einstein mas velocidad propia de la manzana">u = v<sub>E</sub> + u′</div>
+        <div class="math latex" aria-label="u igual a velocidad de Einstein mas velocidad propia de la manzana" data-tex="">u=v_E+u^\prime</div>
       </div>
       <div class="eq">
         <span>Einstein</span>
-        <div class="math latex" aria-label="u igual a fraccion relativista de suma de velocidades">
-          <span>u =</span>
-          <span class="frac"><span>v<sub>E</sub> + u′</span><span class="bar"></span><span>1 + v<sub>E</sub>u′</span></span>
-        </div>
+        <div class="math latex" aria-label="u igual a fraccion relativista de suma de velocidades" data-tex="">u=\frac{v_E+u^\prime}{1+v_Eu^\prime/c^2}</div>
       </div>
     </div>
   </section>

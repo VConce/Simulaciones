@@ -5,6 +5,7 @@ for(const node of document.querySelectorAll('.tex')){
 }
 const scene=document.querySelector('.scene'), train=byId('train');
 const platform=document.querySelector('.platform-figure');
+const panorama=document.querySelector('.panorama');
 let trainFrame=false;
 const speedLimit=Number(byId('velocity').max);
 const clockViews = [
@@ -105,11 +106,11 @@ function frame(now){
   const startX=.31*w+.52*pw-.598*tw;
   const trainX=trainFrame ? startX : (travel+startX+tw)%(w+tw)-tw;
   train.style.transform='translateX('+trainX+'px)';
-  // Wrap only when the figure and its clock have both left the illustration.
-  const platformSpan=w+2*pw;
-  const platformX=trainFrame ? w-((w*.69+travel)%platformSpan)-w*.31 : 0;
+  const period=3*w;
+  const scroll=trainFrame && w ? (w+travel)%period : 0;
+  const platformX=trainFrame && w ? (1.31*w-scroll+2*pw+period)%period-2*pw-.31*w : 0;
   platform.style.transform='translateX('+platformX+'px)';
-  scene.style.backgroundPosition=trainFrame ? 'calc(50% - '+travel+'px) center' : 'center';
+  panorama.style.transform='translateX('+(-scroll)+'px)';
   requestAnimationFrame(frame);
 }
 byId('reference').onchange=e=>{

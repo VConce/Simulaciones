@@ -10,33 +10,25 @@
     body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.2;background-image:linear-gradient(rgba(31,52,91,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(31,52,91,.08) 1px,transparent 1px);background-size:42px 42px;mask-image:radial-gradient(circle at 50% 18%,black,transparent 78%)}
     .page{width:min(1420px,calc(100vw - 28px));margin:18px auto 28px;position:relative}.hero{margin-bottom:16px}.workspace{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}.title,.panel,.card,.eqGrid article{background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.title{padding:22px 24px}.panel{padding:12px;display:grid;gap:10px}.tag{margin:0 0 9px;color:var(--blue);font-weight:950;text-transform:uppercase;letter-spacing:.08em;font-size:12px}h1{margin:0;font-size:clamp(34px,4vw,58px);line-height:.96;letter-spacing:-.05em}.lead{margin:10px 0 0;color:var(--muted);font-size:17px;line-height:1.42;font-weight:680;max-width:850px}.control{border:1px solid #dde6f3;border-radius:16px;background:rgba(255,255,255,.86);padding:10px}.control label{display:flex;justify-content:space-between;gap:12px;font-weight:950;margin-bottom:8px}.control output{font-variant-numeric:tabular-nums;color:var(--violet)}.control input{width:100%;accent-color:var(--violet);cursor:pointer}.scale{display:flex;justify-content:space-between;color:#718096;font-size:12px;font-weight:800;margin-top:5px}.readGrid{display:grid;grid-template-columns:1fr;gap:8px}.read{border:1px solid #dde6f3;border-radius:18px;background:#fff;padding:12px}.read span{display:block;color:var(--muted);font-weight:850;font-size:12px}.read strong{font-size:22px;color:var(--blue);font-variant-numeric:tabular-nums}.buttons{display:grid;grid-template-columns:1fr;gap:8px}button{border:0;border-radius:15px;padding:11px 12px;font-family:inherit;font-weight:950;cursor:pointer}.primary{color:white;background:linear-gradient(135deg,var(--blue),var(--violet))}.ghost{color:#19233b;background:#edf3ff;border:1px solid #d6e2f1}.card{overflow:hidden;padding:14px}.canvasWrap{background:#020617;border:1px solid #111c35;border-radius:24px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}canvas{display:block;width:100%;height:auto;touch-action:none;cursor:grab}canvas.dragging{cursor:grabbing}.eqGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}.eqGrid article{padding:16px}.eqGrid h3{margin:0 0 8px}.eqGrid p{margin:7px 0 0;color:var(--muted);font-weight:650;line-height:1.38}.math{font-family:Cambria,Georgia,serif;font-size:22px;color:#111827}.hint{font-size:13px;color:#5d6880;font-weight:750;line-height:1.35;margin:0}.status{border-radius:18px;padding:12px;background:linear-gradient(135deg,#eef8ff,#fff);border:1px solid rgba(11,99,229,.18)}.status b{display:block;color:#0b63e5;font-size:12px;text-transform:uppercase;letter-spacing:.08em}.status p{margin:5px 0 0;color:#43516a;font-weight:760}.legend{display:flex;gap:8px;flex-wrap:wrap}.legend span{border-radius:999px;background:#eef3ff;color:#33415c;padding:6px 8px;font-size:11px;font-weight:900}@media(max-width:980px){.workspace{grid-template-columns:1fr}.eqGrid{grid-template-columns:1fr}.readGrid{grid-template-columns:1fr}}
   .vconceLogo{position:fixed;left:14px;top:14px;width:54px;height:54px;object-fit:contain;z-index:10000;pointer-events:none}@media(max-width:900px){.vconceLogo{width:42px;height:42px;left:10px;top:10px}}/* vconce header clearance */body>header{padding-left:max(88px,env(safe-area-inset-left))!important}@media(max-width:900px){body>header{padding-left:64px!important}}</style>
-<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script></head>
-<body><img class="vconceLogo" src="../../electromagnetism/assets/electric/vconce.png" alt="VConce">
-  <main class="page">
-    <section class="hero">
-      <div class="title">
-        <p class="tag">Relatividad general · curvatura de la luz</p>
-        <h1>Lente gravitacional</h1>
-        <p class="lead">Arrastra estrellas de fondo, el observador Tierra y la ventana de vista. El modelo usa la ecuación de lente delgada para mostrar imagen primaria, imagen secundaria y, en alineación exacta, un anillo de Einstein.</p>
-      </div>
-    </section>
-
-    <section class="workspace">
+<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+<body>
+  <main class="page compact-lab lente_gravitacional">
+    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Lente gravitacional</h1></header><section class="workspace">
       <section class="card"><div class="canvasWrap"><canvas id="sim" width="1200" height="700"></canvas></div></section>
       <aside class="panel" aria-label="Controles de la simulacion">
         <div class="control">
           <label for="mass">Masa del agujero negro <output id="massOut">1.0e8 M☉</output></label>
-          <input id="mass" type="range" min="5" max="10" step="0.01" value="8" />
+          <input id="mass" type="range" min="5" max="10" step="0.01" value="8">
           <div class="scale"><span>10^5 M☉</span><span>10^8</span><span>10^10 M☉</span></div>
         </div>
         <div class="control">
           <label for="zoom">Ampliación transversal <output id="zoomOut">1.00x</output></label>
-          <input id="zoom" type="range" min="0.35" max="2.4" step="0.01" value="1" />
+          <input id="zoom" type="range" min="0.35" max="2.4" step="0.01" value="1">
           <div class="scale"><span>×0.35</span><span>×1</span><span>×2.4</span></div>
         </div>
         <div class="control">
           <label for="fov">Campo de vision <output id="fovOut">1.00x</output></label>
-          <input id="fov" type="range" min="0.65" max="1.8" step="0.01" value="1" />
+          <input id="fov" type="range" min="0.65" max="1.8" step="0.01" value="1">
           <div class="scale"><span>cerca</span><span>normal</span><span>amplio</span></div>
         </div>
         <div class="readGrid">
@@ -51,10 +43,11 @@
       </aside>
     </section>
 
-    <section class="eqGrid" aria-label="Teoria">
-      <article><h3>Ecuación de lente</h3><div class="math">β = θ − θ<sub>E</sub>²/θ</div><p>Para una fuente casi alineada con la lente hay dos soluciones: una imagen exterior y otra interior, a lados opuestos del agujero negro.</p></article>
-      <article><h3>Radio de Einstein</h3><div class="math">θ<sub>E</sub> = √[4GM D<sub>ls</sub>/(c² D<sub>l</sub> D<sub>s</sub>)]</div><p>Modelo de lente puntual delgada en campo débil. El esquema amplía las distancias transversales. El radio angular de S5 se expresa en segundos de arco.</p></article>
-      <article><h3>Imagen doble</h3><div class="math">θ<sub>±</sub> = (β ± √[β² + 4θ<sub>E</sub>²])/2</div><p>La imagen secundaria se hace muy debil cuando la fuente esta lejos del eje, por eso solo aparece claramente en ciertas posiciones.</p></article>
+    <div class="lab-intro"><p class="lead">Arrastra estrellas de fondo, el observador Tierra y la ventana de vista. El modelo usa la ecuación de lente delgada para mostrar imagen primaria, imagen secundaria y, en alineación exacta, un anillo de Einstein.</p>
+      </div><section class="eqGrid lab-theory" aria-label="Teoria">
+      <article><h3>Ecuación de lente</h3><div class="math" data-tex="">\beta=\theta-\frac{\theta_E^2}{\theta}</div><p>Para una fuente casi alineada con la lente hay dos soluciones: una imagen exterior y otra interior, a lados opuestos del agujero negro.</p></article>
+      <article><h3>Radio de Einstein</h3><div class="math" data-tex="">\theta_E=\sqrt{\frac{4GM}{c^2}\frac{D_{ls}}{D_lD_s}}</div><p>Modelo de lente puntual delgada en campo débil. El esquema amplía las distancias transversales. El radio angular de S5 se expresa en segundos de arco.</p></article>
+      <article><h3>Imagen doble</h3><div class="math" data-tex="">\theta_\pm=\frac{\beta\pm\sqrt{\beta^2+4\theta_E^2}}{2}</div><p>La imagen secundaria se hace muy debil cuando la fuente esta lejos del eje, por eso solo aparece claramente en ciertas posiciones.</p></article>
     </section>
   </main>
 <script>

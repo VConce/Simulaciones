@@ -1,0 +1,44 @@
+.compact-lab {width:min(1480px,calc(100% - 24px));max-width:none;margin:6px auto 24px}
+.lab-heading {display:flex;align-items:center;gap:12px;margin:0 0 8px;padding:3px 5px;color:#192d40;background:transparent}
+.lab-heading img {display:block;width:38px;height:40px;flex:none;object-fit:contain}
+.lab-heading h1 {margin:0;font:700 clamp(1.25rem,2.3vw,2rem)/1.14 system-ui,sans-serif;letter-spacing:-.025em}
+.compact-lab .experiment-layout {display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,300px);gap:10px;align-items:start}
+.compact-lab .experiment-layout>* {min-width:0;margin:0}
+.compact-lab .lab-intro {padding:14px 16px;margin-top:12px;background:white;border-radius:12px}
+.compact-lab .lab-intro .lead {margin:0;color:#32485d;font-size:1rem;line-height:1.5}
+.compact-lab .lab-intro aside {margin-top:8px;max-width:none;box-shadow:none}
+.compact-lab .stageHeader,.compact-lab .simHead,.compact-lab .sceneHead {padding:6px 12px;align-items:center;min-height:0}
+.compact-lab .stageHeader h2,.compact-lab .simHead h2,.compact-lab .sceneHead h2 {font-size:1.08rem;margin:0}
+.compact-lab.bicicleta_einstein .side,.compact-lab.bicicleta_einstein .controlPanel {grid-template-columns:minmax(0,1fr)}
+.compact-lab.bicicleta_einstein .buttons {grid-template-columns:repeat(auto-fit,minmax(90px,1fr))}
+.compact-lab .lab-theory {margin-top:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr));gap:12px}
+.compact-lab .lab-theory>* {min-width:0}
+.compact-lab .lab-theory.equations {display:block}
+.compact-lab .math[data-tex], [data-tex] {display:block;max-width:100%;overflow-x:auto;overflow-y:hidden;font-size:clamp(.94rem,1.5vw,1.2rem);line-height:1.5}
+[data-tex] .katex-display {margin:.35em 0}
+.compact-lab .lab-intro .formulaCard,.compact-lab .lab-intro aside.formula {color:#203549;background:#f0f5fb;padding:12px}
+.compact-lab .canvasWrap,.compact-lab .canvasBox {padding:0;min-width:0}
+.compact-lab .canvasWrap canvas,.compact-lab .canvasBox canvas {width:100%;height:auto;margin:auto}
+.compact-lab .grid,.compact-lab .lab,.compact-lab .workspace,.compact-lab .scenes {margin-top:0;gap:10px;align-items:start}
+.compact-lab .scenes {display:grid;grid-template-columns:1fr 1fr}
+.compact-lab .controlCard {margin:8px 0}
+.compact-lab.lanza_granero .scene {height:clamp(155px,46svh,410px)}
+.compact-lab.observador_paseando .canvasWrap>canvas {width:min(100%,calc(64svh * 1.846));}
+@media(min-width:761px){
+.compact-lab .lab,.compact-lab .workspace {grid-template-columns:minmax(0,1fr) minmax(245px,305px)}
+.compact-lab .experiment-layout canvas {max-width:calc(69svh * 1.76)}
+.compact-lab.lanza_granero .grid {grid-template-columns:1fr 1fr minmax(200px,245px)}
+}
+@media(max-width:760px){
+.compact-lab {width:calc(100% - 12px);max-width:none;margin-top:4px}
+.lab-heading img {width:30px;height:32px}.lab-heading {gap:8px;margin-bottom:4px}
+.compact-lab .experiment-layout,.compact-lab .lab,.compact-lab .workspace {grid-template-columns:1fr}
+.compact-lab .scenes {grid-template-columns:1fr}.compact-lab .scenes canvas {max-height:33svh;width:auto;max-width:100%}
+.compact-lab .lab-theory {grid-template-columns:1fr}
+.compact-lab .lab-intro {padding:12px}
+.compact-lab.lanza_granero .grid {grid-template-columns:1fr}
+.compact-lab.lanza_granero .scene {height:21svh}
+.compact-lab.lanza_granero .frame {padding:5px}
+.compact-lab.lanza_granero .frame h2 {margin:2px 0;font-size:1.05rem}
+.compact-lab.lanza_granero .measure {margin-top:3px}.compact-lab.lanza_granero .measure .box {padding:3px 6px}
+}

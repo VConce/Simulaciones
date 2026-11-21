@@ -14,34 +14,26 @@
 button, input[type=range], select {min-height:44px}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #1768a3;outline-offset:3px}
 @media(max-width:680px){main{max-width:100%}.grid,.scenes,.readGrid,.metrics,.eqGrid,.top{min-width:0}.hero,.panel,.control,.card{min-width:0}canvas{max-width:100%}.vconceLogo{position:static!important;display:block;margin:9px 12px 0;width:38px;height:38px}}
-</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script></head>
-<body><img class="vconceLogo" src="../../electromagnetism/assets/electric/vconce.png" alt="VConce">
-  <main class="page">
-    <section class="hero">
-      <div class="title">
-        <p class="tag">Relatividad especial · simultaneidad</p>
-        <h1>Observador paseando</h1>
-        <p class="lead">Galileo contempla dos estrellas en reposo desde la playa. Einstein se mueve hacia la estrella naranja (a la derecha). Las viñetas muestran las coordenadas de las emisiones en cada marco. La llegada de la luz al observador es otro suceso.</p>
-      </div>
-    </section>
-
-    <section class="card">
+</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+<body>
+  <main class="page compact-lab observador_paseando">
+    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Observador paseando</h1></header><section class="card">
       <div class="canvasWrap">
         <canvas id="sim" width="1200" height="650"></canvas>
         <div class="simControls" aria-label="Controles de reproduccion y velocidad">
           <button type="button" id="pauseAnimation" class="primaryButton">Pausar</button><button id="restartPanel" class="primaryButton" type="button">Reiniciar</button>
           <div class="control">
             <label for="v">Velocidad de Einstein <output id="vOut">1 m/s</output></label>
-            <input id="v" type="range" min="0" max="1" step="0.001" value="0.955" />
+            <input id="v" type="range" min="0" max="1" step="0.001" value="0.955">
             <div class="scale"><span>1 m/s</span><span>Escala logarítmica</span><span>0.99 c</span></div>
             <div class="speedEdit">
-              <input id="speedValue" type="text" inputmode="decimal" value="1" aria-label="Valor de velocidad" />
+              <input id="speedValue" type="text" inputmode="decimal" value="1" aria-label="Valor de velocidad">
               <select id="speedUnit" aria-label="Unidad de velocidad"><option value="ms" selected>m/s</option><option value="c">c</option></select>
             </div>
           </div>
           <div class="control">
             <label for="starDistance">Distancia entre las estrellas <output id="starDistanceOut">10 años luz</output></label>
-            <input id="starDistance" type="range" min="0" max="4" step="0.01" value="1" />
+            <input id="starDistance" type="range" min="0" max="4" step="0.01" value="1">
             <div class="scale"><span>1 a.l.</span><span>100 a.l.</span><span>10 000 a.l.</span></div>
           </div>
           <div class="distanceRead"><span>Distancia a los observadores</span><strong id="observerDistanceOut">21.0 años luz</strong></div>
@@ -56,9 +48,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       </div>
     </section>
 
-    <section class="eqGrid" aria-label="Teoria">
-      <article><h3>Transformacion temporal</h3><div class="math">Δt' = γ(Δt − vΔx/c²)</div><p>Si Galileo mide dos explosiones con Δt = 0 pero separadas por Δx, Einstein puede medir un desfase temporal.</p></article>
-      <article><h3>Factor gamma</h3><div class="math">γ = 1 / √(1 − v²/c²)</div><p>El desfase crece con la velocidad relativa. La animación reescala el efecto para que sea visible en clase.</p></article>
+    <div class="lab-intro"><p class="lead">Galileo contempla dos estrellas en reposo desde la playa. Einstein se mueve hacia la estrella naranja (a la derecha). Las viñetas muestran las coordenadas de las emisiones en cada marco. La llegada de la luz al observador es otro suceso.</p>
+      </div><section class="eqGrid lab-theory" aria-label="Teoria">
+      <article><h3>Transformacion temporal</h3><div class="math" data-tex="">\Delta t'=\gamma\!\left(\Delta t-\frac{v\Delta x}{c^2}\right)</div><p>Si Galileo mide dos explosiones con Δt = 0 pero separadas por Δx, Einstein puede medir un desfase temporal.</p></article>
+      <article><h3>Factor gamma</h3><div class="math" data-tex="">\gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>El desfase crece con la velocidad relativa. La animación reescala el efecto para que sea visible en clase.</p></article>
       <article><h3>Lectura didactica</h3><p>Tomando Δx de la estrella azul a la naranja, Δt′ = −γvΔx/c². La estrella naranja emite primero en S′.</p></article>
     </section>
   </main>

@@ -82,46 +82,13 @@
 button, input[type=range], select {min-height:44px}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #1768a3;outline-offset:3px}
 @media(max-width:680px){main{max-width:100%}.grid,.scenes,.readGrid,.metrics,.eqGrid,.top{min-width:0}.hero,.panel,.control,.card{min-width:0}canvas{max-width:100%}.vconceLogo{position:static!important;display:block;margin:9px 12px 0;width:38px;height:38px}}
-</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script></head>
-<body><img class="vconceLogo" src="../../electromagnetism/assets/electric/vconce.png" alt="VConce">
-  <main class="page">
-    <section class="hero">
-      <div class="title">
-        <div class="orb">μ</div>
-        <div>
-          <p class="tag">Relatividad especial · dilatación temporal</p>
-          <h1>Muón cósmico</h1>
-          <p class="lead">Un muón creado en la alta atmósfera vive muy poco en su propio reloj. La relatividad explica por qué aun así puede llegar hasta la superficie terrestre.</p>
-        </div>
-      </div>
-      <aside class="controlCard" aria-label="Controles de la simulación">
-        <div>
-          <label for="beta">Velocidad del muón <output id="betaOut">0.980 c</output></label>
-          <input id="beta" type="range" min="0.70" max="0.999" step="0.001" value="0.980" />
-          <div class="scale"><span>0.70 c</span><span>relativista</span><span>0.999 c</span></div>
-        </div>
-        <div>
-          <label for="height">Altura de creación <output id="heightOut">15.0 km</output></label>
-          <input id="height" type="range" min="2" max="25" step="0.5" value="15" />
-          <div class="scale"><span>2 km</span><span>atmósfera</span><span>25 km</span></div>
-        </div>
-        <div class="actions">
-          <button id="pause" class="primary" type="button">Pausar</button>
-          <button id="newMuon" class="primary" type="button">Nuevo muón</button><button id="reset" class="ghost" type="button">Reiniciar</button>
-        </div>
-      </aside>
-    </section>
-
-    <section class="readGrid" aria-label="Lecturas principales">
-      <div class="read"><span>Probabilidad de llegar al suelo</span><strong id="probability"></strong></div><div class="read"><span>Muón de este ensayo</span><strong id="outcome"></strong></div><div class="read"><span>Factor gamma</span><strong id="gammaOut">5.03</strong></div>
-      <div class="read"><span>Tiempo Tierra</span><strong id="earthTimeOut">0.00 μs</strong></div>
-      <div class="read"><span>Tiempo muón</span><strong id="muonTimeOut">0.00 μs</strong></div>
-    </section>
-
-    <section class="scenes">
+</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+<body>
+  <main class="page compact-lab muon_einstein">
+    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Muón cósmico</h1></header><section class="scenes">
       <article class="sceneCard">
         <div class="sceneHead">
-          <div><h2>Marco de la Tierra</h2><p>El muón cae desde la atmósfera hacia la superficie.</p></div>
+          <div><h2>Marco de la Tierra</h2></div>
           <div class="pill">Marco S</div>
         </div>
         <div class="canvasWrap"><canvas id="earthCanvas" width="760" height="520"></canvas></div>
@@ -129,17 +96,40 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 
       <article class="sceneCard">
         <div class="sceneHead">
-          <div><h2>Reloj del muón</h2><p>El reloj de muñeca mide el tiempo propio τ.</p></div>
+          <div><h2>Reloj del muón</h2></div>
           <div class="pill">Marco S'</div>
         </div>
         <div class="canvasWrap"><canvas id="muonCanvas" width="760" height="520"></canvas></div>
       </article>
     </section>
 
-    <section class="lesson">
-      <article class="mini"><h3>En la Tierra</h3><p>La distancia de caída es la altura atmosférica completa. El contador muestra el tiempo coordenado medido por relojes terrestres.</p></article>
-      <article class="mini"><h3>En el muón</h3><p>Su reloj avanza más despacio respecto al marco terrestre: τ = t/γ. Por eso envejece menos durante el viaje.</p></article>
-      <article class="mini"><h3>¿Cuántos llegan?</h3><p>Cada ensayo sortea un tiempo propio de desintegración exponencial. Para una altura h, la fracción esperada al nivel del suelo es exp[−h/(γvτ₀)], con τ₀ ≈ 2.197 μs. El modelo supone velocidad constante.</p></article>
+    <aside class="controlCard" aria-label="Controles de la simulación">
+        <div>
+          <label for="beta">Velocidad del muón <output id="betaOut">0.980 c</output></label>
+          <input id="beta" type="range" min="0.70" max="0.999" step="0.001" value="0.980">
+          <div class="scale"><span>0.70 c</span><span>relativista</span><span>0.999 c</span></div>
+        </div>
+        <div>
+          <label for="height">Altura de creación <output id="heightOut">15.0 km</output></label>
+          <input id="height" type="range" min="2" max="25" step="0.5" value="15">
+          <div class="scale"><span>2 km</span><span>atmósfera</span><span>25 km</span></div>
+        </div>
+        <div class="actions">
+          <button id="pause" class="primary" type="button">Pausar</button>
+          <button id="newMuon" class="primary" type="button">Nuevo muón</button><button id="reset" class="ghost" type="button">Reiniciar</button>
+        </div>
+      </aside>
+    <section class="readGrid" aria-label="Lecturas principales">
+      <div class="read"><span>Probabilidad de llegar al suelo</span><strong id="probability"></strong></div><div class="read"><span>Muón de este ensayo</span><strong id="outcome"></strong></div><div class="read"><span>Factor gamma</span><strong id="gammaOut">5.03</strong></div>
+      <div class="read"><span>Tiempo Tierra</span><strong id="earthTimeOut">0.00 μs</strong></div>
+      <div class="read"><span>Tiempo muón</span><strong id="muonTimeOut">0.00 μs</strong></div>
+    </section>
+
+    <div class="lab-intro"><p class="lead">Un muón creado en la alta atmósfera vive muy poco en su propio reloj. La relatividad explica por qué aun así puede llegar hasta la superficie terrestre.</p>
+        <p>El muón cae desde la atmósfera hacia la superficie.</p><p>El reloj de muñeca mide el tiempo propio τ.</p></div><section class="lesson lab-theory">
+      <article class="mini"><h3>En la Tierra</h3><p>La distancia de caída es la altura atmosférica completa. El contador muestra el tiempo coordenado medido por relojes terrestres.</p><div data-tex="">t=h/v</div></article>
+      <article class="mini"><h3>En el muón</h3><p>El reloj que viaja con el muón mide el tiempo propio entre su creación y su desintegración.</p><div data-tex="">\tau=t/\gamma</div></article>
+      <article class="mini"><h3>¿Cuántos llegan?</h3><p>Cada ensayo sortea un tiempo propio de desintegración exponencial. La probabilidad de alcanzar el suelo depende de la altura y la velocidad. La vida media propia es de unos 2.197 μs.</p><div data-tex="">P=\exp\!\left(-\frac{h}{\gamma v\tau_0}\right)</div></article>
     </section>
   </main>
 

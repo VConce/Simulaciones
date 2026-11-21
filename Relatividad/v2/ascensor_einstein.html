@@ -464,32 +464,15 @@
       .pill { white-space: normal; }
     }
   .vconceLogo{position:fixed;left:14px;top:14px;width:54px;height:54px;object-fit:contain;z-index:10000;pointer-events:none}@media(max-width:900px){.vconceLogo{width:42px;height:42px;left:10px;top:10px}}/* vconce header clearance */body>header{padding-left:max(88px,env(safe-area-inset-left))!important}@media(max-width:900px){body>header{padding-left:64px!important}}</style>
-<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script></head>
-<body><img class="vconceLogo" src="../../electromagnetism/assets/electric/vconce.png" alt="VConce">
-  <main class="page">
-    <section class="hero" aria-labelledby="title">
-      <div class="titleBlock">
-        <div class="orb" aria-hidden="true"></div>
-        <div>
-          <p class="kicker">Relatividad general interactiva</p>
-          <h1 id="title">Ascensor de Einstein</h1>
-          <p class="lead">Compara dos situaciones localmente indistinguibles: un ascensor acelerando en el espacio y un laboratorio en reposo dentro de un campo gravitatorio uniforme.</p>
-        </div>
-      </div>
-      <aside class="formulaCard">
-        <small>Idea física</small>
-        <span class="formula">a equivalente a g</span>
-        <p>La trayectoria visible del rayo está amplificada para que el alumnado pueda ver cómo aumenta la curvatura al subir la aceleración o la gravedad.</p>
-      </aside>
-    </section>
-
-    <section class="lab">
+<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+<body>
+  <main class="page compact-lab ascensor_einstein">
+    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1 id="title">Ascensor de Einstein</h1></header><section class="lab">
       <article class="card stageCard">
         <div class="stageHeader">
           <div>
             <h2>Simulación visual</h2>
-            <p id="subtitle">La cabina acelera hacia arriba; el rayo parece doblarse hacia el suelo.</p>
-          </div>
+            </div>
           <div id="modeBadge" class="pill">a = 9.81 m/s²</div>
         </div>
         <div class="canvasWrap">
@@ -517,21 +500,21 @@
         <div class="controlBox">
           <div>
             <label for="gravitySlider"><span id="sliderLabel">Aceleración del ascensor</span><output id="gravityOut">9.81 m/s²</output></label>
-            <input id="gravitySlider" type="range" min="0" max="25" value="9.81" step="0.01" />
+            <input id="gravitySlider" type="range" min="0" max="25" value="9.81" step="0.01">
             <div class="scale"><span>0</span><span>Tierra 9.81</span><span>25</span></div>
           </div>
 
           <div><label for="cabinWidth">Anchura de la cabina <output id="cabinWidthOut">2.0 m</output></label><input id="cabinWidth" type="range" min="1" max="4" value="2" step="0.1"></div>
           <div id="velocityControl" class="velocityControl hidden">
             <label for="velocitySlider">Velocidad constante del ascensor <output id="velocityOut">0.00 c</output></label>
-            <input id="velocitySlider" type="range" min="-0.80" max="0.80" value="0" step="0.01" />
+            <input id="velocitySlider" type="range" min="-0.80" max="0.80" value="0" step="0.01">
             <div class="scale"><span>baja -0.80 c</span><span>reposo</span><span>sube +0.80 c</span></div>
             <p class="velocityHint">El emisor se mueve con la cabina. En su propio sistema emite horizontalmente, a cualquier velocidad uniforme.</p>
           </div>
 
           <div>
             <label for="speedSlider">Velocidad de animación <output id="speedOut">1.0x</output></label>
-            <input id="speedSlider" type="range" min="0.25" max="2.5" value="1" step="0.05" />
+            <input id="speedSlider" type="range" min="0.25" max="2.5" value="1" step="0.05">
             <div class="scale"><span>lento</span><span>normal</span><span>rápido</span></div>
           </div>
 
@@ -554,9 +537,16 @@
       </aside>
     </section>
 
-    <section class="equivalence" aria-label="Guía de interpretación">
+    <div class="lab-intro"><p class="lead">Compara dos situaciones localmente indistinguibles: un ascensor acelerando en el espacio y un laboratorio en reposo dentro de un campo gravitatorio uniforme.</p>
+        <aside class="formulaCard">
+        <small>Idea física</small>
+        <span class="formula" data-tex="">|\vec a|=|\vec g|</span>
+        <p>La trayectoria visible del rayo está amplificada para que el alumnado pueda ver cómo aumenta la curvatura al subir la aceleración o la gravedad.</p>
+      </aside>
+    <p id="subtitle">La cabina acelera hacia arriba; el rayo parece doblarse hacia el suelo.</p>
+          </div><section class="equivalence lab-theory" aria-label="Guía de interpretación">
       <article class="mini"><span>1</span><h3>Localmente iguales</h3><p>Si el laboratorio es pequeño, una aceleración hacia arriba produce los mismos efectos que una gravedad hacia abajo.</p></article>
-      <article class="mini"><span>2</span><h3>Rayo amplificado</h3><p>Durante el cruce t ≈ L/c, la caída relativa es Δy ≈ aL²/(2c²), con aL/c² ≪ 1. Se expresa en femtómetros (1 fm = 10⁻¹⁵ m). La desviación vertical está ampliada.</p></article>
+      <article class="mini"><span>2</span><h3>Rayo amplificado</h3><p>Durante el cruce, la luz recorre la anchura del ascensor. La caída se expresa en femtómetros y está ampliada en el dibujo.</p><div data-tex="">t\simeq L/c,\qquad |\Delta y|\simeq\frac{aL^2}{2c^2},\qquad aL/c^2\ll1</div></article>
       <article class="mini"><span>3</span><h3>Más g, más curva</h3><p>Al aumentar el valor de a o g, el rayo tarda lo mismo en cruzar, pero la cabina o el campo producen mayor desviación aparente.</p></article>
     </section>
   </main>

@@ -35,29 +35,13 @@
     .info{margin-top:16px;padding:16px 18px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.mini h3{margin:0 0 5px;font-size:18px}.mini p{margin:0;color:var(--muted);font-weight:650;line-height:1.38}
     @media(max-width:1100px){.hero,.workspace{display:block}.formula{margin-top:12px}.panel{margin-top:16px}.eqGrid,.info{grid-template-columns:1fr}}
   .vconceLogo{position:fixed;left:14px;top:14px;width:54px;height:54px;object-fit:contain;z-index:10000;pointer-events:none}@media(max-width:900px){.vconceLogo{width:42px;height:42px;left:10px;top:10px}}/* vconce header clearance */body>header{padding-left:max(88px,env(safe-area-inset-left))!important}@media(max-width:900px){body>header{padding-left:64px!important}}</style>
-<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script></head>
-<body><img class="vconceLogo" src="../../electromagnetism/assets/electric/vconce.png" alt="VConce">
-  <main class="page">
-    <section class="hero">
-      <div class="title">
-        <div class="badge">2</div>
-        <div>
-          <p class="tag">Relatividad general · dilatación gravitatoria</p>
-          <h1>Torre gravitatoria</h1>
-          <p class="lead">Compara dos relojes situados a distintas alturas. Puedes arrastrarlos por la torre o usar los deslizadores. La simulación empieza en la fecha actual y proyecta la fecha propia de cada reloj.</p>
-        </div>
-      </div>
-      <aside class="formula">
-        <span>Modelo usado</span>
-        <div class="math">dτ = dt&nbsp;<span class="sqrt">1 − <span class="frac"><span class="top">2GM</span><span class="bottom">c²r</span></span></span></div>
-        <p>Aproximación de Schwarzschild para relojes estáticos, suficiente para comparar alturas cerca de la Tierra.</p>
-      </aside>
-    </section>
-
-    <section class="workspace">
+<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+<body>
+  <main class="page compact-lab torre_gravitatoria">
+    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Torre gravitatoria</h1></header><section class="workspace">
       <article class="sceneCard">
         <div class="sceneHead">
-          <div><h2>Relojes en una torre</h2><p>Arrastra los relojes con el dedo o el ratón para colocarlos a la altura deseada.</p></div>
+          <div><h2>Relojes en una torre</h2></div>
           <div class="pill" id="modePill">Tierra ×1.00</div>
         </div>
         <div class="canvasWrap"><canvas id="scene" width="900" height="560"></canvas></div>
@@ -66,7 +50,7 @@
       <aside class="panel" aria-label="Controles de la simulación">
         <div class="control">
           <label for="warp">Escala temporal reloj 1 <output id="warpOut">1 s/s</output></label>
-          <input id="warp" type="range" min="0" max="4" step="0.01" value="0" />
+          <input id="warp" type="range" min="0" max="4" step="0.01" value="0">
           <div class="scale"><span>1 s/s</span><span>1 día/s</span><span>1 década/s</span></div>
         </div>
         <div class="control">
@@ -76,12 +60,12 @@
             <button type="button" data-unit="earth">M⊕</button>
             <button type="button" data-unit="solar">M☉</button>
           </div>
-          <input id="mass" type="range" min="1" max="24.776" step="0.001" value="24.776" />
+          <input id="mass" type="range" min="1" max="24.776" step="0.001" value="24.776">
           <div class="scale"><span id="massMinOut">10 kg</span><span id="massMidOut">10¹² kg</span><span id="massMaxOut">1 M⊕</span></div>
         </div>
         <div class="control">
           <label for="radius">Radio del planeta <output id="radiusOut">6371 km</output></label>
-          <input id="radius" type="range" min="2" max="9" step="0.01" value="3.804" />
+          <input id="radius" type="range" min="2" max="9" step="0.01" value="3.804">
           <div class="scale"><span>100 km</span><span>6371 km</span><span>10^9 km</span></div>
         </div>
         <div class="statusBox" id="gravityStatus">
@@ -106,7 +90,7 @@
         </div>
         <div class="control kerrControl" id="kerrControl" hidden>
           <label for="kerrSpin">Rotación Kerr <output id="kerrOut">χ = 0.000</output></label>
-          <input id="kerrSpin" type="range" min="0" max="0.999999" step="0.000001" value="0" />
+          <input id="kerrSpin" type="range" min="0" max="0.999999" step="0.000001" value="0">
           <div class="scale"><span>sin giro</span><span>Kerr</span><span>χ ≈ 1</span></div>
         </div>
         <div class="control">
@@ -114,17 +98,17 @@
             <label for="tower">Altura física de la torre <output id="towerOut">200 m</output></label>
             <button id="towerTypical" class="miniButton" type="button">Torre típica</button>
           </div>
-          <input id="tower" type="range" min="0" max="100000" step="100" value="200" />
+          <input id="tower" type="range" min="0" max="100000" step="100" value="200">
           <div class="scale"><span>0 m</span><span>10 km atmósfera</span><span>100 km</span></div>
         </div>
         <div class="control">
           <label for="clock1">Altura reloj 1 <output id="clock1Out">0 m</output></label>
-          <input id="clock1" type="range" min="0" max="1" step="0.001" value="0" />
+          <input id="clock1" type="range" min="0" max="1" step="0.001" value="0">
           <div class="scale"><span>superficie</span><span>arrastra</span><span>cima</span></div>
         </div>
         <div class="control">
           <label for="clock2">Altura reloj 2 <output id="clock2Out">200 m</output></label>
-          <input id="clock2" type="range" min="0" max="1" step="0.001" value="1" />
+          <input id="clock2" type="range" min="0" max="1" step="0.001" value="1">
           <div class="scale"><span>superficie</span><span>arrastra</span><span>cima</span></div>
         </div>
         <div class="delta">
@@ -135,7 +119,7 @@
         </div>
         <div class="horizonWarning" id="horizonWarning" hidden>
           <span>Advertencia física</span>
-          <p>En el ecuador, un reloj fijo respecto al infinito exige r > 2GM/c². En Kerr, este límite estático queda fuera del horizonte para χ ≠ 0.</p>
+          <p>En el ecuador, un reloj fijo respecto al infinito exige r &gt; 2GM/c². En Kerr, este límite estático queda fuera del horizonte para χ ≠ 0.</p>
         </div>
         <div class="buttons">
           <button id="pause" class="primary" type="button">Pausar</button>
@@ -144,12 +128,18 @@
       </aside>
     </section>
 
-    <section class="eqGrid" aria-label="Ecuaciones de la simulación">
-      <article class="eqCard"><span>Ritmo gravitatorio</span><div class="math small"><span class="frac"><span class="top">dτ</span><span class="bottom">dt</span></span> = <span class="sqrt">1 − <span class="frac"><span class="top">2GM</span><span class="bottom">c²r</span></span></span></div><p>Reloj estático en el ecuador, a coordenada radial r. El tiempo t corresponde al observador lejano.</p></article>
-      <article class="eqCard"><span>Radio usado</span><div class="math small">r = R + h</div><p>R y h son coordenadas radiales. En campo fuerte h no coincide con la altura medida con una regla.</p></article>
-      <article class="eqCard"><span>Horizonte Kerr</span><div class="math small">r₊ = <span class="frac"><span class="top">GM</span><span class="bottom">c²</span></span>(1+√(1−χ²))</div><p>χ es el espín adimensional; χ &lt; 1.</p></article>
-      <article class="eqCard"><span>Tiempo propio</span><div class="math small">τᵢ = t&nbsp;<span class="sqrt">1 − <span class="frac"><span class="top">2GM</span><span class="bottom">c²(R+hᵢ)</span></span></span></div><p>Para posición y masa constantes. Al mover un reloj se acumula el nuevo ritmo desde ese instante. Se idealiza el traslado como instantáneo.</p></article>
-      <article class="eqCard"><span>Diferencia</span><div class="math small">Δτ = τ₂ − τ₁</div><p>El recuadro rojo muestra esta diferencia acumulada.</p></article>
+    <div class="lab-intro"><p class="lead">Compara dos relojes situados a distintas alturas. Puedes arrastrarlos por la torre o usar los deslizadores. La simulación empieza en la fecha actual y proyecta la fecha propia de cada reloj.</p>
+        <aside class="formula">
+        <span>Modelo usado</span>
+        <div class="math" data-tex="">d\tau=dt\sqrt{1-\frac{2GM}{c^2r}}</div>
+        <p>Aproximación de Schwarzschild para relojes estáticos, suficiente para comparar alturas cerca de la Tierra.</p>
+      </aside>
+    <p>Arrastra los relojes con el dedo o el ratón para colocarlos a la altura deseada.</p></div><section class="eqGrid lab-theory" aria-label="Ecuaciones de la simulación">
+      <article class="eqCard"><span>Ritmo gravitatorio</span><div class="math small" data-tex="">\frac{d\tau}{dt}=\sqrt{1-\frac{2GM}{c^2r}}</div><p>Reloj estático en el ecuador, a coordenada radial r. El tiempo t corresponde al observador lejano.</p></article>
+      <article class="eqCard"><span>Radio usado</span><div class="math small" data-tex="">r=R+h</div><p>R y h son coordenadas radiales. En campo fuerte h no coincide con la altura medida con una regla.</p></article>
+      <article class="eqCard"><span>Horizonte Kerr</span><div class="math small" data-tex="">r_+=\frac{GM}{c^2}\!\left(1+\sqrt{1-\chi^2}\right)</div><p>χ es el espín adimensional; χ &lt; 1.</p></article>
+      <article class="eqCard"><span>Tiempo propio</span><div class="math small" data-tex="">\tau_i=t\sqrt{1-\frac{2GM}{c^2(R+h_i)}}</div><p>Para posición y masa constantes. Al mover un reloj se acumula el nuevo ritmo desde ese instante. Se idealiza el traslado como instantáneo.</p></article>
+      <article class="eqCard"><span>Diferencia</span><div class="math small" data-tex="">\Delta\tau=\tau_2-\tau_1</div><p>El recuadro rojo muestra esta diferencia acumulada.</p></article>
     </section>
 
     <section class="info">
