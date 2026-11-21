@@ -219,9 +219,12 @@ function clockScene(canvas, ground) {
     if (reflections.length > 240) reflections.shift();
   }
   function draw() {
-    const center = W/2 + Math.min(55,W*.07);
-    const cx = ground ? center - Math.max(0,Math.min(W*.10,95)-distance) : center;
-    const groundOrigin = cx - distance;
+    const sceneScale = ground ? .8 : 1;
+    const trackWidth = W/sceneScale;
+    // Allow the trailing chair and the leading mirror to clear opposite edges.
+    const lap = trackWidth + 220;
+    const startX = Math.max(180,trackWidth*.22);
+    const cx = ground ? (startX + distance + 60) % lap - 60 : W/2 + Math.min(55,W*.07);
     const g = clockGeometry(cx, H * .51, height);
     const pulse = bounce(proper);
     const y = g.bottom - pulse.p * spacing;
@@ -237,6 +240,9 @@ function clockScene(canvas, ground) {
       ctx.drawImage(assets.visitor, -9, -14, 18, 28);
       ctx.restore();
     }
+    ctx.save();
+    ctx.translate(0,H*.51*(1-sceneScale));
+    ctx.scale(sceneScale,sceneScale);
     if (assets.lorentz.complete && assets.lorentz.naturalWidth) {
       const h = 82, w = h * assets.lorentz.naturalWidth / assets.lorentz.naturalHeight;
       const right = cx - 47, base = g.bottom + 8;
@@ -250,16 +256,21 @@ function clockScene(canvas, ground) {
     const trailClock = ground ? 'time' : 'proper';
     const cutoff = (trailClock==='proper'?proper:trailTime) - Number(trail.value);
     if(Number(trail.value)>0){
-      let prev=reflections[0], started=false;
+      let prev=reflections[0];
       for(const point of [...reflections.slice(1),{x:distance,fraction:pulse.p,time:trailTime,proper}]){
         if(point[trailClock]>cutoff){
-          if(!started){
-            const part=Math.max(0,(cutoff-prev[trailClock])/(point[trailClock]-prev[trailClock]||1));
-            ctx.moveTo(ground?groundOrigin+prev.x+(point.x-prev.x)*part:cx,
-              g.bottom-spacing*(prev.fraction+(point.fraction-prev.fraction)*part));
-            started=true;
+          const part=Math.max(0,(cutoff-prev[trailClock])/(point[trailClock]-prev[trailClock]||1));
+          const y1=g.bottom-spacing*(prev.fraction+(point.fraction-prev.fraction)*part);
+          const y2=g.bottom-spacing*point.fraction;
+          if (ground) {
+            const x1=startX+prev.x+(point.x-prev.x)*part, x2=startX+point.x;
+            // Each pass is clipped separately so the wrap never draws a chord across the scene.
+            for(let pass=Math.ceil((x1-trackWidth)/lap);pass<=Math.floor(x2/lap);pass++){
+              ctx.moveTo(x1-pass*lap,y1); ctx.lineTo(x2-pass*lap,y2);
+            }
+          } else {
+            ctx.moveTo(cx,y1); ctx.lineTo(cx,y2);
           }
-          ctx.lineTo(ground?groundOrigin+point.x:cx,g.bottom-spacing*point.fraction);
         }
         prev=point;
       }
@@ -269,9 +280,10 @@ function clockScene(canvas, ground) {
     ctx.strokeStyle = '#dbffe6'; ctx.lineWidth = 1.3; ctx.stroke(); ctx.restore();
     drawGreenBall(cx, y);
     const ticks = Math.floor(pulse.hit / 2);
-    if (ground) drawWatch(W-18, 6,'Exterior',clockTimes.exterior,ticks,'#137ab4');
-    else drawWatch(cx-56, g.bottom+13,'Lorentz',clockTimes.lorentz,ticks,'#008967');
+    if (!ground) drawWatch(cx-56, g.bottom+13,'Lorentz',clockTimes.lorentz,ticks,'#008967');
     drawEinstein(g);
+    ctx.restore();
+    if (ground) drawWatch(W-18, 6,'Exterior',clockTimes.exterior,ticks,'#137ab4');
     document.getElementById('vOut').textContent = beta().toFixed(4) + ' c';
     document.getElementById('gammaOut').textContent = gamma().toFixed(2);
     document.getElementById('periodOut').textContent = (PROPER_PERIOD_NS * gamma()).toFixed(2) + ' ns';
@@ -283,7 +295,7 @@ function clockScene(canvas, ground) {
       animationTime += dt;
       if (b > 0 || approach > 0) approach = Math.min(1.65, approach + dt);
       const widthsPerSecond = .2*b + 1.6*b*b + .25*Math.max(0,Math.log10(.1/(1-b)));
-      skyOffset += dt * W * widthsPerSecond * (ground ? .68 : 1);
+      if (!ground) skyOffset += dt * W * widthsPerSecond;
       const elapsedNs = dt * Number(playback.value);
       if (ground) {
         clockTimes.exterior += elapsedNs;
