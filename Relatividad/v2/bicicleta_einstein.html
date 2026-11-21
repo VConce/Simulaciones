@@ -99,20 +99,20 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>La bicicleta de Einstein</h1></header><div class="experiment-layout"><section class="card sim">
     <div class="simHead">
       <label class="reference" for="reference">Marco de referencia <select id="reference"><option value="ground">Suelo</option><option value="bike">Bicicleta (Einstein)</option></select></label>
-      <div class="gamma" id="gammaOut">γ = 1.20</div>
+      <div class="gamma" id="gammaOut">γ = 1.01</div>
     </div>
     <div class="canvasBox"><canvas id="scene" width="1280" height="500" role="img" aria-label="Einstein pedalea ante un paisaje que pasa. Al soltar la manzana se dibuja su trayectoria."></canvas></div>
   </section>
 
   <aside class="card side">
       <div class="results">
-        <div class="res gal"><span>Manzana desde el suelo</span><strong id="groundOut">0.6757 c</strong></div>
-        <div class="res ein"><span>Manzana desde la bicicleta</span><strong id="riderOut">0.2000 c</strong></div>
+        <div class="res gal"><span>Manzana desde el suelo</span><strong id="groundOut">0.9174 c</strong></div>
+        <div class="res ein"><span>Manzana desde la bicicleta</span><strong id="riderOut">0.9000 c</strong></div>
       </div>
       <div class="controlPanel">
         <div class="controls">
-          <div><label for="bikeV">Bicicleta respecto al suelo <output id="bikeOut">0.5500 c</output></label><input id="bikeV" type="range" min="0" max="0.9999" step="0.0001" value="0.55"></div>
-          <div><label for="appleV">Manzana respecto a la bicicleta <output id="appleOut">0.2000 c</output></label><input id="appleV" type="range" min="-0.9999" max="0.9999" step="0.0001" value="0.2000"></div>
+          <div><label for="bikeV">Bicicleta respecto al suelo <output id="bikeOut">0.1000 c</output></label><input id="bikeV" type="range" min="0" max="0.9999" step="0.0001" value="0.1000"></div>
+          <div><label for="appleV">Manzana respecto a la bicicleta <output id="appleOut">0.9000 c</output></label><input id="appleV" type="range" min="-0.9999" max="0.9999" step="0.0001" value="0.9000"></div>
         </div>
         <div class="buttons"><button class="primary" id="dropBtn">Soltar manzana</button><button type="button" id="pauseAnimation" class="ghost">Pausar</button><button class="ghost" id="resetBtn">Reiniciar</button></div>
       </div>
@@ -322,7 +322,7 @@ $("dropBtn").onclick=()=>{
 $("pauseAnimation").onclick=()=>{advance(performance.now());state.paused=!state.paused;render();};
 $("reference").onchange=()=>{lastFrame=performance.now();render();};
 $("resetBtn").onclick=()=>{
-  bikeV.value=.55;appleV.value=.20;$("reference").value="ground";state.distance=0;state.pedalAngle=0;state.paused=false;
+  bikeV.value=bikeV.defaultValue;appleV.value=appleV.defaultValue;$("reference").value="ground";state.distance=0;state.pedalAngle=0;state.paused=false;
   lastFrame=performance.now();clearFlight();update();render();
 };
 document.addEventListener('visibilitychange',()=>{lastFrame=performance.now();});
