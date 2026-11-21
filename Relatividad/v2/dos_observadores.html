@@ -5,9 +5,9 @@
   <title>Dos observadores · El tren de Einstein</title>
   <link rel="icon" href="../../electromagnetism/assets/electric/vconce.png">
   <link rel="stylesheet" href="../../shared/katex/katex.min.css">
-  <link rel="stylesheet" href="tren.css?v=diferencia">
+  <link rel="stylesheet" href="tren.css?v=marcos">
   <script defer src="../../shared/katex/katex.min.js"></script>
-  <script defer src="tren.js?v=diferencia"></script>
+  <script defer src="tren.js?v=marcos"></script>
 </head>
 <body>
 <main>
@@ -26,23 +26,30 @@
       <div class="platform-figure"><img src="../assets/dos-observadores-maxwell-sprite.png" alt=""><div class="dial platform-dial" data-clock="max" aria-hidden="true"></div></div>
     </div>
     <section class="controls" aria-label="Controles del experimento">
-      <div><label for="velocity">Velocidad del tren</label><input id="velocity" type="range" min="0" max="0.9999" value="0.8" step="0.0001">
+      <div class="frame-choice"><label for="reference">Marco de referencia</label><select id="reference" aria-describedby="reference-note"><option value="station">Andén (Maxwell)</option><option value="train">Tren (Einstein)</option></select><small id="reference-note">Cambiar de marco pone a cero la comparación.</small></div>
+      <div><label for="velocity">Rapidez relativa</label><input id="velocity" type="range" min="0" max="0.9999" value="0.8" step="0.0001">
       <div class="entry"><input id="exact" type="text" inputmode="decimal" value="0.8" aria-label="Velocidad exacta"><select id="unit" aria-label="Unidad de velocidad"><option value="c">c</option><option value="ms">m/s</option></select></div></div>
-      <div><label for="rate">Ritmo de Maxwell</label><select id="rate"><option value="1">1 s por 1 s real</option><option value="3" selected>3 s por 1 s real</option><option value="6">6 s por 1 s real</option></select></div>
-      <dl><div><dt>Por cada 10 s del andén</dt><dd><output aria-live="off" id="ratio"></output> en el tren</dd></div><div><dt>Factor γ</dt><dd id="gamma"></dd></div></dl>
+      <div><label for="rate" id="rate-label">Ritmo de Maxwell</label><select id="rate"><option value="1">1 s por 1 s real</option><option value="3" selected>3 s por 1 s real</option><option value="6">6 s por 1 s real</option></select></div>
+      <dl><div><dt id="ratio-label">Por cada 10 s del andén</dt><dd><output aria-live="off" id="ratio"></output> <span id="other-location">en el tren</span></dd></div><div><dt>Factor γ</dt><dd id="gamma"></dd></div></dl>
       <div class="actions"><button id="pause" type="button">Pausar</button><button id="reset" type="button">Poner a cero</button></div>
     </section>
   </div>
   <section class="explanation">
+    <article>
     <h2>¿De quién es el tiempo propio?</h2>
     <p>Einstein pulsa el botón de un cronómetro fijo en el vagón para ponerlo en marcha y vuelve a pulsarlo para pararlo. Las dos pulsaciones ocurren en el mismo lugar del vagón. Un solo reloj está presente en ambos sucesos y mide directamente el intervalo entre ellos. A ese intervalo lo llamamos <strong>tiempo propio</strong>, <span class="tex">\Delta\tau_{\mathrm E}</span>. Desde el andén, cada pulsación ocurre en un lugar distinto. Maxwell puede asignar una hora a cada una usando el reloj de ese punto del andén, siempre que ambos relojes estén sincronizados.</p>
     <div class="formula tex">\Delta\tau_{\mathrm E}=\frac{\Delta t_{\text{andén}}}{\gamma},\qquad \gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div>
     <p>Esta igualdad vale para un tramo a velocidad constante. A <span class="tex">v=0.8c</span>, por cada 10 s del andén, el reloj del tren suma 6 s. Si cambias la velocidad, lo que ya marcaban los relojes se conserva y el nuevo ritmo se aplica desde ese instante.</p>
-    <h3>¿Y si Einstein considera que se mueve Maxwell?</h3>
+    <h3>Prueba los dos marcos a 0.9999 c</h3>
+    <p>Desde el andén, cuando Maxwell suma 10 s, Einstein suma unos 0.1414 s. Escoge ahora el tren como referencia. Cuando Einstein suma 10 s, Maxwell suma esos 0.1414 s. El recuadro superior Δt da en ambos experimentos la diferencia entre las lecturas, unos 9.86 s.</p>
+    </article>
+    <article>
+    <h2>¿Y si Einstein considera que se mueve Maxwell?</h2>
     <p>Puede hacerlo. Si comparamos dos tics del reloj de <em>Maxwell</em>, ambos ocurren en el mismo punto del andén. Ahora el tiempo propio es el de Maxwell, <span class="tex">\Delta\tau_{\mathrm M}</span>. Einstein usaría relojes sincronizados a lo largo del tren para asignar la hora a esos dos tics. Cada marco encuentra que el reloj móvil marcha más despacio. Al intercambiar los papeles también cambiamos la pareja de sucesos y qué relojes distantes consideramos simultáneos.</p>
     <div class="formula tex">\Delta\tau_{\mathrm M}=\frac{\Delta t_{\text{tren}}}{\gamma}</div>
     <h3>¿Qué cambia en la paradoja de los gemelos?</h3>
     <p>En ese experimento ambos relojes coinciden dos veces, en la salida y en el reencuentro. Entre esos mismos sucesos recorren trayectorias distintas. El gemelo del andén permanece en el mismo marco inercial durante todo el viaje. El viajero cambia de marco al dar la vuelta. Al reunirse comparan los relojes en persona y los dos están de acuerdo en el resultado: el viajero ha acumulado menos tiempo propio. <a href="gemelos.html">Probar la paradoja de los gemelos</a>.</p>
-    <p class="caption">La escena representa el marco del andén. El paso del tren se repite para mantenerlo a la vista. La distancia del dibujo es ilustrativa. Los contadores comparan tiempos asignados en ese marco, sin incluir el retraso de las señales luminosas. En la vista de segundos, la aguja da una vuelta por minuto simulado. En la vista de fecha, cada esfera marca la hora de su personaje. Los dos calendarios parten de la misma fecha y hora local, sin cambios de horario estacional.</p>
+    </article>
+    <p class="caption">La escena se dibuja desde el marco elegido. El movimiento se repite para mantener a los personajes a la vista y las distancias son ilustrativas. Cada comparación parte del cruce inicial con ambos relojes sincronizados. Las lecturas corresponden a sucesos simultáneos en el marco elegido y prescinden del tiempo que tarda en llegar la luz. En la vista de segundos, la aguja da una vuelta por minuto simulado. En la vista de fecha, cada esfera marca la hora de su personaje. Los calendarios parten de la misma fecha y hora local, sin cambios de horario estacional.</p>
   </section>
 </main></body></html>

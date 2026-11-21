@@ -25,6 +25,15 @@ header { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:12px; 
 .clocks { align-items:stretch; }
 .difference { --accent:#6d4487; }
 .difference abbr { text-decoration:none; }
+.frame-choice select { width:100%; margin-top:5px; }
+.frame-choice small { display:block; color:#506579; margin-top:4px; line-height:1.3; }
+.explanation { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 clamp(22px,3vw,48px); }
+.explanation article { min-width:0; }
+.explanation article > :first-child { margin-top:0; }
+.explanation article p,.explanation article .formula { max-width:none; margin-right:0; }
+.explanation .caption { grid-column:1/-1; max-width:none; border-top:1px solid #ccd9e2; padding-top:12px; }
+.scene.train-frame { background-repeat:repeat-x; }
+.platform-figure { left:31%; }
 @media(max-width:740px) {
   header { grid-template-columns:1fr auto; gap:4px 8px; }
   .clocks { grid-row:2; grid-column:1/-1; flex-wrap:wrap; }
@@ -32,6 +41,8 @@ header { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:12px; 
   .clock output { font-size:1rem; }
   .calendar .clock output { font-size:.85rem; }
   .controls dl { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .frame-choice { grid-column:1/-1; }
+  .explanation { grid-template-columns:1fr; row-gap:14px; }
 }
 @media(max-width:480px) {
   .clocks { gap:4px; flex-wrap:nowrap; }

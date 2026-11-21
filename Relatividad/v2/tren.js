@@ -4,6 +4,8 @@ for(const node of document.querySelectorAll('.tex')){
   katex.render(node.textContent,node,{displayMode:node.classList.contains('formula'),output:'htmlAndMathml'});
 }
 const scene=document.querySelector('.scene'), train=byId('train');
+const platform=document.querySelector('.platform-figure');
+let trainFrame=false;
 const speedLimit=Number(byId('velocity').max);
 const clockViews = [
   makeClockView('max', byId('max-time')),
@@ -40,8 +42,9 @@ function advance(now){
   last=now;
   if(paused||document.hidden)return;
   const elapsed=dt*clocks.rate;
-  clocks.station+=elapsed;
-  clocks.passenger+=elapsed*Math.sqrt((1-beta)*(1+beta));
+  const movingElapsed=elapsed*Math.sqrt((1-beta)*(1+beta));
+  clocks.station+=trainFrame ? movingElapsed : elapsed;
+  clocks.passenger+=trainFrame ? elapsed : movingElapsed;
   distance+=dt*beta*.055;
 }
 const pad = n => String(n).padStart(2,'0');
@@ -97,11 +100,32 @@ byId('time-view').onclick = () => {
 function frame(now){
   advance(now);
   showClocks();
-  const w=scene.clientWidth, tw=train.offsetWidth, cycle=w+tw;
-  const offset=(distance*cycle+.56*w+.43*tw)%cycle-tw;
-  train.style.transform='translateX('+offset+'px)';
+  const w=scene.clientWidth, tw=train.offsetWidth, pw=platform.offsetWidth;
+  const travel=distance*(w+tw);
+  const startX=.31*w+.52*pw-.598*tw;
+  const trainX=trainFrame ? startX : (travel+startX+tw)%(w+tw)-tw;
+  train.style.transform='translateX('+trainX+'px)';
+  // Wrap only when the figure and its clock have both left the illustration.
+  const platformSpan=w+2*pw;
+  const platformX=trainFrame ? w-((w*.69+travel)%platformSpan)-w*.31 : 0;
+  platform.style.transform='translateX('+platformX+'px)';
+  scene.style.backgroundPosition=trainFrame ? 'calc(50% - '+travel+'px) center' : 'center';
   requestAnimationFrame(frame);
 }
+byId('reference').onchange=e=>{
+  trainFrame=e.target.value==='train';
+  last=performance.now();
+  for (const state of [stopwatch,calendarClocks]) {
+    if (state) {state.station=0;state.passenger=0;}
+  }
+  distance=0;
+  scene.classList.toggle('train-frame',trainFrame);
+  scene.setAttribute('aria-label',trainFrame ? 'Vista desde el tren. Einstein permanece quieto y el andén con Maxwell se desplaza hacia la izquierda.' : 'Vista desde el andén. Maxwell permanece quieto y el tren con Einstein se desplaza hacia la derecha.');
+  byId('rate-label').textContent=trainFrame ? 'Ritmo de Einstein' : 'Ritmo de Maxwell';
+  byId('ratio-label').textContent=trainFrame ? 'Por cada 10 s del tren' : 'Por cada 10 s del andén';
+  byId('other-location').textContent=trainFrame ? 'en el andén' : 'en el tren';
+  showClocks();
+};
 function updateSpeed(value){
   advance(performance.now());
   beta=Math.min(speedLimit,Math.max(0,value));
@@ -109,7 +133,7 @@ function updateSpeed(value){
   const ms=byId('unit').value==='ms';
   byId('exact').value=String(Number((ms?beta*c:beta).toPrecision(9)));
   const fraction=Math.sqrt((1-beta)*(1+beta));
-  byId('ratio').textContent=(10*fraction).toFixed(2)+' s';
+  byId('ratio').textContent=(10*fraction).toFixed(10*fraction<1 ? 4 : 2)+' s';
   byId('gamma').textContent=(1/fraction).toFixed(3);
 }
 byId('velocity').oninput=e=>updateSpeed(e.target.valueAsNumber);
