@@ -34,7 +34,8 @@ header { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:12px; 
 .explanation .caption { grid-column:1/-1; max-width:none; border-top:1px solid #ccd9e2; padding-top:12px; }
 .panorama { display:none; position:absolute; inset:0 auto 0 0; width:735%; pointer-events:none; }
 .train-frame .panorama { display:flex; }
-.route-tile { flex:0 0 calc(100% / 3); height:100%; background:url("panorama-estacion-campo.webp") center top/100% 110% no-repeat; }
+.route-tile { flex:0 0 calc(100% / 3); height:100%; background:url("panorama-estacion-campo.webp") center/100% 100% no-repeat; }
+.scene.train-frame #train { top:71.3%; bottom:auto; translate:0 -62.5%; }
 .route-tile:nth-child(2) { transform:scaleX(-1); }
 .platform-figure { left:31%; }
 @media(max-width:740px) {
