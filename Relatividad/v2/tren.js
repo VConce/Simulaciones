@@ -30,15 +30,18 @@ const startMs = Date.UTC(launch.getFullYear(), launch.getMonth(), launch.getDate
 const daySeconds = 86400, yearSeconds = 365.25*daySeconds;
 const calendarRates = [[1,'1 s'],[60,'1 min'],[3600,'1 h'],[daySeconds,'1 día'],[yearSeconds,'1 año'],[100*yearSeconds,'100 años']];
 const secondRates = [[1,'1 s'],[3,'3 s'],[6,'6 s']];
-let calendar = false, secondsRate = 3, calendarRate = daySeconds;
-let station=0, passenger=0, distance=0, beta=.8, rate=3, paused=false;
+const stopwatch = {station:0, passenger:0, rate:3};
+let calendarClocks;
+let clocks=stopwatch, calendar=false;
+let distance=0, beta=.8, paused=false;
 let last=performance.now();
 function advance(now){
   const dt=Math.max(0,(now-last)/1000);
   last=now;
   if(paused||document.hidden)return;
-  station+=dt*rate;
-  passenger+=dt*rate*Math.sqrt((1-beta)*(1+beta));
+  const elapsed=dt*clocks.rate;
+  clocks.station+=elapsed;
+  clocks.passenger+=elapsed*Math.sqrt((1-beta)*(1+beta));
   distance+=dt*beta*.055;
 }
 const pad = n => String(n).padStart(2,'0');
@@ -68,6 +71,7 @@ function drawClock(view, elapsed) {
   }
 }
 function showClocks(){
+  const {station,passenger}=clocks;
   drawClock(clockViews[0],station);
   drawClock(clockViews[1],passenger);
   const gap = station-passenger;
@@ -76,14 +80,14 @@ function showClocks(){
 }
 byId('time-view').onclick = () => {
   advance(performance.now());
-  if (calendar) calendarRate=rate; else secondsRate=rate;
+  if (!calendarClocks) calendarClocks={...stopwatch,rate:daySeconds};
   calendar=!calendar;
-  rate=calendar ? calendarRate : secondsRate;
+  clocks=calendar ? calendarClocks : stopwatch;
   document.body.classList.toggle('calendar',calendar);
   byId('time-view').textContent=calendar ? 'segundos' : 'fecha';
   const choices=calendar ? calendarRates : secondRates;
   byId('rate').replaceChildren(...choices.map(([value,label])=>new Option(label+' por 1 s real',value)));
-  byId('rate').value=String(rate);
+  byId('rate').value=String(clocks.rate);
   showClocks();
 };
 function frame(now){
@@ -112,8 +116,8 @@ byId('exact').onblur=e=>{
 };
 byId('exact').onkeydown=e=>{if(e.key==='Enter')e.target.blur();};
 byId('unit').onchange=()=>updateSpeed(beta);
-byId('rate').onchange=e=>{advance(performance.now());rate=Number(e.target.value);};
+byId('rate').onchange=e=>{advance(performance.now());clocks.rate=Number(e.target.value);};
 byId('pause').onclick=e=>{advance(performance.now());paused=!paused;e.target.textContent=paused?'Reanudar':'Pausar';showClocks();};
-byId('reset').onclick=()=>{last=performance.now();station=0;passenger=0;distance=0;showClocks();};
+byId('reset').onclick=()=>{last=performance.now();clocks.station=0;clocks.passenger=0;distance=0;showClocks();};
 document.addEventListener('visibilitychange',()=>{last=performance.now();});
 updateSpeed(beta);requestAnimationFrame(frame);
