@@ -14,7 +14,7 @@
 button, input[type=range], select {min-height:44px}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #1768a3;outline-offset:3px}
 @media(max-width:680px){main{max-width:100%}.grid,.scenes,.readGrid,.metrics,.eqGrid,.top{min-width:0}.hero,.panel,.control,.card{min-width:0}canvas{max-width:100%}.vconceLogo{position:static!important;display:block;margin:9px 12px 0;width:38px;height:38px}}
-</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.frame-picker{margin-left:auto;display:flex;align-items:center;gap:6px;font-weight:650}.frame-picker select{border:1px solid #b8c9db;border-radius:8px;background:white;color:#192d40;padding:0 8px;font:inherit}.reloj_einstein .metrics{grid-template-columns:repeat(auto-fit,minmax(min(125px,45%),1fr))}@media(max-width:520px){.frame-picker{display:grid;gap:0;font-size:.8rem}.frame-picker select{font-size:.95rem}}</style></head>
+</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.frame-picker{margin-left:auto;display:flex;align-items:center;gap:6px;font-weight:650}.frame-picker select{border:1px solid #b8c9db;border-radius:8px;background:white;color:#192d40;padding:0 8px;font:inherit}.reloj_einstein .metrics{grid-template-columns:repeat(auto-fit,minmax(min(125px,45%),1fr))}@media(max-width:520px){.frame-picker{display:grid;gap:0;font-size:.8rem}.frame-picker select{font-size:.95rem}}</style><style>.reloj_einstein .lab-heading{flex-wrap:wrap;align-items:center}.reloj_einstein .lab-heading .speedPanel{margin:0 0 0 auto;max-width:100%;flex:0 1 auto}.reloj_einstein .lab-heading .control{gap:8px 12px}.reloj_einstein .lab-heading .control label{justify-content:space-between}@media(max-width:760px){.reloj_einstein .lab-heading .speedPanel{flex-basis:100%}.reloj_einstein .lab-heading .control{width:100%;grid-template-columns:repeat(2,minmax(0,1fr))}.lab-heading select{max-width:100%}}</style></head>
 <body>
   <style>
     .reloj_einstein .experiment-layout{grid-template-columns:minmax(0,1fr)}
@@ -32,7 +32,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     @media(max-width:760px){.reloj_einstein .control{display:grid;grid-template-columns:1fr 1fr;gap:6px}.reloj_einstein .canvasWrap{height:clamp(200px,48vw,325px)}}
   </style>
   <main class="page compact-lab reloj_einstein">
-    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Reloj de Einstein</h1></header><div class="experiment-layout"><section class="card">
+    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Reloj de Einstein</h1><aside class="speedPanel" aria-label="Control de velocidad">
+        <div class="control">
+          <div><label for="v">Velocidad del reloj <output id="vOut">0.6000 c</output></label>
+          <input id="v" type="range" min="0" max="0.9999" step="0.0001" value="0.6000">
+          <div class="scale"><span>0 c</span><span>0.5 c</span><span>0.9999 c</span></div>
+          </div><div><label for="trail">Rastro de la luz</label><input id="trail" type="range" min="0" max="18" step="0.1" value="5" data-exact-input="true"></div>
+          <div><label for="playback">Escala de reproducción</label>
+          <select id="playback"><option value="1" selected>1 ns exterior por segundo real</option><option value="3">3 ns exteriores por segundo real</option><option value="10">10 ns exteriores por segundo real</option></select></div>
+          <div><button type="button" id="pauseAnimation" class="primaryButton">Pausar</button> <button type="button" id="resetClock">Poner a cero</button></div>
+        </div>
+      </aside></header><div class="experiment-layout"><section class="card">
       <div class="clock-scenes">
         <section><h2>Desde el exterior</h2><div class="canvasWrap"><canvas id="sim" width="960" height="450" role="img" aria-label="Trayectoria de la luz desde el exterior"></canvas></div></section>
         <section><h2>Desde el propio reloj · pulso a ritmo local</h2><div class="canvasWrap"><canvas id="onboard" width="480" height="450" role="img" aria-label="Trayectoria vertical de la luz desde el propio reloj"></canvas></div></section>
@@ -45,17 +55,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       </div>
     </section>
 
-    <aside class="speedPanel" aria-label="Control de velocidad">
-        <div class="control">
-          <div><label for="v">Velocidad del reloj <output id="vOut">0.6000 c</output></label>
-          <input id="v" type="range" min="0" max="0.9999" step="0.0001" value="0.6000">
-          <div class="scale"><span>0 c</span><span>0.5 c</span><span>0.9999 c</span></div>
-          </div><div><label for="trail">Rastro de la luz</label><input id="trail" type="range" min="0" max="18" step="0.1" value="5" data-exact-input="true"></div>
-          <div><label for="playback">Escala de reproducción</label>
-          <select id="playback"><option value="1" selected>1 ns exterior por segundo real</option><option value="3">3 ns exteriores por segundo real</option><option value="10">10 ns exteriores por segundo real</option></select></div>
-          <div><button type="button" id="pauseAnimation" class="primaryButton">Pausar</button> <button type="button" id="resetClock">Poner a cero</button></div>
-        </div>
-      </aside>
+
     </div><div class="lab-intro"><p class="lead">Desde el exterior, los espejos avanzan y la luz dibuja un zigzag. Desde el propio reloj, el pulso sube y baja por la misma vertical. En ambos marcos la luz viaja a c.</p>
       <p>Los dos relojes empiezan juntos. A 0.9999c, cuando el exterior marca 141.42 ns, Lorentz ha acumulado 2.00 ns. Debajo de cada lectura, los tics cuentan las idas y vueltas completas del rayo que ves en esa viñeta. La derecha reproduce el pulso a ritmo local para que puedas seguir sus rebotes incluso a velocidades muy altas.</p></div><section class="eqGrid lab-theory" aria-label="Teoria">
       <article><h3>¿Qué mide Lorentz?</h3><div class="math" data-tex="">\Delta\tau=\frac{2L_0}{c}</div><p>Lorentz viaja sentado junto al espejo inferior. Cuando el pulso sale de ese espejo y regresa a él, los dos sucesos ocurren en el mismo lugar en su marco. Su reloj mide el periodo propio, 2.00 ns para una separación de 0.299792458 m. Una vez agarrado, Einstein viaja con Lorentz y mide el mismo periodo.</p></article>
@@ -180,11 +180,17 @@ function clockScene(canvas, ground) {
     ctx.restore();
   }
   function drawWatch(x, y, title, seconds, ticks, color) {
-    ctx.save(); ctx.translate(x,y);
+    ctx.save();
     const small = canvas.clientWidth < 540;
     const size = small ? 1.38 : 1;
+    const value = seconds.toFixed(2)+' ns', count = 'Tics del pulso: '+ticks;
+    ctx.font='bold 17px monospace';
+    const valueWidth=ctx.measureText(value).width;
+    ctx.font='bold 13px system-ui';
+    const width=Math.max(174,Math.ceil(60+Math.max(valueWidth,ctx.measureText(count).width)));
+    ctx.translate(Math.max(3,Math.min(x-width*size,W-width*size-10)),y);
     ctx.scale(size,size);
-    ctx.fillStyle='rgba(9,20,39,.9)';ctx.beginPath();ctx.roundRect(0,0,143,62,10);ctx.fill();
+    ctx.fillStyle='rgba(9,20,39,.9)';ctx.beginPath();ctx.roundRect(0,0,width,62,10);ctx.fill();
     ctx.translate(23,23);
     ctx.fillStyle='white';ctx.strokeStyle=color;ctx.lineWidth=2;
     ctx.beginPath();ctx.arc(0,0,19,0,2*Math.PI);ctx.fill();ctx.stroke();
@@ -196,8 +202,8 @@ function clockScene(canvas, ground) {
       ctx.beginPath();ctx.moveTo(0,2);ctx.lineTo(0,-len);ctx.stroke();ctx.restore();
     }
     ctx.fillStyle='#c9dced';ctx.font='bold 13px system-ui';ctx.fillText(title,26,-3);
-    ctx.fillStyle='#fff';ctx.font='bold 17px monospace';ctx.fillText(seconds.toFixed(2)+' ns',26,16,90);
-    ctx.font='bold 13px system-ui';ctx.fillText('Tics del pulso: '+ticks,26,33,109);ctx.restore();
+    ctx.fillStyle='#fff';ctx.font='bold 17px monospace';ctx.fillText(value,26,16);
+    ctx.font='bold 13px system-ui';ctx.fillText(count,26,33);ctx.restore();
   }
   function advance(dt) {
     const rate = 1 / gamma(), speed = beta() * cPixels;
@@ -262,10 +268,9 @@ function clockScene(canvas, ground) {
     ctx.strokeStyle = '#68ff98'; ctx.lineWidth = 4; ctx.stroke();
     ctx.strokeStyle = '#dbffe6'; ctx.lineWidth = 1.3; ctx.stroke(); ctx.restore();
     drawGreenBall(cx, y);
-    const watchScale = canvas.clientWidth < 540 ? 1.38 : 1;
     const ticks = Math.floor(pulse.hit / 2);
-    if (ground) drawWatch(W-147*watchScale, 6,'Exterior',clockTimes.exterior,ticks,'#137ab4');
-    else drawWatch(Math.max(3,cx-56-143*watchScale), g.bottom+13,'Lorentz',clockTimes.lorentz,ticks,'#008967');
+    if (ground) drawWatch(W-18, 6,'Exterior',clockTimes.exterior,ticks,'#137ab4');
+    else drawWatch(cx-56, g.bottom+13,'Lorentz',clockTimes.lorentz,ticks,'#008967');
     drawEinstein(g);
     document.getElementById('vOut').textContent = beta().toFixed(4) + ' c';
     document.getElementById('gammaOut').textContent = gamma().toFixed(2);

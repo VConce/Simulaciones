@@ -17,6 +17,37 @@
   const earthSprite = image('../assets/earth-blue-marble-sprite.png');
   const space = image('reloj-panorama.webp');
   const balloon = image('globo-aerostatico.webp');
+  const balloons = [
+    {x:w*.20, altitude:.61, width:17, height:26},
+    {x:w*.86, altitude:.28, width:21, height:31}
+  ];
+  let held = null;
+  function balloonPointer(e) {
+    const rect=canvas.getBoundingClientRect();
+    return {x:(e.clientX-rect.left)*w/rect.width,y:(e.clientY-rect.top)*h/rect.height};
+  }
+  function balloonAt(p) {
+    const pad=Math.min(20,7*w/canvas.clientWidth);
+    return balloons.find(b=>p.x>=b.x-pad && p.x<=b.x+b.width+pad && p.y>=b.y-pad && p.y<=b.y+b.height+pad);
+  }
+  canvas.addEventListener('pointerdown',e=>{
+    if(held || e.button!==0)return;
+    const p=balloonPointer(e), b=balloonAt(p);
+    if(!b)return;
+    held={b,id:e.pointerId,dx:p.x-b.x,dy:p.y-b.y};
+    canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing';
+  });
+  canvas.addEventListener('pointermove',e=>{
+    const p=balloonPointer(e);
+    if(!held){canvas.style.cursor=balloonAt(p)?'grab':'';return}
+    if(e.pointerId!==held.id)return;
+    const b=held.b;
+    b.x=Math.max(0,Math.min(w-b.width,p.x-held.dx));
+    b.placedY=Math.max(0,Math.min(h-b.height,p.y-held.dy));
+    draw();
+  });
+  function releaseBalloon(e){if(held?.id===e.pointerId){held=null;canvas.style.cursor=''}}
+  for(const event of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(event,releaseBalloon);
   const flying = image('muon-vuelo.webp'), blink = image('muon-ojos-cerrados.webp');
   const wicker = image('cesta-mimbre.webp'), pace = byId('pace');
   const green = image('muon-verde.webp'), flash = image('muon-destello.webp');
@@ -170,8 +201,10 @@
     sky.addColorStop(0,'rgba(69,159,244,.12)');sky.addColorStop(1,'rgba(64,179,247,.55)');
     ctx.fillStyle=sky;ctx.fillRect(0,start,w,span);drawEarth(ctx,w,h,ground);
     if (ready(balloon)) {
-      ctx.drawImage(balloon, w*.20, ground-span*.61-26, 17, 26);
-      ctx.drawImage(balloon, w*.86, ground-span*.28-31, 21, 31);
+      for(const b of balloons){
+        b.y=b.placedY ?? ground-span*b.altitude-b.height;
+        ctx.drawImage(balloon,b.x,b.y,b.width,b.height);
+      }
     }
     if(altitude.value>12){
       const boundary=ground-span*12/altitude.value;
