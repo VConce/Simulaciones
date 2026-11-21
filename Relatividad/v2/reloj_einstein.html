@@ -51,7 +51,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
         </div>
       </aside>
     </div><div class="lab-intro"><p class="lead">Desde el propio reloj, el pulso sube y baja por la misma vertical. Desde el suelo, los espejos avanzan mientras la luz viaja entre ellos y el pulso dibuja un zigzag. En ambos casos la luz viaja a c. Pausa la animación y cambia de vista para comparar el mismo instante del recorrido.</p>
-      <p>El reloj junto a Lorentz mide su tiempo propio. El de la esquina indica la hora que asignan los relojes sincronizados del suelo al mismo instante del viaje. Ambos contadores usan segundos a escala para comparar sus ritmos; los periodos del pulso se indican en nanosegundos.</p></div><section class="eqGrid lab-theory" aria-label="Teoria">
+      <p>Cada observador ve avanzar su propio reloj al ritmo elegido y asigna al reloj en movimiento un ritmo menor, por un factor γ. Los dos pueden hacerlo porque cada marco define de forma distinta qué sucesos distantes son simultáneos. Al cambiar de vista se conservan los segundos acumulados para comparar los ritmos a partir de ese momento. Los periodos del pulso se indican en nanosegundos.</p></div><section class="eqGrid lab-theory" aria-label="Teoria">
       <article><h3>¿Qué mide Lorentz?</h3><div class="math" data-tex="">\Delta\tau=\frac{2L_0}{c}</div><p>Lorentz viaja sentado junto al espejo inferior. Cuando el pulso sale de ese espejo y regresa a él, los dos sucesos ocurren en el mismo lugar en su marco. Su reloj mide el periodo propio, 2.00 ns para una separación de 0.299792458 m. Una vez agarrado, Einstein viaja con Lorentz y mide el mismo periodo.</p></article>
       <article><h3>Dilatación temporal</h3><div class="math" data-tex="">\Delta t=\gamma\,\Delta\tau</div><p>En el laboratorio, la componente horizontal de la velocidad de la luz es v y la vertical es c/γ. El módulo sigue siendo c.</p></article>
       <article><h3>Factor gamma</h3><div class="math" data-tex="">\gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>Cuando v se aproxima a c, el tiempo entre dos retornos de la luz al mismo espejo aumenta en el marco del suelo.</p></article>
@@ -211,7 +211,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       ctx.drawImage(assets.lorentz, right - w, base - h, w, h);
     }
     drawClockFrame(cx, H * .51, height);
-    drawEinstein(g);
     ctx.save();
     ctx.lineWidth = 5; ctx.strokeStyle = '#70ff99'; ctx.lineJoin = 'round';
     ctx.setLineDash([]); ctx.beginPath();
@@ -238,6 +237,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     const watchScale = canvas.clientWidth < 540 ? 1.38 : 1;
     drawWatch(Math.max(3,cx-56-143*watchScale), g.bottom+13,'Lorentz',lorentzSeconds,'#008967');
     drawWatch(W-147*watchScale, 6,'Suelo',groundSeconds,'#137ab4');
+    drawEinstein(g);
     document.getElementById('vOut').textContent = beta().toFixed(4) + ' c';
     document.getElementById('gammaOut').textContent = gamma().toFixed(2);
     document.getElementById('periodOut').textContent = (PROPER_PERIOD_NS * gamma()).toFixed(2) + ' ns';
@@ -252,9 +252,12 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       if (b > 0 || approach > 0) approach = Math.min(1.65, approach + dt);
       skyOffset += dt * b * (50 + 185 * b * b) * (reference.value === 'clock' ? 1 : .68);
       const seconds = dt * Number(playback.value);
-      groundSeconds += seconds;
-      lorentzSeconds += seconds / gamma();
-      advance(seconds / 3);
+      const fromGround = reference.value === 'ground';
+      const dilation = gamma();
+      groundSeconds += fromGround ? seconds : seconds / dilation;
+      lorentzSeconds += fromGround ? seconds / dilation : seconds;
+      // The light path is integrated in ground coordinates along Lorentz's clock.
+      advance(seconds / 3 * (fromGround ? 1 : dilation));
     }
     draw(); requestAnimationFrame(frame);
   }
