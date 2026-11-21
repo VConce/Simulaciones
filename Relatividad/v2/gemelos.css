@@ -1,5 +1,18 @@
 *{box-sizing:border-box}body{margin:0;background:#f1f5fa;color:#192d40;font:16px/1.48 system-ui,sans-serif}
 .lab-heading{position:sticky;top:0;z-index:4;background:#f1f5fa}
+.frame-choice{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0 8px;font-weight:650;font-size:.92rem}
+.frame-choice select{font:inherit;border:1px solid #99b0c5;background:#fff;border-radius:7px;padding:4px 8px;min-height:40px;color:#193b54}
+.turn-reading .turn-pair{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:7px 0}
+.turn-pair button{text-align:left;padding:6px 10px;font-size:.85rem;background:#f3f7fb}
+.turn-pair strong{display:block;font:700 1rem/1.4 ui-monospace,monospace}
+.turn-pair button[aria-pressed=true]{background:#e2f4eb;border:2px solid #197456;padding:5px 9px}
+.scene .moving-world{display:none}
+.scene.ship-view{background:#091528 url("../assets/elevator-space-stars.png") center/cover}
+.ship-view .family{display:none}
+.ship-view .moving-world{display:block;position:absolute;top:55%;width:min(12%,95px);aspect-ratio:1;object-fit:contain;transform:translate(-50%,-50%);}
+.ship-view .earth-disc,.ship-view .origin{left:var(--earth-x)}
+.ship-view .star-disc,.ship-view .star{left:var(--star-x)}
+.ship-view .route{left:var(--earth-x);right:calc(100% - var(--star-x))}
 .lab-heading{justify-content:flex-start;flex-wrap:wrap}.clocks,.clock,.buttons{display:flex;align-items:center;gap:8px}.clocks{margin-left:auto}.clock,.panel,.turn-reading,.travel,.explanation{background:#fff;border:1px solid #c5d5e0;border-radius:12px;padding:10px 14px}.clock{padding:5px 10px;--accent:#6d4487}.earth{--accent:#136a9b}.ship{--accent:#087456}.clock h2{margin:0;font-size:.81rem;color:var(--accent)}.clock output{display:block;font:bold clamp(.86rem,1.65vw,1.35rem) ui-monospace,monospace}.dial{position:relative;flex:none;width:40px;aspect-ratio:1;border:2px solid var(--accent);border-radius:50%;background:radial-gradient(circle,#fff 58%,transparent 60%),repeating-conic-gradient(var(--accent) 0 2deg,#fff 2deg 30deg)}.dial b{position:absolute;left:calc(50% - 1.5px);bottom:50%;width:3px;height:39%;background:var(--accent);transform-origin:50% 100%}
 .scene{position:relative;height:clamp(210px,47svh,530px);overflow:hidden;border-radius:14px;background:#061526 url("../assets/gemelos-space-bg.png") center/cover}
 .route{position:absolute;top:40%;left:12%;right:12%;border-top:2px dashed #c7eaffaa}.destination,#phase{position:absolute;color:white;background:#102037de;border-radius:6px;padding:4px 9px;font-size:.85rem}.destination{top:16%;transform:translateX(-50%)}.origin{left:12%}.star{left:88%}#phase{left:50%;bottom:3%;transform:translateX(-50%);text-align:center;width:max-content;max-width:90%}#rocket{position:absolute;top:40%;width:min(17%,155px);transform:translate(-50%,-50%)}

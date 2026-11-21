@@ -23,7 +23,11 @@
 .compact-lab .scenes {display:grid;grid-template-columns:1fr 1fr}
 .compact-lab .controlCard {margin:8px 0}
 .compact-lab.lanza_granero .scene {height:clamp(155px,46svh,410px)}
-.compact-lab.observador_paseando .canvasWrap>canvas {width:min(100%,calc(64svh * 1.846));}
+.observador_paseando .comparison {display:grid;grid-template-columns:minmax(0,1fr) clamp(215px,20vw,270px);gap:10px;align-items:start}
+.observador_paseando .comparison .simControls {position:static;transform:none;width:100%;min-width:0;box-shadow:none}
+.observador_paseando .comparison .canvasWrap {border:0;background:transparent}
+.observador_paseando .comparison canvas {width:100%;margin:0}
+@media(max-width:760px){.observador_paseando .comparison{grid-template-columns:1fr}}
 @media(min-width:761px){
 .compact-lab .lab,.compact-lab .workspace {grid-template-columns:minmax(0,1fr) minmax(245px,305px)}
 .compact-lab .experiment-layout canvas {max-width:calc(69svh * 1.76)}

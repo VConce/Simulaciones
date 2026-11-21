@@ -106,9 +106,10 @@ function frame(now){
   const startX=.31*w+.52*pw-.598*tw;
   const trainX=trainFrame ? startX : (travel+startX+tw)%(w+tw)-tw;
   train.style.transform='translateX('+trainX+'px)';
-  const period=3*w;
-  const scroll=trainFrame && w ? (w+travel)%period : 0;
-  const platformX=trainFrame && w ? (1.31*w-scroll+2*pw+period)%period-2*pw-.31*w : 0;
+  const period=panorama.offsetWidth/2;
+  const startScroll=(period-w)/2;
+  const scroll=trainFrame && period ? (startScroll+travel)%period : 0;
+  const platformX=trainFrame && period ? (startScroll+.31*w-scroll+2*pw+period)%period-2*pw-.31*w : 0;
   platform.style.transform='translateX('+platformX+'px)';
   panorama.style.transform='translateX('+(-scroll)+'px)';
   requestAnimationFrame(frame);

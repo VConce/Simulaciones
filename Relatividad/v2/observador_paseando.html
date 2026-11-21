@@ -14,12 +14,15 @@
 button, input[type=range], select {min-height:44px}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #1768a3;outline-offset:3px}
 @media(max-width:680px){main{max-width:100%}.grid,.scenes,.readGrid,.metrics,.eqGrid,.top{min-width:0}.hero,.panel,.control,.card{min-width:0}canvas{max-width:100%}.vconceLogo{position:static!important;display:block;margin:9px 12px 0;width:38px;height:38px}}
-</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
+</style><link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css?v=escenas-juntas"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script></head>
 <body>
   <main class="page compact-lab observador_paseando">
     <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Observador paseando</h1></header><section class="card">
-      <div class="canvasWrap">
-        <canvas id="sim" width="1200" height="650"></canvas>
+      <div class="comparison">
+        <div class="canvasWrap">
+          <canvas id="sim" width="1124" height="600" role="img" aria-label="Escenas contiguas de las dos emisiones desde los marcos de Galileo y Einstein"></canvas>
+          <button id="restartOverlay" class="restartOverlay" type="button" hidden>Reiniciar</button>
+        </div>
         <div class="simControls" aria-label="Controles de reproduccion y velocidad">
           <button type="button" id="pauseAnimation" class="primaryButton">Pausar</button><button id="restartPanel" class="primaryButton" type="button">Reiniciar</button>
           <div class="control">
@@ -39,7 +42,6 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
           <div class="distanceRead"><span>Distancia a los observadores</span><strong id="observerDistanceOut">21.0 años luz</strong></div>
           <div class="speedDelta"><span>Desfase medido por Einstein</span><strong id="inlineDeltaOut">0.00 s</strong></div>
         </div>
-        <button id="restartOverlay" class="restartOverlay" type="button" hidden>Reiniciar</button>
       </div>
       <div class="readoutPanel" aria-label="Lecturas de la simulacion">
         <div class="read"><span>Factor gamma</span><strong id="gammaOut">1.00</strong></div>
@@ -84,8 +86,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
   const COUNTDOWN = 3;
   const EXPLOSION_DURATION = 1.35;
   const scenes = {
-    galileo: { x: 28, y: 50, w: 552, h: 548, title: 'Galileo: playa en reposo' },
-    einstein: { x: 620, y: 50, w: 552, h: 548, title: 'Einstein: paseo a velocidad v' }
+    galileo: { x: 6, y: 44, w: 552, h: 548, title: 'Galileo: playa en reposo' },
+    einstein: { x: 566, y: 44, w: 552, h: 548, title: 'Einstein: paseo a velocidad v' }
   };
 
   function img(src) { const im = new Image(); im.src = src; return im; }
@@ -337,8 +339,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = '#eaf1ff'; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = '#172033'; ctx.font = '950 20px Bahnschrift, Segoe UI, sans-serif'; ctx.textAlign = 'left';
-    ctx.fillText('Dos explosiones simultaneas para Galileo', 38, 30);
-    ctx.fillText('El observador en movimiento no conserva la simultaneidad', 630, 30);
+    ctx.fillText('Emisiones simultáneas para Galileo', scenes.galileo.x + 8, 29);
+    ctx.fillText('Orden de emisión para Einstein', scenes.einstein.x + 8, 29);
     drawGalileoScene(); drawEinsteinScene();
     const endAt = updateReadouts();
     if (!state.ended && state.t >= endAt) state.ended = true;
