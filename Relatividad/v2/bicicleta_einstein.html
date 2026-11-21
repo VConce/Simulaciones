@@ -100,7 +100,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <label class="reference" for="reference">Marco de referencia <select id="reference"><option value="ground">Suelo</option><option value="bike">Bicicleta (Einstein)</option></select></label>
       <div class="gamma" id="gammaOut">γ = 1.20</div>
     </div>
-    <div class="canvasBox"><canvas id="scene" width="1280" height="500"></canvas></div>
+    <div class="canvasBox"><canvas id="scene" width="1280" height="500" role="img" aria-label="Einstein pedalea ante un paisaje que pasa. Al soltar la manzana se dibuja su trayectoria."></canvas></div>
   </section>
 
   <aside class="card side">
@@ -118,7 +118,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
       <p class="note" id="note">La suma relativista nunca supera <strong>c</strong>.</p>
     </aside>
   </div><div class="lab-intro"><p class="lead">Einstein viaja a velocidad <strong>v<sub>E</sub></strong> y lanza una manzana con velocidad <strong>u′</strong> medida en su propio marco. El objetivo es comparar la suma clásica con la suma relativista.</p>
-    <p>Cambia de referencia durante el lanzamiento o en pausa. Desde el suelo verás avanzar a Einstein. Desde la bicicleta verás pasar el camino bajo sus ruedas. Las lecturas indican la velocidad horizontal de la misma manzana. La caída vertical es ilustrativa.</p></div><section class="card equations lab-theory">
+    <p>La cámara acompaña a Einstein. En la vista del suelo, el inicio del trazo queda en el punto del camino donde soltó la manzana. Desde la bicicleta, queda junto a su mano. Cambia de referencia durante el lanzamiento o en pausa para comparar las trayectorias. La caída vertical es ilustrativa.</p></div><section class="card equations lab-theory">
     <div class="equationsHead">
       <h2>Ecuaciones del experimento</h2>
       <p>Los controles expresan las velocidades como fracciones de la velocidad de la luz <strong>c</strong>. El signo indica el sentido del movimiento.</p>
@@ -143,16 +143,16 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <script>
 const assets = {
   einstein: Object.assign(new Image(), {src:"../assets/einstein-bike-sprite.png"}),
-  wheel: Object.assign(new Image(), {src:"../assets/wheel-sprite.png"}),
   apple: Object.assign(new Image(), {src:"../assets/apple-sprite.png"}),
-  trees: Object.assign(new Image(), {src:"../assets/tree-sprite-sheet.png"}),
-  path: Object.assign(new Image(), {src:"../assets/dirt-path-sprite.png"})
+  landscape: Object.assign(new Image(), {src:"cicloruta.webp"})
 };
 const canvas=document.getElementById("scene"),ctx=canvas.getContext("2d");
 const bikeV=document.getElementById("bikeV"),appleV=document.getElementById("appleV");
-const state={age:0,launched:false,paused:false,bike:+bikeV.value,apple:+appleV.value};
-const pxPerLightSecond=64, flightDuration=4.4;
-const fmt=(x,d=2)=>Number(x).toFixed(d), gamma=v=>1/Math.sqrt(Math.max(1e-6,1-v*v));
+const state={age:0,distance:0,landedFor:0,launched:false,paused:false,bike:+bikeV.value,apple:+appleV.value};
+const pxPerLightSecond=112, flightDuration=4.4;
+const riderOrigin={x:346,y:140}, hand={x:riderOrigin.x+351,y:riderOrigin.y+92};
+const roadY=riderOrigin.y+314;
+const fmt=(x,d=2)=>Number(x).toFixed(d), gamma=v=>1/Math.sqrt(1-v*v);
 const relAdd=(v,u)=>(v+u)/(1+v*u);
 function $(id){return document.getElementById(id)}
 function update(){
@@ -163,107 +163,165 @@ function update(){
   $("gammaOut").textContent="γ = "+fmt(gamma(state.bike));
   $("note").textContent="La suma clásica daría "+fmt(state.bike+state.apple,4)+" c desde el suelo (trazo naranja).";
 }
-function rr(x,y,w,h,r,fill,stroke){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke()}}
-function drawTreeSprite(spriteIndex,x,bottom,height,alpha=1){
-  const img=assets.trees;
-  if(!img.complete||!img.naturalWidth)return false;
-  const qW=img.naturalWidth/2, qH=img.naturalHeight/2;
-  const sx=(spriteIndex%2)*qW, sy=Math.floor(spriteIndex/2)*qH;
-  const width=height*(qW/qH);
-  ctx.save();ctx.globalAlpha=alpha;
-  ctx.drawImage(img,sx,sy,qW,qH,x-width/2,bottom-height,width,height);
+
+// Blend the two stretches of meadow once. Each lap then contains a single village.
+let landscapePattern, landscapeLength;
+function prepareLandscape(){
+  const im=assets.landscape;
+  if(!im.naturalWidth || landscapePattern)return;
+  const width=Math.max(1920,Math.round(canvas.height*im.naturalWidth/im.naturalHeight));
+  const overlap=Math.round(width*.045);
+  landscapeLength=width-overlap;
+  const strip=document.createElement('canvas');
+  strip.width=landscapeLength;strip.height=canvas.height;
+  const g=strip.getContext('2d');
+  const imageHeight=width*im.naturalHeight/im.naturalWidth;
+  const top=roadY-.90*imageHeight;
+  g.drawImage(im,-overlap,top,width,imageHeight);
+  const join=document.createElement('canvas');
+  join.width=overlap;join.height=strip.height;
+  const edge=join.getContext('2d');
+  edge.drawImage(im,0,top,width,imageHeight);
+  const blend=edge.createLinearGradient(0,0,overlap,0);
+  blend.addColorStop(0,'transparent');blend.addColorStop(1,'black');
+  edge.globalCompositeOperation='destination-in';edge.fillStyle=blend;
+  edge.fillRect(0,0,overlap,join.height);
+  g.drawImage(join,landscapeLength-overlap,0);
+  landscapePattern=ctx.createPattern(strip,'repeat-x');
+}
+function drawBackground(){
+  prepareLandscape();
+  ctx.fillStyle='#c9e3ee';ctx.fillRect(0,0,canvas.width,canvas.height);
+  if(!landscapePattern)return;
+  const offset=state.distance%landscapeLength;
+  ctx.save();ctx.translate(-offset,0);ctx.fillStyle=landscapePattern;
+  ctx.fillRect(offset,0,canvas.width,canvas.height);ctx.restore();
+}
+function line(x1,y1,x2,y2,color,width){
+  ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+}
+function circle(x,y,r,color){
+  ctx.fillStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);ctx.fill();
+}
+function wheel(x,y,angle){
+  ctx.save();ctx.translate(x,y);ctx.rotate(angle);
+  const ring=(r,color,width)=>{ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.arc(0,0,r,0,Math.PI*2);ctx.stroke();};
+  ring(50,'#242322',8);ring(49,'#555451',1.5);ring(46,'#d9d5c9',3);
+  for(let i=0;i<24;i++){
+    const a=i*Math.PI/12;
+    line(3*Math.cos(a+1.2),3*Math.sin(a+1.2),45*Math.cos(a),45*Math.sin(a),'#827d70',1);
+  }
+  line(0,-40,0,-45,'#332f28',2.5);circle(0,0,4,'#96958b');ctx.restore();
+}
+function tube(x1,y1,x2,y2){
+  line(x1,y1,x2,y2,'#482522',6);line(x1,y1,x2,y2,'#c6382c',4);
+  line(x1,y1-1,x2,y2-1,'#f18265',1);
+}
+function frameAndChain(){
+  line(206,255,278,257,'#403d34',2);line(206,267,278,276,'#403d34',2);
+  tube(205,261,246,197);tube(205,261,278,267);tube(246,197,278,267);
+  tube(246,197,350,186);tube(278,267,353,199);tube(349,178,354,202);tube(354,202,380,263);
+  line(247,197,241,183,'#595956',4);line(230,186,256,184,'#252321',7);
+  line(349,180,344,164,'#575553',4);line(344,164,354,158,'#9b9992',3);
+  circle(278,267,13,'#494742');circle(278,267,10,'#bcbab1');circle(278,267,7,'#514d45');
+}
+function drawLeg(phase,near){
+  const hip={x:252,y:179}, crank={x:278,y:267};
+  const pedal={x:crank.x+17*Math.cos(phase),y:crank.y+17*Math.sin(phase)};
+  const ankle={x:pedal.x-8,y:pedal.y-10};
+  const dx=ankle.x-hip.x,dy=ankle.y-hip.y,length=Math.hypot(dx,dy);
+  const thigh=54,shin=52,along=(thigh*thigh-shin*shin+length*length)/(2*length);
+  const bend=Math.sqrt(Math.max(0,thigh*thigh-along*along));
+  const knee={x:hip.x+(along*dx+bend*dy)/length,y:hip.y+(along*dy-bend*dx)/length};
+  line(crank.x,crank.y,pedal.x,pedal.y,'#514b43',5);
+  line(pedal.x-8,pedal.y+1,pedal.x+8,pedal.y+1,'#2e302f',4);
+  line(hip.x,hip.y,knee.x,knee.y,'#373532',22);line(knee.x,knee.y,ankle.x,ankle.y,'#373532',17);
+  line(hip.x,hip.y,knee.x,knee.y,near?'#66625d':'#494641',19);
+  line(knee.x,knee.y,ankle.x,ankle.y,near?'#605c57':'#494641',14);
+  line(knee.x-2,knee.y+5,ankle.x-2,ankle.y-5,near?'#77716a':'#55514a',1.6);
+  ctx.fillStyle=near?'#684128':'#493322';ctx.strokeStyle='#30271e';ctx.lineWidth=1.8;
+  ctx.beginPath();ctx.moveTo(ankle.x-6,ankle.y-2);ctx.quadraticCurveTo(ankle.x+1,ankle.y+3,ankle.x+6,ankle.y);
+  ctx.quadraticCurveTo(pedal.x+16,pedal.y-6,pedal.x+11,pedal.y);
+  ctx.lineTo(ankle.x-6,pedal.y);ctx.closePath();ctx.fill();ctx.stroke();
+}
+// Clip the existing illustration at the jacket so articulated legs can drive the crank.
+const torso=new Path2D('M 0 0 H 600 V 168 H 302 L 289 167 L 270 162 Q 255 156 248 168 Q 235 190 218 177 H 0 Z');
+const appleCutout=new Path2D('M 0 0 H 600 V 338 H 0 Z M 337 72 L 353 73 L 356 78 Q 371 77 365 96 L 361 99 Q 355 108 345 103 L 340 99 Q 335 91 342 82 Z');
+function drawEinstein(){
+  const angle=state.distance/52,phase=angle*1.7;
+  const bob=1.5*Math.sin(phase*2);
+  ctx.save();ctx.translate(riderOrigin.x,riderOrigin.y);ctx.lineCap='round';ctx.lineJoin='round';
+  wheel(205,261,angle);wheel(380,263,angle);
+  drawLeg(phase+Math.PI,false);frameAndChain();drawLeg(phase,true);
+  if(assets.einstein.naturalWidth){
+    ctx.save();ctx.translate(0,bob);ctx.clip(torso);
+    if(state.launched)ctx.clip(appleCutout,'evenodd');
+    ctx.drawImage(assets.einstein,0,0,600,338);ctx.restore();
+  }
   ctx.restore();
-  return true;
-}
-function drawTreeBelt(sequence,spacing,offset,bottom,baseHeight,alpha,scale=1){
-  const beltWidth=sequence.length*spacing;
-  const start=-spacing-(offset%beltWidth);
-  for(let x=start;x<canvas.width+spacing;x+=spacing){
-    const cycleIndex=Math.floor((x-start)/spacing);
-    const item=sequence[cycleIndex%sequence.length];
-    drawTreeSprite(item.idx,x+item.dx,bottom,baseHeight*item.scale*scale,alpha);
-  }
-}
-function drawPathTile(offset){
-  const img=assets.path,W=canvas.width;
-  if(!img.complete||!img.naturalWidth){
-    ctx.fillStyle="#d6a15d";ctx.fillRect(0,382,W,118);return;
-  }
-  const tileW=520,tileH=142,off=offset%tileW;
-  for(let x=-tileW-off;x<W+tileW;x+=tileW){
-    ctx.drawImage(img,0,0,img.naturalWidth,img.naturalHeight,x,358,tileW,tileH);
-  }
-}
-function drawBackground(offset){
-  const W=canvas.width,H=canvas.height;
-  let sky=ctx.createLinearGradient(0,0,0,H*.62);sky.addColorStop(0,"#7bd0ff");sky.addColorStop(1,"#eaf8ff");ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
-  ctx.fillStyle="#c4ed9b";ctx.beginPath();ctx.moveTo(0,305);ctx.quadraticCurveTo(260,252,560,316);ctx.quadraticCurveTo(900,370,1280,292);ctx.lineTo(1280,418);ctx.lineTo(0,418);ctx.fill();
-  ctx.fillStyle="rgba(80,155,86,.30)";ctx.beginPath();ctx.moveTo(0,330);ctx.quadraticCurveTo(340,300,620,342);ctx.quadraticCurveTo(920,386,1280,322);ctx.lineTo(1280,420);ctx.lineTo(0,420);ctx.fill();
-  const farSequence=[{idx:0,dx:-20,scale:.86},{idx:3,dx:18,scale:.98},{idx:1,dx:-8,scale:.82},{idx:2,dx:24,scale:.9},{idx:3,dx:-18,scale:.74}];
-  const nearSequence=[{idx:0,dx:-34,scale:1.02},{idx:1,dx:28,scale:1.06},{idx:2,dx:-12,scale:1.0},{idx:3,dx:38,scale:1.18},{idx:0,dx:8,scale:.92},{idx:2,dx:-42,scale:1.08}];
-  drawTreeBelt(farSequence,290,offset*.36,360,190,.44,.88);
-  drawTreeBelt(nearSequence,360,offset*.82,404,255,.82,1);
-  drawPathTile(offset);
-}
-function drawRotated(img,x,y,size,angle){
-  if(!img.complete||!img.naturalWidth)return;
-  ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.drawImage(img,-size/2,-size/2,size,size);ctx.restore();
-}
-function drawEinstein(shift){
-  const x=360+shift,y=156,w=600,h=338;
-  if(assets.einstein.complete&&assets.einstein.naturalWidth)ctx.drawImage(assets.einstein,x,y,w,h);
-  const spin=state.age*state.bike*pxPerLightSecond/58;
-  drawRotated(assets.wheel,x+214,y+263,116,spin);
-  drawRotated(assets.wheel,x+380,y+263,116,spin);
-  // Small release gesture: a brief glow and shoulder bob when the apple is launched.
-  const age=state.launched?state.age:-1;
-  if(age>=0&&age<.55){
-    ctx.save();ctx.globalAlpha=1-age/.55;ctx.strokeStyle="#fff";ctx.lineWidth=7;ctx.lineCap="round";
-    ctx.beginPath();ctx.moveTo(x+375,y+112);ctx.quadraticCurveTo(x+428,y+84-age*34,x+488,y+110-age*46);ctx.stroke();ctx.restore();
-  }
 }
 function drawApple(horizontal,classic,fromBike){
-  const x0=720,y0=268,fall=8.2*state.age**2;
+  if(!state.launched)return;
+  const age=state.age;
+  const originShift=fromBike?0:state.bike*age*pxPerLightSecond;
+  const x0=hand.x-originShift-state.bike*state.landedFor*pxPerLightSecond;
+  const y0=state.releaseY,fall=(roadY-14-y0)*(age/flightDuration)**2;
   function trail(dx,color,dash){
     ctx.strokeStyle=color;ctx.lineWidth=3;ctx.setLineDash(dash);ctx.beginPath();
     ctx.moveTo(x0,y0);ctx.quadraticCurveTo(x0+dx/2,y0,x0+dx,y0+fall);ctx.stroke();
   }
-  ctx.save();
-  if(state.launched){
-    if(!fromBike)trail(classic,"#a75212",[7,6]);
-    trail(horizontal,"#075b87",[]);
+  ctx.save();ctx.globalAlpha=Math.min(1,(1.5-state.landedFor)*3);
+  if(!fromBike)trail(classic,'#a75212',[7,6]);
+  trail(horizontal,'#075b87',[]);
+  circle(x0,y0,4,'#075b87');
+  if(assets.apple.naturalWidth){
+    ctx.drawImage(assets.apple,x0+horizontal-23,y0+fall-22,46,46);
   }
-  if(assets.apple.complete&&assets.apple.naturalWidth)ctx.drawImage(assets.apple,x0+horizontal-18,y0+fall-18,36,36);
   ctx.restore();
 }
 function viewFromBike(){return $("reference").value==="bike";}
 function render(){
   const v=state.bike,u=relAdd(v,state.apple),fromBike=viewFromBike();
-  // Along the apple's path, t′ = γ(t − vx/c²), with velocities in units of c.
+  // At the apple event, t′ = γ(t − vx/c²), with velocities expressed in c.
   const bikeTime=gamma(v)*(1-v*u)*state.age;
-  drawBackground(fromBike?v*bikeTime*pxPerLightSecond:0);
-  drawEinstein(fromBike?0:v*state.age*pxPerLightSecond);
+  drawBackground();
+  drawEinstein();
   const dx=(fromBike?state.apple*bikeTime:u*state.age)*pxPerLightSecond;
   drawApple(dx,(v+state.apple)*state.age*pxPerLightSecond,fromBike);
-  $("pauseAnimation").disabled=!state.launched||state.age>=flightDuration;
-  $("pauseAnimation").textContent=state.paused?"Reanudar":"Pausar";
+  $("pauseAnimation").textContent=state.paused?'Reanudar':'Pausar';
 }
 let lastFrame=performance.now();
 function advance(now){
   const dt=Math.min(.1,Math.max(0,now-lastFrame)/1000);lastFrame=now;
-  if(!state.launched||state.paused||document.hidden)return;
+  if(state.paused||document.hidden)return;
+  state.distance+=dt*state.bike*pxPerLightSecond;
+  if(!state.launched)return;
+  if(state.age>=flightDuration){
+    state.landedFor+=dt;
+    if(state.landedFor>=1.5)clearFlight();
+    return;
+  }
   const u=relAdd(state.bike,state.apple);
   const rate=viewFromBike()?1/(gamma(state.bike)*(1-state.bike*u)):1;
   state.age=Math.min(flightDuration,state.age+dt*rate);
 }
 function frame(now){advance(now);render();requestAnimationFrame(frame);}
-function prepare(){state.age=0;state.launched=false;state.paused=false;update();render();}
-bikeV.oninput=appleV.oninput=prepare;
-$("dropBtn").onclick=()=>{state.age=0;state.launched=true;state.paused=false;lastFrame=performance.now();render();};
+function clearFlight(){state.age=0;state.landedFor=0;state.launched=false;}
+bikeV.oninput=appleV.oninput=()=>{
+  advance(performance.now());clearFlight();update();render();
+};
+$("dropBtn").onclick=()=>{
+  advance(performance.now());clearFlight();state.launched=true;state.paused=false;
+  state.releaseY=hand.y+1.5*Math.sin(state.distance/52*3.4);render();
+};
 $("pauseAnimation").onclick=()=>{advance(performance.now());state.paused=!state.paused;render();};
 $("reference").onchange=()=>{lastFrame=performance.now();render();};
-$("resetBtn").onclick=()=>{bikeV.value=.55;appleV.value=.20;$("reference").value="ground";prepare();};
-prepare();requestAnimationFrame(frame);
+$("resetBtn").onclick=()=>{
+  bikeV.value=.55;appleV.value=.20;$("reference").value="ground";state.distance=0;state.paused=false;
+  lastFrame=performance.now();clearFlight();update();render();
+};
+document.addEventListener('visibilitychange',()=>{lastFrame=performance.now();});
+update();render();requestAnimationFrame(frame);
 </script>
 </body>
 </html>
