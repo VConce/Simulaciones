@@ -23,8 +23,7 @@
     .page{width:min(1380px,calc(100vw - 28px));margin:18px auto 28px;position:relative}.hero{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:18px;align-items:stretch;margin-bottom:14px;border:1px solid var(--line);border-radius:30px;background:rgba(255,255,255,.76);box-shadow:var(--shadow);padding:18px 20px;backdrop-filter:blur(16px)}
     .title{display:flex;gap:16px;align-items:center}.badge{width:74px;height:74px;border-radius:24px;display:grid;place-items:center;color:white;font-size:38px;font-weight:950;background:linear-gradient(145deg,#0d63e6,#6d49ff);box-shadow:0 18px 46px rgba(68,73,190,.26)}
     h1{margin:0;font-size:clamp(34px,4.3vw,62px);line-height:.95;letter-spacing:-.055em}.tag{margin:0 0 7px;color:#6847df;font-weight:950;letter-spacing:.08em;text-transform:uppercase;font-size:12px}.lead{margin:8px 0 0;color:#4e5d74;font-size:17px;font-weight:680;line-height:1.35;max-width:760px}
-    .formula{border:1px solid rgba(109,73,255,.2);border-radius:22px;background:linear-gradient(145deg,#ffffff,#f4f0ff);padding:13px 15px;color:#26233d;box-shadow:0 14px 38px rgba(46,56,107,.11)}.formula span,.eqCard span{display:block;color:#6d49ff;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:950;margin-bottom:5px}.formula p{margin:5px 0 0;color:var(--muted);font-weight:650;font-size:13px}
-    .math{font-family:Cambria,"Times New Roman",serif;font-style:italic;font-size:21px;line-height:1.35;color:#151b2c}.math.small{font-size:18px}.frac{display:inline-grid;grid-template-rows:auto 1px auto;align-items:center;text-align:center;vertical-align:middle;margin:0 .15em}.frac::before{content:"";grid-row:2;border-top:1.8px solid currentColor}.frac .top{grid-row:1;padding:0 .18em}.frac .bottom{grid-row:3;padding:0 .18em}.sqrt{border-top:1.7px solid currentColor;padding-left:.12em}.sqrt::before{content:"√";font-style:normal;margin-right:.08em}
+    .formula{border:1px solid rgba(109,73,255,.2);border-radius:22px;background:linear-gradient(145deg,#ffffff,#f4f0ff);padding:13px 15px;color:#26233d;box-shadow:0 14px 38px rgba(46,56,107,.11)}.formula > span,.eqCard > span{display:block;color:#6d49ff;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:950;margin-bottom:5px}.formula p{margin:5px 0 0;color:var(--muted);font-weight:650;font-size:13px}
     .workspace{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px}.sceneCard,.panel,.info,.eqGrid{border:1px solid var(--line);border-radius:30px;background:var(--card);box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(14px)}
     .sceneHead{padding:14px 18px 8px;display:flex;justify-content:space-between;align-items:center;gap:12px}.sceneHead h2{margin:0;font-size:25px;letter-spacing:-.035em}.sceneHead p{margin:2px 0 0;color:var(--muted);font-weight:720}.pill{border-radius:999px;padding:9px 13px;color:white;background:linear-gradient(135deg,var(--blue),var(--violet));font-weight:950;white-space:nowrap}
     .canvasWrap{padding:0 14px 14px;position:relative}canvas{width:100%;height:auto;display:block;border:1px solid #17213b;border-radius:24px;background:#8fcaff;touch-action:none;cursor:grab}canvas.dragging{cursor:grabbing}
@@ -41,6 +40,10 @@
 .torre_gravitatoria .panel .delta{grid-column:1/-1;padding:6px 10px;display:grid;grid-template-columns:1fr auto;column-gap:10px;align-items:center}.torre_gravitatoria .delta strong{font-size:1.1rem;white-space:nowrap}.torre_gravitatoria .delta p{margin:2px 0;font-size:.77rem}.torre_gravitatoria .panel .actions{grid-column:1/-1}.torre_gravitatoria .warp-panel{max-width:23%}
 @media(min-width:761px){.compact-lab.torre_gravitatoria .workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(315px,30%)}}
 @media(max-width:600px){.torre_gravitatoria .warp-panel{position:static;width:100%;max-width:none;margin-bottom:4px}.warp-panel .scale{display:none}}
+.tower-reading{margin:12px 0;background:white;border:1px solid var(--line);border-radius:20px;padding:clamp(14px,2vw,24px);line-height:1.5}
+.tower-reading h2,.tower-reading h3{margin:0;line-height:1.22}.tower-reading>p{margin:.5em 0 1em;max-width:95ch}.tower-lessons{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr));gap:clamp(12px,2vw,28px)}
+.tower-lessons article{min-width:0;border-top:3px solid #9cbce0;padding-top:.8em}.tower-reading article p,.kerr-reading p{margin:.6em 0}.tower-reading [data-tex]{color:#172841;padding:.25em 0}.kerr-reading{margin-top:14px;padding:10px 14px;border-radius:12px;background:#f0f5fb}.kerr-reading summary{font-weight:700;cursor:pointer}.kerr-reading p{max-width:100ch}
+.torre_gravitatoria .info{grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))}
 </style></head>
 <body>
   <main class="page compact-lab torre_gravitatoria">
@@ -120,7 +123,33 @@
       </aside>
     </section>
 
-<section class="lab-theory"><article class="eqCard mini"><h3>Dos relojes a distinta altura</h3><p>Deja uno en la base y arrastra el otro hacia arriba. Ambos cuentan su tiempo propio. Por cada segundo del reloj de abajo, el de arriba acumula un poco más. La escala verde acelera el transcurso del experimento.</p><div data-tex>\frac{d\tau_2}{d\tau_1}=\sqrt{\frac{1-r_s/r_2}{1-r_s/r_1}}</div></article><article class="eqCard mini"><h3>¿Qué mide un reloj fijo?</h3><p>A distancia radial r de una masa esférica M, un reloj en reposo avanza más despacio que uno muy lejano. Aquí r = R + h. Los relojes deben estar fuera del límite estático.</p><div data-tex>d\tau=\sqrt{1-\frac{r_s}{r}}\,dt,\qquad r_s=\frac{2GM}{c^2}</div></article><article class="eqCard mini"><h3>Una torre en la Tierra</h3><p>Para una diferencia de altura pequeña y un campo débil, el adelanto relativo es proporcional a la altura. A 200 m, el reloj superior gana unos 1.9 ns al día. La diferencia se acumula incluso si luego juntas los relojes.</p><div data-tex>\frac{\Delta\tau_2-\Delta\tau_1}{\Delta\tau_1}\simeq\frac{g(h_2-h_1)}{c^2}</div></article></section><section class="info">        <div class="statusBox" id="gravityStatus">
+<section class="tower-reading" aria-labelledby="tower-question">
+      <h2 id="tower-question">¿Cuánto adelanta el reloj de arriba?</h2>
+      <p>Elige «Tierra», deja el reloj 1 en la base y sitúa el reloj 2 a 200 m. Cada observador ve pasar sus propios segundos con normalidad. Al comparar lo que han acumulado durante el mismo experimento, el reloj de arriba marca un poco más.</p>
+      <div class="tower-lessons">
+        <article><h3>Del radio al ritmo del reloj</h3>
+          <p>En el exterior de una masa esférica de masa <i>M</i> y radio <i>R</i>, un reloj fijo a altura <i>h</i> está a distancia <i>r = R + h</i> del centro. El tiempo que mide allí, <i>τ</i>, se llama tiempo propio. Tomamos como referencia el tiempo <i>t</i> de un reloj muy lejano en reposo.</p>
+          <div data-tex>r_s=\frac{2GM}{c^2},\qquad \frac{d\tau}{dt}=\sqrt{1-\frac{r_s}{r}}</div>
+          <p>Al subir el reloj, la raíz se acerca a uno. Los símbolos <i>G</i> y <i>c</i> representan la constante de gravitación y la velocidad de la luz.</p>
+        </article>
+        <article><h3>Cómo comparar los dos relojes</h3>
+          <p>Si ambos permanecen a alturas fijas, divide sus ritmos. El resultado dice cuántos segundos acumula el reloj 2 por cada segundo del reloj 1.</p>
+          <div data-tex>\frac{\Delta\tau_2}{\Delta\tau_1}=\sqrt{\frac{1-r_s/r_2}{1-r_s/r_1}}</div>
+          <p>A igual altura el cociente vale uno. Prueba a intercambiar sus alturas durante la marcha. Se invierte cuál gana tiempo a partir de ese instante. El recuadro rojo conserva el desfase ya acumulado.</p>
+        </article>
+        <article><h3>Un día en una torre terrestre</h3>
+          <p>Cerca de la superficie, para una torre baja en comparación con el radio terrestre, basta con la gravedad local <i>g</i> y la diferencia de altura <i>Δh = h₂ − h₁</i>.</p>
+          <div data-tex>\Delta\tau_2-\Delta\tau_1\simeq\Delta\tau_1\,\frac{g\,\Delta h}{c^2}</div>
+          <p>Con 200 m de desnivel y 86 400 s en la base, el reloj superior gana unos <strong>1.9 ns</strong>. Pon la escala verde en un día por segundo para seguir el desfase. Este efecto se ha medido incluso con alturas inferiores a un metro. <a href="https://www.nist.gov/publications/relativity-and-optical-clocks">Experimento del NIST</a>.</p>
+        </article>
+      </div>
+      <details class="kerr-reading"><summary>¿Qué cambia con Gargantúa?</summary>
+        <p>Esta opción sitúa los relojes en el ecuador de un agujero negro en rotación. La simulación los mantiene a radio y dirección fijos respecto a las estrellas lejanas. Para esos observadores, el factor de tiempo sigue siendo el de arriba y exige <i>r &gt; rₛ</i>. Al acercar un reloj a ese límite, una hora suya puede corresponder a muchas horas lejos del agujero.</p>
+        <div data-tex>r_+=\frac{GM}{c^2}\left(1+\sqrt{1-\chi^2}\right)</div>
+        <p>El parámetro de giro <i>χ</i> determina el radio del horizonte <i>r₊</i>. Sin giro, el horizonte coincide con <i>rₛ</i>. Cuando hay giro, entre el horizonte y el límite estático ecuatorial el arrastre del espacio-tiempo obliga a moverse en la dirección de rotación. La comparación de la película implica además un planeta en órbita.</p>
+      </details>
+    </section>
+    <section class="info">        <div class="statusBox" id="gravityStatus">
           <span>Régimen gravitatorio</span>
           <strong id="regimeOut">Planeta / estrella</strong>
           <p id="schwarzOut">rₛ = 8.87 mm · R/rₛ ≫ 1</p>
@@ -130,7 +159,7 @@
           <strong id="movieRatioOut">1 h local → 1.00 h lejos</strong>
           <p id="movieNote">Activa Gargantúa para rozar el caso 1 h en el planeta = 7 años fuera.</p>
         </div>
-<article class="eqCard mini"><h3>El caso extremo</h3><p>Gargantúa representa relojes sostenidos a radio fijo en el ecuador, sin orbitar. La rotación cambia el horizonte. En el ecuador el límite estático sigue en el radio de Schwarzschild. Dentro de ese límite un reloj no puede permanecer fijo respecto a las estrellas lejanas.</p><div data-tex>r_+=\frac{GM}{c^2}\left(1+\sqrt{1-\chi^2}\right)</div></article>      <article class="factTable"><h3>Desfase esperado en una torre de 200 m</h3><div class="factRows" id="factRows"></div></article>
+<article class="factTable"><h3>Desfase esperado en una torre de 200 m</h3><div class="factRows" id="factRows"></div></article>
     </section>
   </main>
 
@@ -536,7 +565,7 @@
       const h = 486;
       const ratio = towerSprite.naturalWidth && towerSprite.naturalHeight ? towerSprite.naturalWidth / towerSprite.naturalHeight : 0.27;
       const w = h * ratio;
-      return { x: 535 - w / 2, y: 36, w, h, guideX: 650, top: 74, bottom: 483 };
+      return { x: 535 - w / 2, y: 36, w, h, guideX: 650, top: 74, bottom: canvas.height - 31 - 9 - 55 - 14 };
     }
 
     function yForFraction(frac) {

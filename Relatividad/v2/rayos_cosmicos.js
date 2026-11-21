@@ -23,19 +23,46 @@
   const archive=document.createElement('canvas');
   archive.width=W;archive.height=H;
   const ink=archive.getContext('2d');
-  let fixed=true,fadeStart=0;
-  el('trailMode').onclick=()=>{
-    fixed=!fixed;fadeStart=time;
-    el('trailMode').setAttribute('aria-pressed',String(fixed));
-    el('trailMode').textContent=fixed?'Rastro fijo':'Rastro desvaneciente';
+  const trail=el('trail');
+  let lifetime=Infinity,cutoff=0,archiveAge=0,archiveOpacity=1;
+  function ageTrail(dt){
+    if(lifetime===Infinity)return;
+    cutoff=Math.max(cutoff,time-lifetime);
+    if(archiveOpacity===0)return;
+    archiveAge+=dt;
+    archiveOpacity=Math.min(archiveOpacity,lifetime?Math.max(0,1-archiveAge/lifetime):0);
+    if(archiveOpacity===0)ink.clearRect(0,0,W,H);
+  }
+  trail.oninput=()=>{
+    const value=Number(trail.value);
+    lifetime=value===Number(trail.max)?Infinity:value;
+    const label=lifetime===Infinity?'Fijo':lifetime===0?'Sin rastro':lifetime+' s de simulación';
+    el('trailOut').textContent=label;
+    trail.setAttribute('aria-valuetext',label);
+    ageTrail(0);
+    // Consolidate the visible fraction of old permanent trails before adding new ones.
+    if(lifetime===Infinity&&archiveOpacity<1){
+      ink.save();ink.globalCompositeOperation='destination-in';ink.globalAlpha=archiveOpacity;
+      ink.fillRect(0,0,W,H);ink.restore();archiveAge=0;archiveOpacity=1;
+    }
     render();
   };
-  function archiveShower(event){
-    for(const line of event.tracks){
-      ink.strokeStyle=particles[line.type][1];ink.globalAlpha=.55;
-      ink.lineWidth=line.type==='p'?3.2:2;ink.setLineDash(line.type==='nu'?[5,5]:[]);
-      ink.beginPath();ink.moveTo(line.x,line.y);ink.lineTo(line.end.x,line.end.y);ink.stroke();
+  function trace(pen,line,endTime,x,y){
+    const startTime=Math.max(cutoff,line.start);
+    if(!lifetime||endTime<=startTime)return;
+    const f=(startTime-line.start)/(line.end.t-line.start);
+    const x0=line.x+f*(line.end.x-line.x),y0=line.y+f*(line.end.y-line.y);
+    const color=particles[line.type][1];
+    pen.strokeStyle=color;
+    if(Number.isFinite(lifetime)){
+      const gradient=pen.createLinearGradient(x0,y0,x,y);
+      const alpha=t=>Math.round(255*Math.max(0,1-(time-t)/lifetime)).toString(16).padStart(2,'0');
+      gradient.addColorStop(0,color+alpha(startTime));gradient.addColorStop(1,color+alpha(endTime));
+      pen.strokeStyle=gradient;
     }
+    pen.globalAlpha=endTime===line.end.t?.55:.96;pen.lineWidth=line.type==='p'?3.2:2;
+    pen.setLineDash(line.type==='nu'?[5,5]:[]);
+    pen.beginPath();pen.moveTo(x0,y0);pen.lineTo(x,y);pen.stroke();pen.globalAlpha=1;
   }
   const balloon = new Image();
   balloon.src = 'globo-aerostatico.webp';
@@ -82,7 +109,7 @@
       }
     }
     const energy=.938272*(1/Math.sqrt(1-beta*beta)-1);
-    showers.push({tracks,until:Math.max(...tracks.map(s=>s.end.t))+2.5});
+    showers.push({tracks,until:Math.max(...tracks.map(s=>s.end.t))});
     count++;
     el('reading').textContent='Protones lanzados: '+count+'. Último: '+beta.toFixed(5)+'c · '+energy.toFixed(2)+' GeV de energía cinética.';
   }
@@ -94,20 +121,17 @@
       ctx.drawImage(balloon, W*.82, H*.60, 18, 27);
       ctx.drawImage(balloon, W*.26, H*.78, 21, 32);
     }
-    ctx.globalAlpha=fixed?1:Math.max(0,1-(time-fadeStart)/2.5);
-    ctx.drawImage(archive,0,0);ctx.globalAlpha=1;
+    if(archiveOpacity>0){ctx.globalAlpha=archiveOpacity;ctx.drawImage(archive,0,0);ctx.globalAlpha=1;}
     for(const event of showers){
       for(const line of event.tracks){
         if(time<line.start) continue;
         const p=Math.min(1,(time-line.start)/(line.end.t-line.start));
         const x=line.x+p*(line.end.x-line.x),y=line.y+p*(line.end.y-line.y);
-        ctx.strokeStyle=particles[line.type][1];ctx.fillStyle=ctx.strokeStyle;
-        const opacity=fixed?1:Math.max(0,1-Math.max(0,time-line.end.t)/2.5);
-        if(opacity===0)continue;
-        ctx.lineWidth=line.type==='p'?3.2:2;ctx.globalAlpha=(p===1?.55:.96)*opacity;
-        ctx.setLineDash(line.type==='nu'?[5,5]:[]);
-        ctx.beginPath();ctx.moveTo(line.x,line.y);ctx.lineTo(x,y);ctx.stroke();
-        if(p<1 || (line.type==='mu' && line.end.y===ground)){
+        trace(ctx,line,Math.min(time,line.end.t),x,y);
+        ctx.fillStyle=particles[line.type][1];
+        const markerLife=Math.min(2.5,lifetime);
+        const opacity=p<1?1:markerLife?Math.max(0,1-(time-line.end.t)/markerLife):0;
+        if(p<1 || (opacity>0 && line.type==='mu' && line.end.y===ground)){
           ctx.globalAlpha=opacity;ctx.beginPath();ctx.arc(x,y,p<1?3.5:4.5,0,2*Math.PI);ctx.fill();
           if(!rain || Number(playback.value)<1 || line.type==='p' || line.type==='mu'){
             ctx.font='bold '+(canvas.clientWidth<620?25:18)+'px system-ui';ctx.lineWidth=3;
@@ -131,23 +155,24 @@
   el('single').onclick=single;
   el('stream').onclick=()=>{setRain(!rain);if(rain){setPause(false);next=time;}};
   el('pause').onclick=()=>setPause(!paused);
-  el('reset').onclick=()=>{setRain(false);setPause(false);time=0;count=0;showers=[];ink.clearRect(0,0,W,H);el('reading').textContent='Protones lanzados: 0.';render();};
+  el('reset').onclick=()=>{setRain(false);setPause(false);time=0;count=0;cutoff=0;archiveAge=0;archiveOpacity=1;showers=[];ink.clearRect(0,0,W,H);el('reading').textContent='Protones lanzados: 0.';render();};
   el('speed').oninput=()=>{el('beta').textContent=Number(el('speed').value).toFixed(5)+'c';};
   function frame(now){
     if(!paused){
-      time+=Math.min(.1,(now-last)/1000)*Number(playback.value);
+      const dt=Math.min(.1,(now-last)/1000)*Number(playback.value);
+      time+=dt;ageTrail(dt);
       if(rain && time>=next){
         const beta=1-Math.exp(between(Math.log(.00001),Math.log(.02)));
         shower(beta);next=time+2.2;
       }
       showers=showers.filter(s=>{
-        if(time<s.until)return true;
-        if(fixed)archiveShower(s);
+        if(lifetime!==Infinity)return s.until>=cutoff;
+        if(time<s.until+2.5)return true;
+        for(const line of s.tracks)trace(ink,line,line.end.t,line.end.x,line.end.y);
         return false;
       });
-      if(!fixed && time-fadeStart>=2.5)ink.clearRect(0,0,W,H);
     }
     last=now;render();requestAnimationFrame(frame);
   }
-  el('speed').oninput();single();requestAnimationFrame(frame);
+  el('speed').oninput();trail.oninput();single();requestAnimationFrame(frame);
 })();

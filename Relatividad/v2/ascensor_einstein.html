@@ -467,6 +467,16 @@
 <link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.ascensor_einstein .lab-theory article{display:block;background:white;padding:15px;border-radius:14px}.ascensor_einstein .lab-theory h3{margin:0}.ascensor_einstein .lab-theory p{line-height:1.45}</style><style>
 .reading{margin-top:12px;background:#f8fbfd;border:1px solid #d7e3ea;border-radius:16px;padding:16px;color:#182e40}.reading>h2{margin:0;font-size:1.35rem}.reading>p{margin:5px 0 14px;line-height:1.5}.reading-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:14px}.reading-grid article{min-width:0;padding:12px;background:white;border:1px solid #d9e4ee;border-radius:12px}.reading-grid h3{margin:0;font-size:1.03rem}.reading-grid p{line-height:1.52;margin:.7em 0}.reading-grid [data-tex]{font-size:clamp(.85rem,1.1vw,1.05rem)}
 .uniform-comparison{padding:8px 14px;background:#102236;color:#e5f3fb;display:flex;gap:15px;align-items:center}.uniform-comparison[hidden]{display:none}.uniform-comparison canvas{width:clamp(100px,18vw,200px);height:auto;flex:none}.uniform-comparison strong{display:block}
+.ascensor_einstein .lab>.explain{grid-column:1/-1;margin:0;padding:12px 17px;line-height:1.45;font-weight:550}
+@media(min-width:901px){
+ .compact-lab.ascensor_einstein .lab{grid-template-columns:minmax(0,1fr) minmax(298px,27%);align-items:stretch}
+ .ascensor_einstein .panel{padding:10px;gap:8px;display:flex;flex-direction:column;justify-content:space-between}
+ .ascensor_einstein .controlBox{gap:8px;padding:10px;align-content:space-between;flex:1}
+ .ascensor_einstein .controlBox label{margin-bottom:2px}.ascensor_einstein .meter{padding:8px}.ascensor_einstein .meter strong{font-size:1.45rem}
+ .ascensor_einstein .stageCard{display:flex;flex-direction:column}.ascensor_einstein .canvasWrap{flex:1;display:flex;flex-direction:column;background:#101c2a}
+ .ascensor_einstein .canvasWrap #scene{flex:1;min-height:0;object-fit:contain}.ascensor_einstein .velocityHint{margin:3px 0}
+}.ascensor_einstein .uniform-comparison #angleView{width:clamp(100px,15vw,190px);margin:0}
+@media(max-width:900px){.compact-lab.ascensor_einstein .lab{grid-template-columns:1fr}.ascensor_einstein .stageCard{order:0}.ascensor_einstein .lab>.explain{order:1}.ascensor_einstein .panel{order:2}}
 </style></head>
 <body>
   <main class="page compact-lab ascensor_einstein">
@@ -535,10 +545,11 @@
           </div>
         </div>
 
+
+      </aside>
         <div class="explain" id="explainBox">
           <strong>Modo ascensor.</strong> La luz viaja recta en el espacio exterior, pero durante el tiempo que tarda en cruzar la cabina, el suelo acelera hacia arriba. Para quien está dentro, el rayo parece curvarse hacia abajo.
         </div>
-      </aside>
     </section>
 
 <section class="reading" aria-labelledby="readingTitle">
@@ -568,6 +579,8 @@
   <script>
     const canvas = document.getElementById("scene");
     const ctx = canvas.getContext("2d");
+    const einsteinBody = new Image();
+    einsteinBody.src = "einstein-ascensor-cuerpo.webp";
     const einsteinFace = new Image();
     einsteinFace.src = "../assets/einstein-face-sprite.png";
     const spaceBackground = new Image();
@@ -871,68 +884,11 @@
     }
 
     function drawPerson(cx, floorY) {
-      ctx.save();
-      ctx.translate(cx, floorY);
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-
-      ctx.fillStyle = "rgba(0,0,0,.22)";
-      ctx.beginPath();
-      ctx.ellipse(0, 8, 55, 11, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = "#162133";
-      ctx.strokeStyle = "#101621";
-      ctx.lineWidth = 5;
-      roundedRect(-30, -128, 60, 88, 18);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.strokeStyle = "#1c2430";
-      ctx.lineWidth = 12;
-      ctx.beginPath();
-      ctx.moveTo(-25, -105);
-      ctx.lineTo(-46, -58);
-      ctx.moveTo(25, -105);
-      ctx.lineTo(48, -58);
-      ctx.stroke();
-
-      ctx.strokeStyle = "#151b24";
-      ctx.lineWidth = 14;
-      ctx.beginPath();
-      ctx.moveTo(-16, -42);
-      ctx.lineTo(-30, -2);
-      ctx.lineTo(-42, 48);
-      ctx.moveTo(16, -42);
-      ctx.lineTo(29, -2);
-      ctx.lineTo(42, 48);
-      ctx.stroke();
-
-      ctx.strokeStyle = "#070b12";
-      ctx.lineWidth = 8;
-      ctx.beginPath();
-      ctx.moveTo(-47, 48);
-      ctx.lineTo(-20, 48);
-      ctx.moveTo(35, 48);
-      ctx.lineTo(60, 48);
-      ctx.stroke();
-
-      if (einsteinFace.complete && einsteinFace.naturalWidth) {
-        ctx.save();
-        ctx.shadowColor = "rgba(0,0,0,.34)";
-        ctx.shadowBlur = 12;
-        ctx.drawImage(einsteinFace, -68, -230, 136, 136);
-        ctx.restore();
-      } else {
-        ctx.strokeStyle = "#121722";
-        ctx.lineWidth = 6;
-        ctx.fillStyle = "#f3b68e";
-        ctx.beginPath();
-        ctx.arc(0, -155, 27, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-      }
-      ctx.restore();
+      if (!einsteinBody.naturalWidth || !einsteinFace.naturalWidth) return;
+      const bodyHeight = 170;
+      const bodyWidth = bodyHeight * einsteinBody.naturalWidth / einsteinBody.naturalHeight;
+      ctx.drawImage(einsteinBody, cx - bodyWidth / 2, floorY - bodyHeight, bodyWidth, bodyHeight);
+      ctx.drawImage(einsteinFace, cx - 58, floorY - bodyHeight - 94, 116, 116);
     }
 
     function drawElevator() {
@@ -1003,7 +959,7 @@
       ctx.fillRect(ix, iy, iw, ih);
       fillRoundRect(e.x + e.w / 2 - 70, e.y + 48, 140, 44, 12, "#eef7ff", "#a9bdd0", 2);
 
-      drawPerson(e.x + e.w / 2, e.y + e.h - 94);
+      drawPerson(e.x + e.w / 2, e.y + e.h - 46);
       return e;
     }
 
