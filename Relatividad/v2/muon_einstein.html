@@ -69,7 +69,9 @@
     .sceneHead h2{margin:0;font-size:25px;letter-spacing:-.035em}
     .sceneHead p{margin:2px 0 0;color:var(--muted);font-weight:720}
     .pill{border-radius:999px;padding:9px 13px;color:white;background:linear-gradient(135deg,var(--blue),var(--violet));font-weight:950;white-space:nowrap}
-    .canvasWrap{padding:0 14px 14px}
+    .canvasWrap{padding:0 14px 14px;position:relative}
+    .muon-lifetime{position:absolute;top:6px;left:16px;padding:4px 8px;border:1px solid #54728d;border-radius:8px;background:#101e30;color:#e2f3ff;font:600 clamp(11px,1vw,14px)/1.25 system-ui;pointer-events:none}
+    .muon-lifetime strong{display:block;color:white;font-size:1.15em}
     canvas{width:100%;height:auto;display:block;border:1px solid #16213d;border-radius:24px;background:#071126}
     .lesson{
       margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
@@ -92,7 +94,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
         <div>Exosfera<small>desde 700 km</small></div><div>Termosfera<small>80–700 km</small></div>
         <div>Mesosfera<small>50–80 km</small></div><div id="strato">Estratosfera<small>12–50 km</small></div>
         <div class="on-route">Troposfera<small>0–12 km</small></div></aside>
-        <div class="canvasWrap"><canvas id="earthCanvas" width="760" height="450" role="img" aria-labelledby="sceneTitle"></canvas></div></div>
+        <div class="canvasWrap"><canvas id="earthCanvas" width="760" height="450" role="img" aria-labelledby="sceneTitle"></canvas><div class="muon-lifetime">Vida media en reposo<strong>τ₀ = 2.197 μs</strong></div></div></div>
       <div class="distanceRead"><span id="distanceLabel">Espesor desde la Tierra</span><strong id="distanceOut"></strong></div></article>
     <div class="muon-menu"><aside class="controlCard" aria-label="Controles de la simulación">
         <label for="model">Modelo <select id="model"><option value="rel">Relatividad especial</option><option value="classic">Física clásica</option></select></label>
