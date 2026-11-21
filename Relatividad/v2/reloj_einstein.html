@@ -29,11 +29,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     @media(max-width:760px){.reloj_einstein .control{display:grid;grid-template-columns:1fr 1fr;gap:6px}.reloj_einstein .canvasWrap{height:clamp(200px,48vw,325px)}}
   </style>
   <main class="page compact-lab reloj_einstein">
-    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Reloj de Einstein</h1><label class="frame-picker">Ver desde <select id="reference"><option value="ground">Suelo</option><option value="clock">Propio reloj</option></select></label></header><div class="experiment-layout"><section class="card">
+    <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Reloj de Einstein</h1><label class="frame-picker">Ver desde <select id="reference"><option value="ground">Exterior</option><option value="clock">Propio reloj</option></select></label></header><div class="experiment-layout"><section class="card">
       <div class="canvasWrap"><canvas id="sim" width="960" height="450" role="img" aria-label="Trayectoria del pulso entre los dos espejos"></canvas></div>
       <div class="metrics" aria-label="Lecturas de la simulación">
         <div class="metric"><span>Factor gamma</span><strong id="gammaOut">1.25</strong></div>
-        <div class="metric"><span>Periodo desde el suelo</span><strong id="periodOut">2.50 ns</strong></div>
+        <div class="metric"><span>Periodo desde el exterior</span><strong id="periodOut">2.50 ns</strong></div>
         <div class="metric green"><span>Periodo propio (Lorentz)</span><strong>2.00 ns</strong></div>
         <div class="metric green"><span>Rebotes del pulso</span><strong id="rightHitsOut">0</strong></div>
       </div>
@@ -50,11 +50,11 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
           <div><button type="button" id="pauseAnimation" class="primaryButton">Pausar</button> <button type="button" id="resetClock">Poner a cero</button></div>
         </div>
       </aside>
-    </div><div class="lab-intro"><p class="lead">Desde el propio reloj, el pulso sube y baja por la misma vertical. Desde el suelo, los espejos avanzan mientras la luz viaja entre ellos y el pulso dibuja un zigzag. En ambos casos la luz viaja a c. Pausa la animación y cambia de vista para comparar el mismo instante del recorrido.</p>
+    </div><div class="lab-intro"><p class="lead">Desde el propio reloj, el pulso sube y baja por la misma vertical. Para el observador externo, los espejos avanzan mientras la luz viaja entre ellos y el pulso dibuja un zigzag. En ambos casos la luz viaja a c. Pausa la animación y cambia de vista para comparar el mismo instante del recorrido.</p>
       <p>Cada observador ve avanzar su propio reloj al ritmo elegido y asigna al reloj en movimiento un ritmo menor, por un factor γ. Los dos pueden hacerlo porque cada marco define de forma distinta qué sucesos distantes son simultáneos. Al cambiar de vista se conservan los segundos acumulados para comparar los ritmos a partir de ese momento. Los periodos del pulso se indican en nanosegundos.</p></div><section class="eqGrid lab-theory" aria-label="Teoria">
       <article><h3>¿Qué mide Lorentz?</h3><div class="math" data-tex="">\Delta\tau=\frac{2L_0}{c}</div><p>Lorentz viaja sentado junto al espejo inferior. Cuando el pulso sale de ese espejo y regresa a él, los dos sucesos ocurren en el mismo lugar en su marco. Su reloj mide el periodo propio, 2.00 ns para una separación de 0.299792458 m. Una vez agarrado, Einstein viaja con Lorentz y mide el mismo periodo.</p></article>
-      <article><h3>Dilatación temporal</h3><div class="math" data-tex="">\Delta t=\gamma\,\Delta\tau</div><p>En el laboratorio, la componente horizontal de la velocidad de la luz es v y la vertical es c/γ. El módulo sigue siendo c.</p></article>
-      <article><h3>Factor gamma</h3><div class="math" data-tex="">\gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>Cuando v se aproxima a c, el tiempo entre dos retornos de la luz al mismo espejo aumenta en el marco del suelo.</p></article>
+      <article><h3>Dilatación temporal</h3><div class="math" data-tex="">\Delta t=\gamma\,\Delta\tau</div><p>En el marco del observador externo, la componente horizontal de la velocidad de la luz es v y la vertical es c/γ. El módulo sigue siendo c.</p></article>
+      <article><h3>Factor gamma</h3><div class="math" data-tex="">\gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>Cuando v se aproxima a c, el tiempo entre dos retornos de la luz al mismo espejo aumenta en el marco del observador externo.</p></article>
     </section>
   </main>
 <script>
@@ -236,7 +236,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     drawGreenBall(cx, y);
     const watchScale = canvas.clientWidth < 540 ? 1.38 : 1;
     drawWatch(Math.max(3,cx-56-143*watchScale), g.bottom+13,'Lorentz',lorentzSeconds,'#008967');
-    drawWatch(W-147*watchScale, 6,'Suelo',groundSeconds,'#137ab4');
+    drawWatch(W-147*watchScale, 6,'Exterior',groundSeconds,'#137ab4');
     drawEinstein(g);
     document.getElementById('vOut').textContent = beta().toFixed(4) + ' c';
     document.getElementById('gammaOut').textContent = gamma().toFixed(2);
