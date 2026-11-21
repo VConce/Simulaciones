@@ -1,6 +1,14 @@
 (() => {
   const el = id => document.getElementById(id);
   const canvas = el('shower'), ctx = canvas.getContext('2d');
+  const playback = el('playback');
+  function showPlayback(){
+    const label=Number(playback.value)+'×';
+    el('playbackOut').textContent=label;
+    playback.setAttribute('aria-valuetext',label);
+  }
+  playback.oninput=showPlayback;
+  showPlayback();
   const particles = {
     p:['p','#ffbb56','Protón'], pi:['π','#ff94bc','Piones'],
     g:['γ','#ffe97a','Fotones'], e:['e','#76cfff','Electrones y positrones'],
@@ -73,7 +81,7 @@
         ctx.beginPath();ctx.moveTo(line.x,line.y);ctx.lineTo(x,y);ctx.stroke();
         if(p<1 || (line.type==='mu' && line.end.y===ground)){
           ctx.globalAlpha=1;ctx.beginPath();ctx.arc(x,y,p<1?3.5:4.5,0,2*Math.PI);ctx.fill();
-          if(!rain || line.type==='p' || line.type==='mu'){
+          if(!rain || Number(playback.value)<1 || line.type==='p' || line.type==='mu'){
             ctx.font='bold '+(canvas.clientWidth<620?25:18)+'px system-ui';ctx.lineWidth=3;
             ctx.setLineDash([]);ctx.strokeStyle='#102033';ctx.strokeText(line.symbol,x+5,y+2);ctx.fillText(line.symbol,x+5,y+2);
           }
@@ -99,7 +107,7 @@
   el('speed').oninput=()=>{el('beta').textContent=Number(el('speed').value).toFixed(5)+'c';};
   function frame(now){
     if(!paused){
-      time+=Math.min(.1,(now-last)/1000);
+      time+=Math.min(.1,(now-last)/1000)*Number(playback.value);
       if(rain && time>=next){
         const beta=1-Math.exp(between(Math.log(.00001),Math.log(.02)));
         shower(beta);next=time+2.2;
