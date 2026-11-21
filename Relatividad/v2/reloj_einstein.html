@@ -75,7 +75,8 @@ function clockScene(canvas, ground) {
   const assets = {
     einstein: img('einstein-carrera.webp'),
     lorentz: img('lorentz-sentado.webp'),
-    space: img('reloj-panorama.webp')
+    space: img('reloj-panorama.webp'),
+    visitor: img('galactus-mini.png')
   };
   const HALF_PERIOD = 0.9;
   const PROPER_PERIOD_NS = 2;
@@ -91,22 +92,33 @@ function clockScene(canvas, ground) {
   function img(src) { const im = new Image(); im.src = src; return im; }
   function beta() { return Number(vSlider.value); }
   function gamma() { const b = beta(); return 1 / Math.sqrt(1 - b * b); }
+  let panorama;
   function drawCover(im, x, y, w, h, offset = 0) {
     if (!im.complete || !im.naturalWidth) {
       const g = ctx.createLinearGradient(0, y, 0, y + h); g.addColorStop(0, '#020617'); g.addColorStop(1, '#0b1430'); ctx.fillStyle = g; ctx.fillRect(x, y, w, h); return;
     }
-    const scale = Math.max(w / im.naturalWidth, h / im.naturalHeight);
-    const dw = im.naturalWidth * scale, dh = im.naturalHeight * scale;
+    if (!panorama) {
+      const overlap = Math.round(im.naturalWidth * .065);
+      panorama = document.createElement('canvas');
+      panorama.width = im.naturalWidth - overlap;
+      panorama.height = im.naturalHeight;
+      const sky = panorama.getContext('2d');
+      sky.drawImage(im, 0, 0);
+      // Blend the end onto the start. The wrap itself joins consecutive source pixels.
+      for (let x = 0; x < overlap; x++) {
+        const u = x / (overlap - 1);
+        sky.globalAlpha = 1 - u*u*(3-2*u);
+        sky.drawImage(im, panorama.width+x, 0, 1, panorama.height, x, 0, 1, panorama.height);
+      }
+    }
+    const scale = Math.max(w / panorama.width, h / panorama.height);
+    const dw = panorama.width * scale, dh = panorama.height * scale;
     const baseY = y + (h - dh) / 2;
-    // Alternate the orientation so both ends meet their exact edge pixels.
     const first = Math.floor(offset / dw);
     for (let tile = first; x + tile * dw - offset < x + w; tile++) {
       const left = Math.round(x + tile * dw - offset);
       const right = Math.round(x + (tile + 1) * dw - offset);
-      const flipped = tile % 2 !== 0;
-      ctx.save(); ctx.translate(flipped ? right : left, baseY);
-      ctx.scale(flipped ? -1 : 1, 1);
-      ctx.drawImage(im, 0, 0, right - left, dh); ctx.restore();
+      ctx.drawImage(panorama, left, baseY, right - left, dh);
     }
   }
   function drawMeteor() {
@@ -208,6 +220,16 @@ function clockScene(canvas, ground) {
     const y = g.bottom - pulse.p * spacing;
     drawCover(assets.space, 0, 0, W, H, skyOffset);
     drawMeteor();
+    const visit = (animationTime + 31) % 54;
+    if (ground && visit < 8 && assets.visitor.naturalWidth) {
+      const u = visit / 8;
+      ctx.save();
+      ctx.globalAlpha = .68 * Math.min(1, u*8, (1-u)*8);
+      ctx.translate(W*(.12+.13*u), H*(.17+.035*Math.sin(2*Math.PI*u)));
+      ctx.rotate(.25*Math.sin(2*Math.PI*u));
+      ctx.drawImage(assets.visitor, -9, -14, 18, 28);
+      ctx.restore();
+    }
     if (assets.lorentz.complete && assets.lorentz.naturalWidth) {
       const h = 82, w = h * assets.lorentz.naturalWidth / assets.lorentz.naturalHeight;
       const right = cx - 47, base = g.bottom + 8;
