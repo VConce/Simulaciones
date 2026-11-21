@@ -3913,12 +3913,15 @@
         if (o.type === "sphereShell") name = `Esfera corteza ρ = ${fmt(o.rho ?? .5, 2)}`;
         if (o.type === "foam") name = `Espuma εr = ${fmt(foamEps(o), 1)}`;
         if (o.type === "faraday") name = `Jaula ${fmt(o.w ?? 230, 0)}×${fmt(o.h ?? 170, 0)}×${fmt(o.d ?? 80, 0)}`;
-        return `<div class="objectItem"><span>${name}</span><button data-remove="${o.id}" aria-label="Eliminar">×</button></div>`;
+        return `<div class="objectItem"><span>${name}</span><button type="button" data-object-options="${o.id}" aria-label="Opciones de ${name}" title="Opciones del objeto">…</button></div>`;
       }).join("");
-      $$("[data-remove]").forEach(btn => {
+      $$("[data-object-options]").forEach(btn => {
         btn.onclick = () => {
-          state.objects = state.objects.filter(o => o.id !== btn.dataset.remove);
-          sync();
+          const object = state.objects.find(o => String(o.id) === btn.dataset.objectOptions);
+          if (!object) return;
+          canvas.scrollIntoView({ block: "nearest" });
+          openMenu(object, objectAnchor(object), { pinned: true });
+          $("#objectMenu .closeMenu").focus({ preventScroll: true });
         };
       });
     }

@@ -369,7 +369,16 @@ reviewStyle.textContent+=`
 function gravityGridPoint(x,y){const g=st.gridSnap,s=g.step*290,offset=g.mode==='centers'?s/2:0;return{x:g.origin.x+offset+Math.round((x-g.origin.x-offset)/s)*s,y:g.origin.y+offset+Math.round((y-g.origin.y-offset)/s)*s}}
 function snapGravityObject(o){if(st.gridSnap?.enabled)Object.assign(o,gravityGridPoint(o.x,o.y))}
 const snapSetup=setup;
-setup=function(){gravitySnapSuspended++;try{snapSetup();const o=mainStar();if(o)st.gridSnap.origin={x:o.x,y:o.y}}finally{gravitySnapSuspended--}};
+setup=function(compact=false){
+  gravitySnapSuspended++;
+  try {
+    snapSetup(compact);
+    const central=mainStar();
+    if(central)st.gridSnap.origin={x:central.x,y:central.y};
+  } finally {
+    gravitySnapSuspended--;
+  }
+};
 const snapDown=canvas.onpointerdown,snapMove=canvas.onpointermove,snapUp=canvas.onpointerup;
 canvas.onpointerdown=e=>{snapDown(e);if(st.drag?.o){st.drag.snapRaw={x:st.drag.o.x,y:st.drag.o.y};st.drag.snapStart=pt(e);st.drag.snapMoved=false}};
 canvas.onpointermove=e=>{
