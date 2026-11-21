@@ -3,7 +3,34 @@ const c=299792458, byId=id=>document.getElementById(id);
 for(const node of document.querySelectorAll('.tex')){
   katex.render(node.textContent,node,{displayMode:node.classList.contains('formula'),output:'htmlAndMathml'});
 }
-const scene=document.querySelector('.scene'), train=byId('train'), dials=document.querySelectorAll('.dial i');
+const scene=document.querySelector('.scene'), train=byId('train');
+const speedLimit=Number(byId('velocity').max);
+const clockViews = [
+  makeClockView('max', byId('max-time')),
+  makeClockView('ein', byId('ein-time'))
+];
+function makeClockView(owner, output) {
+  const hands = Array.from(document.querySelectorAll('[data-clock="'+owner+'"]'), dial => {
+    return ['hour','minute','second'].map(name => {
+      const hand = document.createElement('i');
+      hand.className = name+'-hand';
+      dial.append(hand);
+      return hand;
+    });
+  });
+  const reading = document.createElement('span');
+  const day = document.createElement('small');
+  output.replaceChildren(reading, day);
+  return {hands, reading, day};
+}
+const launch = new Date();
+// Use a uniform calendar so changing daylight-saving offsets never changes a clock interval.
+const startMs = Date.UTC(launch.getFullYear(), launch.getMonth(), launch.getDate(),
+  launch.getHours(), launch.getMinutes(), launch.getSeconds(), launch.getMilliseconds());
+const daySeconds = 86400, yearSeconds = 365.25*daySeconds;
+const calendarRates = [[1,'1 s'],[60,'1 min'],[3600,'1 h'],[daySeconds,'1 día'],[yearSeconds,'1 año'],[100*yearSeconds,'100 años']];
+const secondRates = [[1,'1 s'],[3,'3 s'],[6,'6 s']];
+let calendar = false, secondsRate = 3, calendarRate = daySeconds;
 let station=0, passenger=0, distance=0, beta=.8, rate=3, paused=false;
 let last=performance.now();
 function advance(now){
@@ -14,13 +41,51 @@ function advance(now){
   passenger+=dt*rate*Math.sqrt((1-beta)*(1+beta));
   distance+=dt*beta*.055;
 }
-function showClocks(){
-  byId('max-time').textContent=station.toFixed(1)+' s';
-  byId('ein-time').textContent=passenger.toFixed(1)+' s';
-  byId('gap').textContent=(station-passenger).toFixed(1)+' s';
-  dials[0].style.transform='rotate('+((station%60)*6)+'deg)';
-  dials[1].style.transform='rotate('+((passenger%60)*6)+'deg)';
+const pad = n => String(n).padStart(2,'0');
+function setText(node, value) {
+  if (node.textContent !== value) node.textContent = value;
 }
+function drawClock(view, elapsed) {
+  let dialSeconds = elapsed;
+  if (calendar) {
+    const totalMs = startMs + elapsed*1000;
+    const cycleMs = 146097*daySeconds*1000; // The Gregorian calendar repeats every 400 years.
+    const date = new Date(totalMs % cycleMs);
+    const year = date.getUTCFullYear() + 400*Math.floor(totalMs/cycleMs);
+    setText(view.reading,[date.getUTCHours(),date.getUTCMinutes(),date.getUTCSeconds()].map(pad).join(':'));
+    setText(view.day,[pad(date.getUTCDate()),pad(date.getUTCMonth()+1),year].join('/'));
+    dialSeconds = (totalMs % (daySeconds*1000))/1000;
+  } else {
+    setText(view.reading,elapsed.toFixed(1)+' s');
+    setText(view.day,'');
+  }
+  for (const [hour,minute,second] of view.hands) {
+    if (calendar) {
+      hour.style.transform='rotate('+((dialSeconds%43200)/120)+'deg)';
+      minute.style.transform='rotate('+((dialSeconds%3600)/10)+'deg)';
+    }
+    second.style.transform='rotate('+((dialSeconds%60)*6)+'deg)';
+  }
+}
+function showClocks(){
+  drawClock(clockViews[0],station);
+  drawClock(clockViews[1],passenger);
+  const gap = station-passenger;
+  const value = calendar && gap>=daySeconds ? (gap/daySeconds).toFixed(2)+' días' : gap.toFixed(1)+' s';
+  setText(byId('gap'),value);
+}
+byId('time-view').onclick = () => {
+  advance(performance.now());
+  if (calendar) calendarRate=rate; else secondsRate=rate;
+  calendar=!calendar;
+  rate=calendar ? calendarRate : secondsRate;
+  document.body.classList.toggle('calendar',calendar);
+  byId('time-view').textContent=calendar ? 'segundos' : 'fecha';
+  const choices=calendar ? calendarRates : secondRates;
+  byId('rate').replaceChildren(...choices.map(([value,label])=>new Option(label+' por 1 s real',value)));
+  byId('rate').value=String(rate);
+  showClocks();
+};
 function frame(now){
   advance(now);
   showClocks();
@@ -31,7 +96,7 @@ function frame(now){
 }
 function updateSpeed(value){
   advance(performance.now());
-  beta=Math.min(.99,Math.max(0,value));
+  beta=Math.min(speedLimit,Math.max(0,value));
   byId('velocity').value=beta;
   const ms=byId('unit').value==='ms';
   byId('exact').value=String(Number((ms?beta*c:beta).toPrecision(9)));
@@ -42,7 +107,7 @@ function updateSpeed(value){
 byId('velocity').oninput=e=>updateSpeed(e.target.valueAsNumber);
 byId('exact').onblur=e=>{
   const raw=e.target.value.trim().replace(',','.');
-  const value=Number(raw);
+  const value=Number(byId('unit').value==='c' ? raw.replace(/\s*c$/i,'') : raw);
   updateSpeed(raw&&Number.isFinite(value)?value/(byId('unit').value==='ms'?c:1):beta);
 };
 byId('exact').onkeydown=e=>{if(e.key==='Enter')e.target.blur();};

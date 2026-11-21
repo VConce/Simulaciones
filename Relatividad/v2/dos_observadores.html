@@ -5,26 +5,27 @@
   <title>Dos observadores · El tren de Einstein</title>
   <link rel="icon" href="../../electromagnetism/assets/electric/vconce.png">
   <link rel="stylesheet" href="../../shared/katex/katex.min.css">
-  <link rel="stylesheet" href="tren.css">
+  <link rel="stylesheet" href="tren.css?v=calendario">
   <script defer src="../../shared/katex/katex.min.js"></script>
-  <script defer src="tren.js"></script>
+  <script defer src="tren.js?v=calendario"></script>
 </head>
 <body>
 <main>
   <header>
     <div class="brand"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><div><span>Relatividad especial</span><h1>Dos observadores</h1></div></div>
     <div class="clocks">
-      <section class="clock max"><div class="dial" aria-hidden="true"><i></i></div><div><h2>Maxwell · andén</h2><output aria-live="off" id="max-time">0.0 s</output></div></section>
-      <section class="clock ein"><div class="dial" aria-hidden="true"><i></i></div><div><h2>Einstein · tren</h2><output aria-live="off" id="ein-time">0.0 s</output></div></section>
+      <section class="clock max"><div class="dial" data-clock="max" aria-hidden="true"></div><div><h2>Maxwell · andén</h2><output aria-live="off" id="max-time">0.0 s</output></div></section>
+      <section class="clock ein"><div class="dial" data-clock="ein" aria-hidden="true"></div><div><h2>Einstein · tren</h2><output aria-live="off" id="ein-time">0.0 s</output></div></section>
     </div>
+    <button type="button" id="time-view" aria-controls="max-time ein-time">fecha</button>
   </header>
   <div class="workbench">
     <div class="scene" role="img" aria-label="Vista desde el andén. Maxwell está junto a la vía y Einstein viaja sobre el tren.">
-      <div id="train"><img class="engine" src="../assets/dos-observadores-train-sprite.png" alt=""><img class="passenger" src="../assets/dos-observadores-einstein-sprite.png" alt=""></div>
-      <img class="maxwell" src="../assets/dos-observadores-maxwell-sprite.png" alt="">
+      <div id="train"><img class="engine" src="../assets/dos-observadores-train-sprite.png" alt=""><img class="passenger" src="../assets/dos-observadores-einstein-sprite.png" alt=""><div class="dial train-dial" data-clock="ein" aria-hidden="true"></div></div>
+      <div class="platform-figure"><img src="../assets/dos-observadores-maxwell-sprite.png" alt=""><div class="dial platform-dial" data-clock="max" aria-hidden="true"></div></div>
     </div>
     <section class="controls" aria-label="Controles del experimento">
-      <div><label for="velocity">Velocidad del tren</label><input id="velocity" type="range" min="0" max="0.99" value="0.8" step="0.001">
+      <div><label for="velocity">Velocidad del tren</label><input id="velocity" type="range" min="0" max="0.9999" value="0.8" step="0.0001">
       <div class="entry"><input id="exact" type="text" inputmode="decimal" value="0.8" aria-label="Velocidad exacta"><select id="unit" aria-label="Unidad de velocidad"><option value="c">c</option><option value="ms">m/s</option></select></div></div>
       <div><label for="rate">Ritmo de Maxwell</label><select id="rate"><option value="1">1 s por 1 s real</option><option value="3" selected>3 s por 1 s real</option><option value="6">6 s por 1 s real</option></select></div>
       <dl><div><dt>Por cada 10 s del andén</dt><dd><output aria-live="off" id="ratio"></output> en el tren</dd></div><div><dt>Factor γ</dt><dd id="gamma"></dd></div><div><dt>Diferencia acumulada</dt><dd id="gap">0.0 s</dd></div></dl>
@@ -41,6 +42,6 @@
     <div class="formula tex">\Delta\tau_{\mathrm M}=\frac{\Delta t_{\text{tren}}}{\gamma}</div>
     <h3>¿Qué cambia en la paradoja de los gemelos?</h3>
     <p>En ese experimento ambos relojes coinciden dos veces, en la salida y en el reencuentro. Entre esos mismos sucesos recorren trayectorias distintas. El gemelo del andén permanece en el mismo marco inercial durante todo el viaje. El viajero cambia de marco al dar la vuelta. Al reunirse comparan los relojes en persona y los dos están de acuerdo en el resultado: el viajero ha acumulado menos tiempo propio. <a href="gemelos.html">Probar la paradoja de los gemelos</a>.</p>
-    <p class="caption">La escena representa el marco del andén. El paso del tren se repite para mantenerlo a la vista. La distancia del dibujo es ilustrativa. Los contadores comparan tiempos asignados en ese marco, sin incluir el retraso de las señales luminosas. Cada esfera da una vuelta por minuto simulado.</p>
+    <p class="caption">La escena representa el marco del andén. El paso del tren se repite para mantenerlo a la vista. La distancia del dibujo es ilustrativa. Los contadores comparan tiempos asignados en ese marco, sin incluir el retraso de las señales luminosas. En la vista de segundos, la aguja da una vuelta por minuto simulado. En la vista de fecha, cada esfera marca la hora de su personaje. Los dos calendarios parten de la misma fecha y hora local, sin cambios de horario estacional.</p>
   </section>
 </main></body></html>
