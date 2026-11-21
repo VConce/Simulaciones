@@ -148,6 +148,16 @@
     ctx.fillText('En la cesta',right+18,y+15);
     ctx.fillStyle='white';ctx.fillText(String(caught),right+18,y+39);
   }
+  function watch(x,y,label,time,color) {
+    ctx.save();ctx.translate(x,y);ctx.fillStyle='rgba(7,20,39,.94)';
+    ctx.beginPath();ctx.roundRect(0,0,160,48,10);ctx.fill();
+    ctx.translate(23,24);ctx.fillStyle='white';ctx.beginPath();ctx.arc(0,0,18,0,2*Math.PI);ctx.fill();
+    ctx.strokeStyle=color;ctx.lineWidth=2;
+    for(let i=0;i<10;i++){ctx.save();ctx.rotate(i*Math.PI/5);ctx.beginPath();ctx.moveTo(0,-16);ctx.lineTo(0,-13);ctx.stroke();ctx.restore();}
+    ctx.save();ctx.rotate(time*Math.PI/5);ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,2);ctx.lineTo(0,-12);ctx.stroke();ctx.restore();
+    ctx.fillStyle='#d4eafa';ctx.font='bold 15px system-ui';ctx.fillText(label,25,-3);
+    ctx.fillStyle='white';ctx.font='bold 20px monospace';ctx.fillText(time.toFixed(2)+' μs',25,17);ctx.restore();
+  }
   function draw() {
     const muonFrame = reference.value === 'muon', g = factor();
     let phase = stream() ? 0 : Math.min(elapsed/flightSeconds,particles[0].stop);
@@ -188,6 +198,11 @@
         ctx.save();ctx.globalAlpha=Math.min(1,(.62-age)/.23);
         paint(ctx,flash,p.x,y,26+age*(stream()?70:103),'#ffcf77');ctx.restore();
       }
+    }
+    if(!stream()){
+      const x=particles[0].x, y=muonFrame?60:start+span*phase;
+      watch(x+207>w-175?x-207:x+47,Math.max(5,y-42),'Muón',travelTime()*phase,'#166e88');
+      watch(w-168,7,'Tierra',earthTime()*phase,'#17632f');
     }
     byId('sceneTitle').textContent=stream()?(muonFrame?'Chorro desde los muones · cámara en la cesta':'Chorro de muones hacia la Tierra'):muonFrame?'La Tierra se acerca al muón':'El muón cae hacia la Tierra';
     byId('distanceLabel').textContent=muonFrame?'Espesor desde el muón':'Espesor desde la Tierra';
