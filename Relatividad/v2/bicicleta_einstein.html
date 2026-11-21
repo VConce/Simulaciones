@@ -139,6 +139,8 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 const assets = {
   einstein: Object.assign(new Image(), {src:"../assets/einstein-bike-sprite.png"}),
   riding: Object.assign(new Image(), {src:"einstein-manillar.webp"}),
+  galileoFace: Object.assign(new Image(), {src:"galileo-caminando.webp"}),
+  einsteinFace: Object.assign(new Image(), {src:"../assets/einstein-face-sprite.png"}),
   apple: Object.assign(new Image(), {src:"../assets/apple-sprite.png"}),
   landscape: Object.assign(new Image(), {src:"cicloruta.webp"})
 };
@@ -257,6 +259,18 @@ function drawEinstein(){
   }
   ctx.restore();
 }
+const classicalColor='#a75212', relativisticColor='#075b87';
+function drawPortrait(image,crop,x,y,color){
+  if(!image.naturalWidth)return;
+  const radius=Math.max(19,Math.min(33,10*canvas.width/canvas.clientWidth));
+  const cy=Math.max(radius+2,Math.min(canvas.height-radius-2,y));
+  ctx.save();
+  circle(x,cy,radius,'#fff8e9');ctx.clip();
+  ctx.drawImage(image,...crop,x-radius,cy-radius,2*radius,2*radius);
+  ctx.restore();
+  ctx.beginPath();ctx.arc(x,cy,radius,0,2*Math.PI);
+  ctx.strokeStyle=color;ctx.lineWidth=4;ctx.stroke();
+}
 function drawApple(horizontal,classic,fromBike){
   if(!state.launched)return;
   const age=state.age;
@@ -271,12 +285,15 @@ function drawApple(horizontal,classic,fromBike){
     ctx.strokeStyle=color;ctx.lineWidth=3.5;ctx.stroke(path);ctx.restore();
   }
   ctx.save();ctx.globalAlpha=Math.min(1,(1.5-state.landedFor)*3);
-  if(!fromBike)trail(classic,'#a75212',[7,6]);
-  trail(horizontal,'#075b87',[7,6]);
+  if(!fromBike)trail(classic,classicalColor,[7,6]);
+  trail(horizontal,relativisticColor,[7,6]);
   circle(x0,y0,4,'#075b87');
   if(assets.apple.naturalWidth){
     ctx.drawImage(assets.apple,x0+horizontal-23,y0+fall-22,46,46);
   }
+  const offset=22+Math.max(19,Math.min(33,10*canvas.width/canvas.clientWidth));
+  if(!fromBike)drawPortrait(assets.galileoFace,[149,39,102,102],x0+classic,y0+fall-offset,classicalColor);
+  drawPortrait(assets.einsteinFace,[75,45,1100,1100],x0+horizontal,y0+fall+offset,relativisticColor);
   ctx.restore();
 }
 function viewFromBike(){return $("reference").value==="bike";}
