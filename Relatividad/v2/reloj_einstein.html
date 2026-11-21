@@ -29,9 +29,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 
     <aside class="speedPanel" aria-label="Control de velocidad">
         <div class="control">
-          <label for="v">Velocidad del reloj <output id="vOut">0.60 c</output></label>
-          <input id="v" type="range" min="0" max="0.99" step="0.01" value="0.60">
-          <button type="button" id="pauseAnimation" class="primaryButton">Pausar</button><button type="button" id="resetClock">Poner a cero</button><div class="scale"><span>0 c</span><span>0.5 c</span><span>0.99 c</span></div>
+          <label for="v">Velocidad del reloj <output id="vOut">0.6000 c</output></label>
+          <input id="v" type="range" min="0" max="0.9999" step="0.0001" value="0.6000">
+          <button type="button" id="pauseAnimation" class="primaryButton">Pausar</button><button type="button" id="resetClock">Poner a cero</button><div class="scale"><span>0 c</span><span>0.5 c</span><span>0.9999 c</span></div>
         </div>
       </aside>
     </div><div class="lab-intro"><p class="lead">Desde el propio reloj, el pulso sube y baja por la misma vertical. Desde el suelo, los espejos avanzan mientras la luz viaja entre ellos y el pulso dibuja un zigzag. En ambos casos la luz viaja a c. Pausa la animación y cambia de vista para comparar el mismo instante del recorrido.</p>
@@ -145,7 +145,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
     ctx.strokeStyle = '#68ff98'; ctx.lineWidth = 4; ctx.stroke();
     ctx.strokeStyle = '#dbffe6'; ctx.lineWidth = 1.3; ctx.stroke(); ctx.restore();
     drawGreenBall(cx, y);
-    document.getElementById('vOut').textContent = beta().toFixed(2) + ' c';
+    document.getElementById('vOut').textContent = beta().toFixed(4) + ' c';
     document.getElementById('gammaOut').textContent = gamma().toFixed(2);
     document.getElementById('periodOut').textContent = (PROPER_PERIOD_NS * gamma()).toFixed(2) + ' ns';
     document.getElementById('rightHitsOut').textContent = pulse.hit;
