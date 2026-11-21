@@ -464,19 +464,23 @@
       .pill { white-space: normal; }
     }
   .vconceLogo{position:fixed;left:14px;top:14px;width:54px;height:54px;object-fit:contain;z-index:10000;pointer-events:none}@media(max-width:900px){.vconceLogo{width:42px;height:42px;left:10px;top:10px}}/* vconce header clearance */body>header{padding-left:max(88px,env(safe-area-inset-left))!important}@media(max-width:900px){body>header{padding-left:64px!important}}</style>
-<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.ascensor_einstein .lab-theory article{display:block;background:white;padding:15px;border-radius:14px}.ascensor_einstein .lab-theory h3{margin:0}.ascensor_einstein .lab-theory p{line-height:1.45}</style></head>
+<link rel="stylesheet" href="escena.css"><script defer src="escena.js"></script><link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><style>.ascensor_einstein .lab-theory article{display:block;background:white;padding:15px;border-radius:14px}.ascensor_einstein .lab-theory h3{margin:0}.ascensor_einstein .lab-theory p{line-height:1.45}</style><style>
+.reading{margin-top:12px;background:#f8fbfd;border:1px solid #d7e3ea;border-radius:16px;padding:16px;color:#182e40}.reading>h2{margin:0;font-size:1.35rem}.reading>p{margin:5px 0 14px;line-height:1.5}.reading-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:14px}.reading-grid article{min-width:0;padding:12px;background:white;border:1px solid #d9e4ee;border-radius:12px}.reading-grid h3{margin:0;font-size:1.03rem}.reading-grid p{line-height:1.52;margin:.7em 0}.reading-grid [data-tex]{font-size:clamp(.85rem,1.1vw,1.05rem)}
+.uniform-comparison{padding:8px 14px;background:#102236;color:#e5f3fb;display:flex;gap:15px;align-items:center}.uniform-comparison[hidden]{display:none}.uniform-comparison canvas{width:clamp(100px,18vw,200px);height:auto;flex:none}.uniform-comparison strong{display:block}
+</style></head>
 <body>
   <main class="page compact-lab ascensor_einstein">
     <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1 id="title">Ascensor de Einstein</h1></header><section class="lab">
       <article class="card stageCard">
         <div class="stageHeader">
           <div>
-            <h2>Simulación visual</h2>
+            <h2>Vista desde la cabina</h2>
             </div>
           <div id="modeBadge" class="pill">a = 9.81 m/s²</div>
         </div>
         <div class="canvasWrap">
           <canvas id="scene" width="1280" height="720" aria-label="Simulación del ascensor de Einstein"></canvas>
+          <div class="uniform-comparison" id="uniformView" hidden><canvas width="200" height="100" id="angleView" aria-label="Dirección del rayo en el marco exterior"></canvas><div><strong>Vista exterior · velocidad constante</strong><span id="angleOut"></span></div></div>
         </div>
       </article>
 
@@ -537,7 +541,28 @@
       </aside>
     </section>
 
-<section class="lab-theory" aria-label="El principio de equivalencia"><article class="eqCard mini"><h3>¿Por qué llega más abajo?</h3><p>El emisor lanza un pulso horizontal. En un marco inercial que al principio acompaña a la cabina, la luz sigue recta. Durante el cruce, la cabina acelera hacia arriba. La pared intercepta el pulso por debajo de la altura de emisión.</p><div data-tex>t_{\rm cruce}\simeq L/c</div></article><article class="eqCard mini"><h3>La trayectoria desde dentro</h3><p>Tomamos el origen en el emisor y la vertical positiva hacia arriba. Mientras la luz recorre x, la cabina sube aproximadamente la distancia indicada. Duplicar la anchura cuadruplica la caída. El dibujo amplía solo la desviación.</p><div data-tex>y(x)\simeq-\frac{a x^2}{2c^2},\qquad aL/c^2\ll1</div></article><article class="eqCard mini"><h3>¿Y en un planeta?</h3><p>En un laboratorio pequeño sostenido sobre la superficie se obtiene la misma caída local al sustituir a por g. En caída libre desaparece este efecto local. Las diferencias del campo entre puntos alejados limitan la equivalencia.</p><div data-tex>|\Delta y|\simeq\frac{gL^2}{2c^2}</div></article></section>
+<section class="reading" aria-labelledby="readingTitle">
+  <h2 id="readingTitle">¿Dónde toca el rayo la pared de enfrente?</h2>
+  <p>Una lámpara apunta horizontalmente desde la pared izquierda. Marca en la pared derecha un punto a la misma altura que la lámpara. ¿Llega la luz a esa marca o por debajo? Todo depende de lo que haga la cabina <em>durante el vuelo del pulso</em>.</p>
+  <div class="reading-grid">
+    <article><h3>La cabina sube a velocidad constante</h3>
+      <p>Dentro, la luz cruza en horizontal y llega a la marca. Desde fuera, la marca sube mientras el pulso viaja. La luz sigue una recta inclinada y llega al mismo punto material. Si la cabina baja, la inclinación cambia de signo.</p>
+      <p>Con el eje vertical positivo hacia arriba, estas son las componentes de la velocidad de la luz:</p>
+      <div data-tex>\text{Cabina}\quad\begin{cases}u'_x=c\\u'_y=0\end{cases}\qquad\text{Exterior}\quad\begin{cases}u_x=c/\gamma\\u_y=v\end{cases}</div>
+      <p>En ambos casos el módulo es <i>c</i>. Por ejemplo, si la cabina sube a 0.6c, desde fuera la luz avanza a 0.8c en horizontal y a 0.6c en vertical.</p>
+    </article>
+    <article><h3>La cabina acelera hacia arriba</h3>
+      <p>Elige el marco inercial que acompaña a la cabina en el instante de emisión. En ese marco la luz sale horizontal, pero la marca sube mientras el rayo cruza la anchura <i>L</i>. Por eso, dentro de la cabina, el pulso describe una curva hacia el suelo.</p>
+      <div data-tex>t_{\rm cruce}\simeq\frac{L}{c},\qquad y(x)\simeq-\frac12 a\left(\frac{x}{c}\right)^2</div>
+      <p>El signo negativo indica que llega por debajo. Al duplicar la anchura tarda el doble en cruzar y la caída se multiplica por cuatro. La aproximación vale cuando <i>aL/c²</i> es mucho menor que uno.</p>
+    </article>
+    <article><h3>La cabina está apoyada en un planeta</h3>
+      <p>En un laboratorio pequeño, una cabina sostenida contra la gravedad da el mismo resultado local que un ascensor con aceleración ascendente de igual intensidad. Un observador en caída libre junto al emisor ve inicialmente una trayectoria recta.</p>
+      <div data-tex>|\Delta y|\simeq\frac{gL^2}{2c^2}</div>
+      <p>Con 2 m de anchura en la Tierra, el rayo tarda unos 6.67 ns en cruzar y llega solo 0.218 fm por debajo de la marca. La vista amplía la desviación y adapta la escala vertical a la anchura de la cabina. Para comparar anchuras, usa la lectura en femtómetros. En una región extensa, la variación de la gravedad entre puntos permite distinguir ambos experimentos.</p>
+    </article>
+  </div>
+</section>
   </main>
 
   <script>
@@ -649,6 +674,17 @@
       els.modeBadge.textContent = constantVelocityMode
         ? `a = 0, v = ${state.vConst >= 0 ? "+" : ""}${fmt(state.vConst, 2)} c`
         : `${isElevator ? "a" : "g"} = ${fmt(state.g, 2)} m/s²`;
+      document.getElementById('uniformView').hidden=!constantVelocityMode;
+      if(constantVelocityMode){
+        const beta=state.vConst, angle=Math.asin(beta);
+        const graph=document.getElementById('angleView').getContext('2d');
+        graph.clearRect(0,0,200,100);graph.strokeStyle='#8da0b4';graph.setLineDash([4,5]);
+        graph.beginPath();graph.moveTo(0,50);graph.lineTo(200,50);graph.stroke();graph.setLineDash([]);
+        const dx=46*Math.cos(angle),dy=-46*Math.sin(angle);
+        graph.strokeStyle='#ffd56b';graph.lineWidth=3;graph.beginPath();graph.moveTo(100-dx,50-dy);graph.lineTo(100+dx,50+dy);graph.stroke();
+        graph.save();graph.translate(100+dx,50+dy);graph.rotate(-angle);graph.beginPath();graph.moveTo(-8,-4);graph.lineTo(0,0);graph.lineTo(-8,4);graph.stroke();graph.restore();
+        document.getElementById('angleOut').textContent=Math.abs(angle*180/Math.PI).toFixed(1)+'° '+(beta>0?'sobre la horizontal':beta<0?'bajo la horizontal':'respecto a la horizontal');
+      }
       els.explainBox.innerHTML = isElevator
         ? constantVelocityMode
           ? "<strong>Velocidad constante.</strong> En la cabina el rayo es horizontal. Desde el exterior inercial, su componente vertical de velocidad coincide con la de la cabina. Ambos observadores miden c."
@@ -971,11 +1007,16 @@
       return e;
     }
 
+    function beamSag() {
+      const width = Number(document.getElementById("cabinWidth").value);
+      // Fit the exaggerated path inside each cabin. The physical drop is reported in fm.
+      return 306 * (state.g / 25) * (width / 4);
+    }
     function beamPoint(e, t) {
-      const sag = 228 * (state.g / 25) * (Number(document.getElementById("cabinWidth").value) / 4) ** 2;
+      const sag = beamSag();
       const startX = e.x + 38;
       const endX = e.x + e.w - 38;
-      const startY = e.y + 197;
+      const startY = e.y + 137;
       return {
         x: startX + (endX - startX) * t,
         y: startY + sag * t * t
@@ -983,7 +1024,7 @@
     }
 
     function drawBeam(e) {
-      const sag = 228 * (state.g / 25) * (Number(document.getElementById("cabinWidth").value) / 4) ** 2;
+      const sag = beamSag();
       const start = beamPoint(e, 0);
       const end = beamPoint(e, 1);
 
@@ -1090,7 +1131,14 @@
         const dt = Math.min(.1,(now-lastFrame)/1000)*state.speed;
         state.t += dt;
         if (state.mode === "elevator") {
-          state.skySpeed = state.g ? Math.min(200,state.skySpeed + state.g*dt*2) : state.vConst*230;
+          // Perceptual scrolling scale. Higher acceleration gives a steeper start and a faster panorama.
+          if (state.g > 0) {
+            const intensity = state.g / 25;
+            const target = 910 * intensity ** .8;
+            state.skySpeed += (target-state.skySpeed) * -Math.expm1(-dt*(.55+1.25*intensity));
+          } else {
+            state.skySpeed = state.vConst*230;
+          }
           state.skyY += state.skySpeed*dt;
         }
       }
