@@ -37,6 +37,7 @@ const stopwatch = {station:0, passenger:0, rate:3};
 let calendarClocks;
 let clocks=stopwatch, calendar=false;
 let distance=0, beta=.8, paused=false;
+let sceneRate=0;
 let last=performance.now();
 function advance(now){
   const dt=Math.max(0,(now-last)/1000);
@@ -46,7 +47,7 @@ function advance(now){
   const movingElapsed=elapsed*Math.sqrt((1-beta)*(1+beta));
   clocks.station+=trainFrame ? movingElapsed : elapsed;
   clocks.passenger+=trainFrame ? elapsed : movingElapsed;
-  distance+=dt*beta*.055;
+  distance+=dt*sceneRate;
 }
 const pad = n => String(n).padStart(2,'0');
 function setText(node, value) {
@@ -131,6 +132,9 @@ byId('reference').onchange=e=>{
 function updateSpeed(value){
   advance(performance.now());
   beta=Math.min(speedLimit,Math.max(0,value));
+  // Each extra nine above 0.9c increases the visual contrast between speeds.
+  const speedBoost=beta>.9 ? 1.35*Math.log10(.1/(1-beta)) : 0;
+  sceneRate=.055*beta*(1+speedBoost);
   byId('velocity').value=beta;
   const ms=byId('unit').value==='ms';
   byId('exact').value=String(Number((ms?beta*c:beta).toPrecision(9)));
