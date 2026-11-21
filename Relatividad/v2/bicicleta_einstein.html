@@ -145,6 +145,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 <script>
 const assets = {
   einstein: Object.assign(new Image(), {src:"../assets/einstein-bike-sprite.png"}),
+  riding: Object.assign(new Image(), {src:"einstein-manillar.webp"}),
   apple: Object.assign(new Image(), {src:"../assets/apple-sprite.png"}),
   landscape: Object.assign(new Image(), {src:"cicloruta.webp"})
 };
@@ -250,17 +251,16 @@ function drawLeg(phase,near){
 }
 // Clip the existing illustration at the jacket so articulated legs can drive the crank.
 const torso=new Path2D('M 0 0 H 600 V 168 H 302 L 289 167 L 270 162 Q 255 156 248 168 Q 235 190 218 177 H 0 Z');
-const appleCutout=new Path2D('M 0 0 H 600 V 338 H 0 Z M 337 72 L 353 73 L 356 78 Q 371 77 365 96 L 361 99 Q 355 108 345 103 L 340 99 Q 335 91 342 82 Z');
 function drawEinstein(){
   const angle=state.distance/52,phase=angle*1.7;
   const bob=1.5*Math.sin(phase*2);
   ctx.save();ctx.translate(riderOrigin.x,riderOrigin.y);ctx.lineCap='round';ctx.lineJoin='round';
   wheel(205,261,angle);wheel(380,263,angle);
   drawLeg(phase+Math.PI,false);frameAndChain();drawLeg(phase,true);
-  if(assets.einstein.naturalWidth){
+  const rider=state.launched ? assets.riding : assets.einstein;
+  if(rider.naturalWidth){
     ctx.save();ctx.translate(0,bob);ctx.clip(torso);
-    if(state.launched)ctx.clip(appleCutout,'evenodd');
-    ctx.drawImage(assets.einstein,0,0,600,338);ctx.restore();
+    ctx.drawImage(rider,0,0,600,338);ctx.restore();
   }
   ctx.restore();
 }
