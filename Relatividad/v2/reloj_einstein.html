@@ -57,7 +57,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
         </div>
       </aside>
     </div><div class="lab-intro"><p class="lead">Desde el exterior, los espejos avanzan y la luz dibuja un zigzag. Desde el propio reloj, el pulso sube y baja por la misma vertical. En ambos marcos la luz viaja a c.</p>
-      <p>Los dos relojes empiezan juntos. Cada tic equivale a 2 ns en su propio reloj. A 0.9999c, cuando el exterior marca 141.42 ns, Lorentz apenas ha acumulado 2.00 ns: un tic. La animación derecha reproduce el pulso a ritmo local para que puedas ver cómo lo observa Lorentz. Sus rebotes en pantalla están acelerados respecto al contador de tiempo propio.</p></div><section class="eqGrid lab-theory" aria-label="Teoria">
+      <p>Los dos relojes empiezan juntos. A 0.9999c, cuando el exterior marca 141.42 ns, Lorentz ha acumulado 2.00 ns. Debajo de cada lectura, los tics cuentan las idas y vueltas completas del rayo que ves en esa viñeta. La derecha reproduce el pulso a ritmo local para que puedas seguir sus rebotes incluso a velocidades muy altas.</p></div><section class="eqGrid lab-theory" aria-label="Teoria">
       <article><h3>¿Qué mide Lorentz?</h3><div class="math" data-tex="">\Delta\tau=\frac{2L_0}{c}</div><p>Lorentz viaja sentado junto al espejo inferior. Cuando el pulso sale de ese espejo y regresa a él, los dos sucesos ocurren en el mismo lugar en su marco. Su reloj mide el periodo propio, 2.00 ns para una separación de 0.299792458 m. Una vez agarrado, Einstein viaja con Lorentz y mide el mismo periodo.</p></article>
       <article><h3>Dilatación temporal</h3><div class="math" data-tex="">\Delta t=\gamma\,\Delta\tau</div><p>En el marco del observador externo, la componente horizontal de la velocidad de la luz es v y la vertical es c/γ. El módulo sigue siendo c.</p></article>
       <article><h3>Factor gamma</h3><div class="math" data-tex="">\gamma=\frac{1}{\sqrt{1-v^2/c^2}}</div><p>Cuando v se aproxima a c, el tiempo entre dos retornos de la luz al mismo espejo aumenta en el marco del observador externo.</p></article>
@@ -135,12 +135,13 @@ function clockScene(canvas, ground) {
     const sprite = assets.einstein;
     if (!sprite.complete || !sprite.naturalWidth) return;
     const t = Math.min(1, approach / 1.65);
-    const remaining = (1 - t) ** 2;
-    const hanging = t >= .82;
-    const frame = hanging ? 3 : [0,1,2,1][Math.floor(approach*10)%4];
-    const bob = hanging ? 0 : 2*Math.abs(Math.sin(approach*15));
+    const jump = Math.max(0,(t-.76)/.24);
+    const hanging = t >= 1;
+    const frame = jump > 0 ? 3 : [0,1,2,1][Math.floor(approach*10)%4];
+    const startDistance = Math.min(163,Math.max(0,g.center-70));
+    const runHeight = 36*(1-jump) - 17*4*jump*(1-jump);
     ctx.save();
-    ctx.translate(g.center-31-Math.min(163,Math.max(0,g.center-70))*remaining, g.bottom+11+36*remaining+bob);
+    ctx.translate(g.center-31-startDistance*(1-t), g.bottom+11+runHeight);
     if (hanging) ctx.rotate(Math.sin(animationTime*3)*(.035+.055*beta())*t);
     // The top of the raised hand is at (114,4) in the final 180 × 200 cell.
     const scale = .36;
@@ -178,7 +179,7 @@ function clockScene(canvas, ground) {
     ctx.fillStyle = '#43f86e'; ctx.beginPath(); ctx.arc(x, y, 9.5, 0, Math.PI * 2); ctx.fill();
     ctx.restore();
   }
-  function drawWatch(x, y, title, seconds, color) {
+  function drawWatch(x, y, title, seconds, ticks, color) {
     ctx.save(); ctx.translate(x,y);
     const small = canvas.clientWidth < 540;
     const size = small ? 1.38 : 1;
@@ -196,7 +197,7 @@ function clockScene(canvas, ground) {
     }
     ctx.fillStyle='#c9dced';ctx.font='bold 13px system-ui';ctx.fillText(title,26,-3);
     ctx.fillStyle='#fff';ctx.font='bold 17px monospace';ctx.fillText(seconds.toFixed(2)+' ns',26,16,90);
-    ctx.font='bold 13px system-ui';ctx.fillText('Tics: '+Math.floor(seconds/PROPER_PERIOD_NS),26,33,90);ctx.restore();
+    ctx.font='bold 13px system-ui';ctx.fillText('Tics del pulso: '+ticks,26,33,109);ctx.restore();
   }
   function advance(dt) {
     const rate = 1 / gamma(), speed = beta() * cPixels;
@@ -262,8 +263,9 @@ function clockScene(canvas, ground) {
     ctx.strokeStyle = '#dbffe6'; ctx.lineWidth = 1.3; ctx.stroke(); ctx.restore();
     drawGreenBall(cx, y);
     const watchScale = canvas.clientWidth < 540 ? 1.38 : 1;
-    if (ground) drawWatch(W-147*watchScale, 6,'Exterior',clockTimes.exterior,'#137ab4');
-    else drawWatch(Math.max(3,cx-56-143*watchScale), g.bottom+13,'Lorentz',clockTimes.lorentz,'#008967');
+    const ticks = Math.floor(pulse.hit / 2);
+    if (ground) drawWatch(W-147*watchScale, 6,'Exterior',clockTimes.exterior,ticks,'#137ab4');
+    else drawWatch(Math.max(3,cx-56-143*watchScale), g.bottom+13,'Lorentz',clockTimes.lorentz,ticks,'#008967');
     drawEinstein(g);
     document.getElementById('vOut').textContent = beta().toFixed(4) + ' c';
     document.getElementById('gammaOut').textContent = gamma().toFixed(2);
