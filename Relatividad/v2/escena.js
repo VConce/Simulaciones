@@ -1,5 +1,6 @@
 const sliders=Array.from(document.querySelectorAll('input[type=range]:not([id="progress"])'));
 for(const slider of sliders){
+  if(slider.hasAttribute('data-exact-input'))continue;
   const label=slider.labels?.[0]?.textContent||slider.closest('.control,.row')?.querySelector('label')?.textContent||slider.getAttribute('aria-label')||slider.id;
   const row=document.createElement('div'),number=document.createElement('input');
   row.className='precision-row';number.className='precise';number.type='number';

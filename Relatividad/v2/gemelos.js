@@ -2,7 +2,7 @@
 (() => {
   const get=id=>document.getElementById(id);
   const yearMs=365.25*86400000, epoch=Date.now();
-  const formatDate=new Intl.DateTimeFormat('es-ES',{dateStyle:'short',timeStyle:'medium',timeZone:'UTC'});
+  const formatDate=new Intl.DateTimeFormat('es-ES',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23',timeZone:'UTC'});
   const hands=document.querySelectorAll('.dial b');
   const scene=document.querySelector('.scene');
   const beforeButton=get('before-turn'), afterButton=get('after-turn');
@@ -47,15 +47,13 @@
     write('turn-note','Cambio de hora asignada: '+duration(2*beta*distance)+'. El reloj de la nave marca '+duration(turn*properRate)+' a ambos lados del giro.');
     write('phase',home?'Reencuentro en la Tierra':atTurn?(inbound?'Giro · comienzo de la vuelta':'Giro · final de la ida'):inbound?'Vuelta hacia la Tierra':t===0?'Salida desde la Tierra':'Ida hacia la estrella');
     get('rocket').style.left=(shipView?50:12+76*leg)+'%';
-    if(shipView){
-      scene.style.setProperty('--earth-x',(50-38*leg)+'%');
-      scene.style.setProperty('--star-x',(88-38*leg)+'%');
-    }
+    scene.style.setProperty('--earth-x',shipView?(50-38*leg)+'%':'12%');
+    scene.style.setProperty('--star-x',shipView?(88-38*leg)+'%':'88%');
     get('rocket').style.transform='translate(-50%,-50%) scaleX('+(inbound?-1:1)+')';
-    const age=t/total;
+    const age=earthReading/total;
     get('older').style.opacity=Math.min(1,Math.max(0,(age-.2)*4));
     get('elder').style.opacity=Math.min(1,Math.max(0,(age-.6)*3));
-    get('progress').value=100*age;
+    get('progress').value=100*t/total;
     write('gamma',(1/properRate).toFixed(3));write('earth-total',duration(total));write('ship-total',duration(total*properRate));
     write('pause',home?'Repetir viaje':paused?'Reanudar':'Pausar');
   }
@@ -81,7 +79,7 @@
   };
   get('end').onclick=()=>go(1,true);
   get('progress').oninput=e=>go(e.target.valueAsNumber/100,true);
-  get('calendar').onclick=()=>{dates=!dates;write('calendar',dates?'Ver duración':'Ver fechas');draw();};
+  get('calendar').onclick=()=>{dates=!dates;document.querySelector('.clocks').classList.toggle('calendar',dates);write('calendar',dates?'Ver duración':'Ver fechas');draw();};
   document.addEventListener('visibilitychange',()=>{last=performance.now();});
   draw();requestAnimationFrame(frame);
 })();

@@ -3,8 +3,8 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Paradoja de los gemelos · VConce</title>
 <link rel="icon" href="../../electromagnetism/assets/electric/vconce.png">
-<link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><link rel="stylesheet" href="escena.css"><link rel="stylesheet" href="gemelos.css?v=marco-nave">
-<script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><script defer src="escena.js"></script><script defer src="gemelos.js?v=marco-nave"></script>
+<link rel="stylesheet" href="../../shared/katex/katex.min.css"><link rel="stylesheet" href="aula.css"><link rel="stylesheet" href="escena.css"><link rel="stylesheet" href="gemelos.css?v=gemelos-a-bordo">
+<script defer src="../../shared/katex/katex.min.js"></script><script defer src="formulas.js"></script><script defer src="escena.js"></script><script defer src="gemelos.js?v=gemelos-a-bordo"></script>
 </head><body><main class="compact-lab">
 <header class="lab-heading"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce"><h1>Paradoja de los gemelos</h1>
 <div class="clocks" aria-label="Lecturas simultáneas en el marco terrestre">
@@ -15,9 +15,9 @@
 <div class="frame-choice"><label for="reference">Marco de referencia</label><select id="reference"><option value="earth">Tierra</option><option value="ship">Nave (gemelo viajero)</option></select></div>
 <div class="experiment-layout"><div class="visual"><div class="scene" role="img" aria-label="Trayecto de ida y vuelta desde la Tierra hasta la estrella">
 <span class="destination origin">Tierra</span><span class="destination star">Estrella</span>
-<img class="moving-world earth-disc" src="../assets/earth-blue-marble-sprite.png" alt=""><img class="moving-world star-disc" src="../assets/observador-star-orange-real.png" alt="">
-<div class="route"></div><img id="rocket" src="../assets/gemelos-rocket-sprite.png" alt="">
-<div class="family"><div class="portrait"><img id="young" src="../assets/gemelos-earth-twin-sprite.png" alt=""><img id="older" src="../assets/gemelos-earth-twin-older-sprite.png" alt=""><img id="elder" src="../assets/gemelos-earth-twin-elder-sprite.png" alt=""></div><img src="../assets/gemelos-astronaut-twin-sprite.png" alt="Gemelo astronauta"></div>
+<div class="earth-world"><img class="earth-globe" src="../assets/earth-blue-marble-sprite.png" alt=""><div class="portrait" aria-label="Gemelo terrestre"><img id="young" src="../assets/gemelos-earth-twin-sprite.png" alt=""><img id="older" src="../assets/gemelos-earth-twin-older-sprite.png" alt=""><img id="elder" src="../assets/gemelos-earth-twin-elder-sprite.png" alt=""></div></div>
+<div class="star-world" aria-hidden="true"></div><div class="route"></div>
+<div id="rocket"><img class="hull" src="../assets/gemelos-rocket-sprite.png" alt=""><img class="rider" src="../assets/gemelos-astronaut-twin-sprite.png" alt="Gemelo viajero de pie sobre la nave"></div>
 <span id="phase"></span></div>
 <div class="turn-reading"><div><strong>Hora que el viajero asigna a la Tierra</strong><output id="assigned" aria-live="off"></output></div>
 <div class="turn-pair" role="group" aria-label="Detener el viaje a cada lado del giro"><button id="before-turn" aria-pressed="false">Justo antes del giro <strong id="before-time"></strong></button><button id="after-turn" aria-pressed="false">Justo después del giro <strong id="after-time"></strong></button></div><p id="turn-note"></p></div>
