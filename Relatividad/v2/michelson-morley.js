@@ -35,15 +35,12 @@ function measure(angle, lengthA, lengthB, speedKmPerSecond, wavelengthNm) {
 const board = $('apparatus');
 const ctx = board.getContext('2d');
 const detector = $('fringes');
-const fringeCtx = detector.getContext('2d');
-const impactLayer = document.createElement('canvas');
-impactLayer.width = detector.width;
-impactLayer.height = detector.height;
-const impactCtx = impactLayer.getContext('2d');
+const impactCtx = detector.getContext('2d');
+const etherFringes = $('etherFringes').getContext('2d');
+const isotropicFringes = $('isotropicFringes').getContext('2d');
 const fringeSpacing = 115;
 const tau = 2 * Math.PI;
 let hitCount = 0;
-let showPattern = false;
 const lab = document.querySelector('.lab-view');
 const images = {};
 const center = 320;
@@ -74,10 +71,13 @@ pulse.src = 'pulso-optico.webp';
 pulse.addEventListener('load', renderBoard);
 
 function update() {
-  const speed = model.ether ? model.speed : 0;
-  current = measure(model.angle, model.armA, model.armB, speed, model.wavelength);
-  const zero = measure(0, model.armA, model.armB, speed, model.wavelength);
-  const shifted = (current.delta - zero.delta) * current.fringeScale;
+  const { angle, armA: lengthA, armB: lengthB, speed, wavelength } = model;
+  const isotropic = measure(angle, lengthA, lengthB, 0, wavelength);
+  const withEther = measure(angle, lengthA, lengthB, speed, wavelength);
+  const etherAtZero = measure(0, lengthA, lengthB, speed, wavelength);
+  const etherShift = (withEther.delta - etherAtZero.delta) * withEther.fringeScale;
+  current = model.ether ? withEther : isotropic;
+  const shifted = model.ether ? etherShift : 0;
   const [armA, armB] = current.times.map(legs => legs[0] + legs[1]);
   for (const name of Object.keys(initial)) $(name).value = model[name];
   $('angleOut').value = model.angle + '°';
@@ -91,7 +91,6 @@ function update() {
   $('timeDifference').textContent = (current.delta === 0 ? '0' : (current.delta * 1e15).toFixed(3)) + ' fs';
   $('fringeShift').textContent = (Math.abs(shifted) < .0005 ? '0.000' : shifted.toFixed(3)) + ' franjas';
   $('fog').hidden = $('wind').hidden = !model.ether;
-  $('speed').disabled = !model.ether;
   $('modelLabel').textContent = model.ether ? 'Hipótesis histórica · éter clásico' : 'En el laboratorio · luz isotrópica';
   $('ether').setAttribute('aria-pressed', model.ether);
   $('slow').setAttribute('aria-pressed', model.slow);
@@ -99,16 +98,11 @@ function update() {
   $('play').disabled = $('stop').disabled = model.emission === 'stopped';
   $('single').setAttribute('aria-disabled', model.emission === 'single');
   $('stream').setAttribute('aria-pressed', model.emission === 'stream');
-  const status = {
-    stream: model.playing ? 'Chorro continuo en marcha.' : 'Chorro continuo en pausa.',
-    single: model.playing
-      ? 'Un fotón en camino. Tras el divisor se muestran sus dos recorridos posibles.'
-      : 'Fotón en pausa. Pulsa «Reanudar» para seguir su recorrido.',
-    stopped: 'Emisión detenida.'
-  }[model.emission];
-  if ($('emissionStatus').textContent !== status) $('emissionStatus').textContent = status;
   lab.classList.toggle('paused', !model.playing);
-  drawFringes();
+  // Align both references at 0° so only the angular shift separates them.
+  drawPrediction(etherFringes, isotropic.fringe + etherShift, 138);
+  drawPrediction(isotropicFringes, isotropic.fringe, 209);
+  updateImpactCount();
   renderBoard();
 }
 
@@ -121,37 +115,21 @@ function wavelengthHue(wavelength) {
   return f < .42 ? 215 - 115 * f / .42 : 100 - 97 * (f - .42) / .58;
 }
 
-function drawFringes() {
-  const w = detector.width, h = detector.height;
-  const impactsLabel = 'Puntos de impacto de los fotones en el detector';
-  const patternLabel = 'Patrón de interferencia de los dos haces';
+function updateImpactCount() {
   $('clearHits').setAttribute('aria-disabled', hitCount === 0);
-  $('pattern').setAttribute('aria-pressed', showPattern);
   const label = hitCount === 1 ? '1 fotón detectado' : hitCount + ' fotones detectados';
   if ($('hitCount').value !== label) $('hitCount').value = label;
-  const note = showPattern
-    ? 'Patrón previsto para la configuración actual. Pulsa de nuevo para volver a los impactos acumulados.'
-    : 'Las franjas se forman al acumularse los impactos. Si cambias el montaje, borra los puntos para empezar otra medida.';
-  if ($('detectorNote').textContent !== note) $('detectorNote').textContent = note;
-  detector.setAttribute('aria-label', showPattern ? patternLabel : impactsLabel);
-  if (!showPattern) {
-    fringeCtx.clearRect(0, 0, w, h);
-    fringeCtx.drawImage(impactLayer, 0, 0);
-    return;
+}
+
+function drawPrediction(context, phase, hue) {
+  const { width, height } = context.canvas;
+  for (let x = 0; x < width; x++) {
+    const intensity = fringeIntensity(x, phase % 1);
+    context.fillStyle = 'hsl(' + hue + ' 75% ' + (3 + 58 * intensity ** 1.6) + '%)';
+    context.fillRect(x, 0, 1, height);
   }
-  const phase = current.fringe % 1;
-  const hue = wavelengthHue(model.wavelength);
-  for (let x = 0; x < w; x++) {
-    const intensity = fringeIntensity(x, phase);
-    fringeCtx.fillStyle = 'hsl(' + hue + ' 75% ' + (3 + 58 * intensity ** 1.6) + '%)';
-    fringeCtx.fillRect(x, 0, 1, h);
-  }
-  fringeCtx.strokeStyle = '#ffffff90';
-  fringeCtx.lineWidth = 1;
-  fringeCtx.beginPath();
-  fringeCtx.moveTo(w / 2, 0);
-  fringeCtx.lineTo(w / 2, h);
-  fringeCtx.stroke();
+  context.fillStyle = '#ffffff90';
+  context.fillRect(width / 2, 0, 1, height);
 }
 
 function recordImpact() {
@@ -159,9 +137,9 @@ function recordImpact() {
   const phase = current.fringe % 1;
   let x;
   do {
-    x = Math.random() * impactLayer.width;
+    x = Math.random() * detector.width;
   } while (Math.random() > fringeIntensity(x, phase));
-  const y = 3 + Math.random() * (impactLayer.height - 6);
+  const y = 3 + Math.random() * (detector.height - 6);
   const hue = wavelengthHue(model.wavelength);
   impactCtx.fillStyle = 'hsl(' + hue + ' 86% 76%)';
   impactCtx.beginPath();
@@ -172,7 +150,8 @@ function recordImpact() {
 
 function clearImpacts() {
   hitCount = 0;
-  impactCtx.clearRect(0, 0, impactLayer.width, impactLayer.height);
+  impactCtx.clearRect(0, 0, detector.width, detector.height);
+  updateImpactCount();
 }
 
 function radiusFor(length) {
@@ -301,14 +280,14 @@ function animation(time) {
       const arrivals = Math.floor(streamHitCredit);
       streamHitCredit -= arrivals;
       for (let i = 0; i < arrivals; i++) recordImpact();
-      if (arrivals > 0) drawFringes();
+      if (arrivals > 0) updateImpactCount();
     }
   }
   if (model.emission === 'single') {
     if (detectedAt === null && sceneTime - emissionStart >= detectionTime()) {
       detectedAt = sceneTime;
       recordImpact();
-      drawFringes();
+      updateImpactCount();
     }
     if (detectedAt !== null && sceneTime - detectedAt >= detectionFlash) {
       setEmission('stopped');
@@ -415,20 +394,13 @@ $('stream').addEventListener('click', () => {
   if (model.emission !== 'stream') setEmission('stream');
   else if (!model.playing) setPlaying(true);
 });
-$('pattern').addEventListener('click', () => {
-  showPattern = !showPattern;
-  drawFringes();
-});
 $('clearHits').addEventListener('click', () => {
   if (hitCount === 0) return;
   clearImpacts();
-  showPattern = false;
-  drawFringes();
 });
 $('reset').addEventListener('click', () => {
   Object.assign(model, initial, { ether: false, slow: false });
   clearImpacts();
-  showPattern = false;
   sceneTime = 0;
   setEmission('stream', !matchMedia('(prefers-reduced-motion: reduce)').matches);
 });

@@ -8,10 +8,10 @@
   <link rel="icon" type="image/png" href="../../shared/vconce-fisica.png">
   <link rel="stylesheet" href="../../shared/marca-fisica.css">
   <link rel="stylesheet" href="../../shared/katex/katex.min.css">
-  <link rel="stylesheet" href="michelson-morley.css?v=ritmo">
+  <link rel="stylesheet" href="michelson-morley.css?v=predicciones">
   <script defer src="../../shared/katex/katex.min.js"></script>
   <script defer src="formulas.js"></script>
-  <script defer src="michelson-morley.js?v=ritmo"></script>
+  <script defer src="michelson-morley.js?v=predicciones"></script>
 </head>
 <body>
 <main>
@@ -20,6 +20,29 @@
     <h1>Michelson y Morley</h1>
   </header>
   <div class="workbench">
+    <section class="predictions" aria-labelledby="predictionTitle">
+      <h2 id="predictionTitle">Predicciones al girar</h2>
+      <figure class="prediction prediction-ether">
+        <figcaption>Con éter</figcaption>
+        <canvas id="etherFringes" width="600" height="48" role="img" aria-label="Franjas previstas con éter"></canvas>
+      </figure>
+      <figure class="prediction prediction-isotropic">
+        <figcaption>Sin éter</figcaption>
+        <canvas id="isotropicFringes" width="600" height="48" role="img" aria-label="Franjas previstas sin éter"></canvas>
+      </figure>
+      <p>Parten alineadas a 0°. Al girar la rueda, el viento de éter desplaza la verde. La azul se queda fija, como en el experimento.</p>
+    </section>
+    <section class="emission" aria-label="Emisión y llegadas de fotones">
+      <div class="emission-controls">
+        <button type="button" id="stop">Detener</button>
+        <button type="button" id="single">Lanzar un fotón</button>
+        <button type="button" id="stream" aria-pressed="true">Chorro continuo</button>
+      </div>
+      <div class="control detector-rate">
+        <label for="detectorRate">Llegadas del chorro <output id="detectorRateOut" for="detectorRate">1 fotón/s</output></label>
+        <input type="range" id="detectorRate" min="1" max="100" step="1" value="1">
+      </div>
+    </section>
     <section class="experiment" aria-label="Interferómetro">
       <figure>
         <div class="lab-view">
@@ -34,30 +57,15 @@
         </div>
         <figcaption><span>Arrastra el borde de la rueda para girarla. Arrastra A o B para cambiar la longitud del brazo.</span><span>El dibujo representa los recorridos ópticos sin plegarlos.</span></figcaption>
       </figure>
-      <div class="emission">
-        <div class="emission-controls" role="group" aria-label="Emisión de fotones">
-          <button type="button" id="stop">Detener</button>
-          <button type="button" id="single">Lanzar un fotón</button>
-          <button type="button" id="stream" aria-pressed="true">Chorro continuo</button>
-        </div>
-        <p id="emissionStatus" role="status">Chorro continuo en marcha.</p>
-      </div>
       <div class="measurement">
         <section class="detector" aria-labelledby="fringeTitle">
           <div class="detector-bar">
             <h2 id="fringeTitle">Franjas en el detector</h2>
-            <div class="detector-actions">
-              <button type="button" id="pattern" aria-pressed="false">Patrón previsto</button>
-              <button type="button" id="clearHits">Borrar puntos</button>
-            </div>
+            <button type="button" id="clearHits">Borrar puntos</button>
           </div>
           <canvas id="fringes" width="600" height="90" role="img" aria-label="Puntos de impacto de los fotones en el detector"></canvas>
           <output id="hitCount" aria-live="off"></output>
-          <div class="control detector-rate">
-            <label for="detectorRate">Llegadas del chorro <output id="detectorRateOut" for="detectorRate">1 fotón/s</output></label>
-            <input type="range" id="detectorRate" min="1" max="100" step="1" value="1">
-          </div>
-          <p id="detectorNote">Las franjas se forman al acumularse los impactos. Si cambias el montaje, borra los puntos para empezar otra medida.</p>
+          <p>Si cambias el montaje, borra los puntos para empezar otra medida.</p>
         </section>
         <dl class="readouts">
           <div><dt><span class="dot arm-a"></span>Ida y vuelta A</dt><dd id="timeA">—</dd></div>
@@ -93,7 +101,7 @@
       <button type="button" id="equal">Igualar los brazos</button>
       <div class="control">
         <label for="speed">Velocidad respecto al éter <output id="speedOut" for="speed"></output></label>
-        <input type="range" id="speed" min="0" max="60" step="1" value="30" disabled>
+        <input type="range" id="speed" min="0" max="60" step="1" value="30">
       </div>
       <div class="control">
         <label for="wavelength">Longitud de onda <output id="lambdaOut" for="wavelength"></output></label>
@@ -114,7 +122,7 @@
         <h3>Dos recorridos, un patrón</h3>
         <p>El divisor envía luz hacia dos espejos perpendiculares. Al regresar, las ondas se juntan en el detector. Cuando cambia la diferencia de tiempos de ida y vuelta, cambian también la fase relativa y la posición de las franjas.</p>
         <div data-tex>\Delta N=\frac{c}{\lambda}\bigl[\Delta t(\theta)-\Delta t(0)\bigr]</div>
-        <p>Ajustar la distancia a un espejo también mueve las franjas. Durante el giro, deja fijas las dos distancias.</p>
+        <p>Ajustar la distancia a un espejo también mueve las franjas. Durante el giro, deja fijas las dos distancias. Al lanzar un solo fotón, las dos luces después del divisor representan sus dos recorridos posibles.</p>
       </article>
       <article>
         <h3>La predicción del éter clásico</h3>

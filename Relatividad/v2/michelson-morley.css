@@ -19,9 +19,9 @@ h1 { font-size: clamp(1.45rem, 3.4vw, 2rem); letter-spacing: -.04em; }
 h2 { font-size: 1.1rem; }
 h3 { font-size: 1rem; }
 .site-header img { width: 36px; height: 36px; }
-.workbench { display: grid; grid-template-columns: minmax(0, 1fr) 278px; gap: 12px; align-items: start; }
-.experiment, .controls, .reading { background: white; min-width: 0; border: 1px solid var(--border); border-radius: 14px; }
-.experiment { overflow: hidden; }
+.workbench { display: grid; grid-template-columns: minmax(0, 1fr) 278px; grid-template-areas: "predictions emission" "experiment controls"; gap: 10px; align-items: start; }
+.experiment, .controls, .reading, .predictions, .emission { background: white; min-width: 0; border: 1px solid var(--border); border-radius: 14px; }
+.experiment { grid-area: experiment; overflow: hidden; }
 .lab-view { isolation: isolate; position: relative; display: grid; place-items: center; min-height: 0; height: clamp(310px, 43vw, 530px); background: #0f1c27; overflow: hidden; }
 .workshop { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 23%; z-index: -2; }
 .fog { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: url(michelson-eter.webp) center/cover; opacity: .85; mix-blend-mode: screen; animation: drift 8s ease-in-out alternate infinite; }
@@ -37,24 +37,31 @@ h3 { font-size: 1rem; }
 .name-morley { right: 9%; bottom: 12%; }
 .name-einstein { right: 15%; top: 20%; }
 figcaption { padding: 8px 12px; font-size: .82rem; color: #455d6a; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 3px 14px; }
-.emission { border-top: 1px solid var(--border); background: #f6fafc; padding: 8px 12px; }
-.emission-controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; max-width: 470px; }
-.emission p { color: #48606d; font-size: .8rem; line-height: 1.35; margin-top: 5px; }
+.emission { grid-area: emission; padding: 8px 10px; align-self: stretch; align-content: center; }
+.emission-controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
 .measurement { border-top: 1px solid var(--border); display: grid; grid-template-columns: minmax(0,1fr) minmax(235px,.83fr); }
 .detector { min-width: 0; padding: 10px 13px; }
+.predictions { grid-area: predictions; padding: 7px 11px; }
+.predictions h2 { margin-bottom: 4px; }
 .detector-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; }
-.detector-actions { display: flex; flex-wrap: wrap; gap: 5px; }
 .detector-bar button { flex: none; }
 #hitCount { display: block; color: #124e63; font-size: .85rem; font-weight: 650; margin: 4px 0 2px; }
-.detector-rate { margin: 8px 0 6px; }
-.detector p, .small-note { color: #48606d; font-size: .82rem; line-height: 1.4; }
+.detector-rate { margin-top: 8px; }
+.detector p, .predictions p, .small-note { color: #48606d; font-size: .82rem; line-height: 1.4; }
 #fringes { display: block; width: 100%; height: 66px; margin: 4px 0; border-radius: 6px; background: #05111e; }
+.prediction { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: 5px; margin-top: 3px; }
+.prediction figcaption { display: block; padding: 0; font-weight: 650; }
+.prediction-ether figcaption { color: #216044; }
+.prediction-isotropic figcaption { color: #145985; }
+.prediction canvas { display: block; width: 100%; height: 20px; border-radius: 4px; background: #05111e; }
+.predictions p { margin-top: 5px; }
 .readouts { display: grid; grid-template-columns: 1fr 1fr; align-items: center; border-left: 1px solid var(--border); padding: 8px 11px; gap: 7px 12px; }
 .readouts dt { font-size: .78rem; color: #364d5c; }
 .readouts dd { font: 650 clamp(.9rem,1.45vw,1.2rem) ui-monospace, Consolas, monospace; color: #154d67; white-space: nowrap; margin-top: 2px; }
-.controls { display: grid; gap: 8px; padding: 12px; }
+.controls { grid-area: controls; display: grid; gap: 8px; padding: 12px; }
 .control { display: grid; gap: 4px; min-width: 0; }
 .control label { display: flex; justify-content: space-between; align-items: center; font-size: .88rem; gap: 5px; font-weight: 620; }
+label[for="detectorRate"] { font-size: .82rem; }
 output { color: var(--blue); font-variant-numeric: tabular-nums; white-space: nowrap; }
 input[type=range] { width: 100%; height: 23px; margin: 0; accent-color: var(--blue); cursor: pointer; }
 input[type=range]:disabled { opacity: .45; cursor: default; }
@@ -76,18 +83,18 @@ button[aria-pressed=true] { background: #124e63; border-color: #124e63; color: w
 .reading .katex-display { overflow-x: auto; overflow-y: hidden; margin: .5em 0; font-size: .95rem; }
 @media (max-width: 900px) {
   .workbench { grid-template-columns: minmax(0, 1fr) 237px; gap: 8px; }
-  .measurement { grid-template-columns: minmax(0,1fr); }
+  .measurement { grid-template-columns: minmax(0, 1fr); }
   .readouts { border-left: 0; border-top: 1px solid var(--border); }
 }
 @media (max-width: 680px) {
   main { padding: 6px; }
-  .workbench { display: block; }
+  .workbench { grid-template-columns: minmax(0, 1fr); grid-template-areas: "predictions" "emission" "experiment" "controls"; gap: 6px; }
   .lab-view { height: auto; aspect-ratio: 1.50; }
   .model-label, .wind { font-size: .65rem; top: 5px; }
   .model-label { left: 5px; }
   .wind { right: 5px; }
   .person { font-size: .62rem; padding: 2px 4px; }
-  .controls { margin-top: 7px; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .controls { grid-template-columns: 1fr 1fr; gap: 8px; }
   .model-actions, .controls > :nth-child(2), .play-controls, .small-note { grid-column: 1/-1; }
   button { min-height: 42px; }
   .reading-columns { grid-template-columns: 1fr; gap: 8px; }
