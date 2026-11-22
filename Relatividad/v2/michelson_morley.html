@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Michelson y Morley · VConce</title>
+  <meta name="description" content="Gira el interferómetro, ajusta los espejos y reproduce el experimento de Michelson y Morley.">
+  <link rel="icon" type="image/png" href="../../shared/vconce-fisica.png">
+  <link rel="stylesheet" href="../../shared/marca-fisica.css">
+  <link rel="stylesheet" href="../../shared/katex/katex.min.css">
+  <link rel="stylesheet" href="michelson-morley.css">
+  <script defer src="../../shared/katex/katex.min.js"></script>
+  <script defer src="formulas.js"></script>
+  <script defer src="michelson-morley.js"></script>
+</head>
+<body>
+<main>
+  <header class="site-header">
+    <a class="marca-fisica" href="https://www.vconce.com/simulaciones/f%C3%ADsica" aria-label="Volver a las simulaciones de Física de VConce"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce" width="38" height="38"></a>
+    <h1>Michelson y Morley</h1>
+  </header>
+  <div class="workbench">
+    <section class="experiment" aria-label="Interferómetro">
+      <figure>
+        <div class="lab-view">
+          <img class="workshop" src="michelson-taller.webp" alt="Michelson y Morley manejan el instrumento mientras Einstein, con la mano en la barbilla, observa la escena." fetchpriority="high">
+          <div class="fog" id="fog" hidden></div>
+          <canvas id="apparatus" width="640" height="640" role="img" aria-label="Vista cenital de la mesa giratoria, con divisor de haz, dos espejos, fuente y detector. Arrastra la rueda o los espejos."></canvas>
+          <div class="model-label" id="modelLabel">En el laboratorio · luz isotrópica</div>
+          <span class="wind" id="wind" hidden>← Viento de éter</span>
+          <span class="person name-michelson">Michelson</span>
+          <span class="person name-morley">Morley</span>
+          <span class="person name-einstein">Einstein</span>
+        </div>
+        <figcaption><span>Arrastra el borde de la rueda para girarla. Arrastra A o B para cambiar la longitud del brazo.</span><span>El dibujo representa los recorridos ópticos sin plegarlos.</span></figcaption>
+      </figure>
+      <div class="measurement">
+        <section class="detector" aria-labelledby="fringeTitle">
+          <h2 id="fringeTitle">Franjas en el detector</h2>
+          <canvas id="fringes" width="600" height="90" role="img" aria-label="Patrón de interferencia de los dos haces"></canvas>
+          <p>Compara con la posición a 0° sin tocar los espejos.</p>
+        </section>
+        <dl class="readouts">
+          <div><dt><span class="dot arm-a"></span>Ida y vuelta A</dt><dd id="timeA">—</dd></div>
+          <div><dt><span class="dot arm-b"></span>Ida y vuelta B</dt><dd id="timeB">—</dd></div>
+          <div><dt>Diferencia A − B</dt><dd id="timeDifference">—</dd></div>
+          <div><dt>Desplazamiento al girar</dt><dd id="fringeShift">—</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <aside class="controls" aria-label="Controles del interferómetro">
+      <div class="model-actions">
+        <button type="button" id="ether" aria-pressed="false">Éter</button>
+        <button type="button" id="slow" aria-pressed="false">Ralentizar fotones</button>
+      </div>
+      <div class="control">
+        <label for="angle">Orientación del instrumento <output id="angleOut" for="angle"></output></label>
+        <input type="range" id="angle" min="0" max="359" step="1" value="0">
+        <div class="turn-controls">
+          <button type="button" data-turn="-15" aria-label="Girar quince grados en sentido antihorario">−15°</button>
+          <button type="button" data-turn="15" aria-label="Girar quince grados en sentido horario">+15°</button>
+          <button type="button" data-turn="90" aria-label="Girar noventa grados">+90°</button>
+        </div>
+      </div>
+      <div class="control arm-input">
+        <label for="armA"><span><i class="dot arm-a"></i>Espejo A</span><output id="armAOut" for="armA"></output></label>
+        <input type="range" id="armA" min="2" max="15" step="0.1" value="11">
+      </div>
+      <div class="control arm-input">
+        <label for="armB"><span><i class="dot arm-b"></i>Espejo B</span><output id="armBOut" for="armB"></output></label>
+        <input type="range" id="armB" min="2" max="15" step="0.1" value="11">
+      </div>
+      <button type="button" id="equal">Igualar los brazos</button>
+      <div class="control">
+        <label for="speed">Velocidad respecto al éter <output id="speedOut" for="speed"></output></label>
+        <input type="range" id="speed" min="0" max="60" step="1" value="30" disabled>
+      </div>
+      <div class="control">
+        <label for="wavelength">Longitud de onda <output id="lambdaOut" for="wavelength"></output></label>
+        <input type="range" id="wavelength" min="450" max="680" step="1" value="550">
+      </div>
+      <div class="play-controls">
+        <button type="button" id="play">Pausar</button>
+        <button type="button" id="reset">Restablecer</button>
+      </div>
+      <p class="small-note">La ralentización solo afecta al dibujo. Los tiempos y el corrimiento se calculan con la velocidad de la luz.</p>
+    </aside>
+  </div>
+
+  <section class="reading">
+    <h2>¿Qué esperaban ver al girar la mesa?</h2>
+    <div class="reading-columns">
+      <article>
+        <h3>Dos recorridos, un patrón</h3>
+        <p>El divisor envía luz hacia dos espejos perpendiculares. Al regresar, las ondas se juntan en el detector. Cuando cambia la diferencia de tiempos de ida y vuelta, cambian también la fase relativa y la posición de las franjas.</p>
+        <div data-tex>\Delta N=\frac{c}{\lambda}\bigl[\Delta t(\theta)-\Delta t(0)\bigr]</div>
+        <p>Ajustar la distancia a un espejo también mueve las franjas. Durante el giro, deja fijas las dos distancias.</p>
+      </article>
+      <article>
+        <h3>La predicción del éter clásico</h3>
+        <p>En este modelo histórico el montaje se mueve a velocidad <i>v</i> respecto al supuesto éter. Con brazos iguales, el viaje de ida y vuelta dura más en el brazo paralelo al viento que en el perpendicular. Un giro de 90° intercambia sus papeles.</p>
+        <div data-tex>t_{\parallel}=\frac{2L}{c(1-\beta^2)},\quad t_{\perp}=\frac{2L}{c\sqrt{1-\beta^2}},\quad \beta=\frac{v}{c}</div>
+        <p>Con 11 m por brazo, 30 km/s y 550 nm, el desplazamiento previsto entre 0° y 90° es de unas 0.40 franjas.</p>
+      </article>
+      <article>
+        <h3>Lo que midieron en 1887</h3>
+        <p>Michelson y Morley buscaron ese desplazamiento periódico. Observaron un corrimiento mucho menor de lo esperado. En el marco del laboratorio, la relatividad especial predice la misma velocidad de la luz en cada dirección. Aunque los brazos sean desiguales, girar el instrumento no cambia esa diferencia de tiempos.</p>
+        <div data-tex>t_A=\frac{2L_A}{c},\qquad t_B=\frac{2L_B}{c}</div>
+        <p>Einstein aparece como observador imaginario de la escena. <a href="https://ajsonline.org/article/62505-on-the-relative-motion-of-the-earth-and-the-luminiferous-ether">Artículo original de 1887</a>.</p>
+      </article>
+    </div>
+  </section>
+</main>
+</body>
+</html>
