@@ -36,6 +36,14 @@ const board = $('apparatus');
 const ctx = board.getContext('2d');
 const detector = $('fringes');
 const fringeCtx = detector.getContext('2d');
+const impactLayer = document.createElement('canvas');
+impactLayer.width = detector.width;
+impactLayer.height = detector.height;
+const impactCtx = impactLayer.getContext('2d');
+const fringeSpacing = 115;
+const tau = 2 * Math.PI;
+let hitCount = 0;
+let showImpacts = false;
 const lab = document.querySelector('.lab-view');
 const images = {};
 const center = 320;
@@ -45,12 +53,20 @@ const travelTimeScale = lightSpeed / 9;
 const detectionFlash = .21;
 let sceneTime = 0, previousTime = performance.now(), frameId = 0, drag = null, current;
 let emissionStart = 0;
+let detectedAt = null;
 
-for (const name of ['mesa', 'espejo', 'fuente', 'divisor', 'detector']) {
+const optics = {
+  mesa: 'michelson-mesa.webp',
+  espejo: 'michelson-espejo.webp',
+  fuente: 'michelson-fuente.webp',
+  divisor: 'michelson-divisor.webp',
+  detector: 'michelson-placa.webp'
+};
+for (const [name, src] of Object.entries(optics)) {
   const img = new Image();
   images[name] = img;
   img.addEventListener('load', renderBoard);
-  img.src = 'michelson-' + name + '.webp';
+  img.src = src;
 }
 const pulse = new Image();
 pulse.src = 'pulso-optico.webp';
@@ -94,13 +110,36 @@ function update() {
   renderBoard();
 }
 
+function fringeIntensity(x, phase) {
+  return .5 + .5 * Math.cos(tau * (x / fringeSpacing - phase));
+}
+
+function wavelengthHue(wavelength) {
+  const f = (wavelength - 450) / 230;
+  return f < .42 ? 215 - 115 * f / .42 : 100 - 97 * (f - .42) / .58;
+}
+
 function drawFringes() {
   const w = detector.width, h = detector.height;
+  const impactsLabel = 'Puntos de impacto de los fotones individuales';
+  const patternLabel = 'Patrón de interferencia de los dos haces';
+  $('hitCount').hidden = $('clearHits').hidden = !showImpacts;
+  $('clearHits').setAttribute('aria-disabled', hitCount === 0);
+  $('detectorNote').textContent = showImpacts
+    ? 'Acumula impactos para ver las franjas. Si cambias el montaje, borra los puntos para comparar una sola configuración.'
+    : 'Patrón previsto tras muchas detecciones. Para comparar con 0°, deja los espejos fijos.';
+  detector.setAttribute('aria-label', showImpacts ? impactsLabel : patternLabel);
+  if (showImpacts) {
+    fringeCtx.clearRect(0, 0, w, h);
+    fringeCtx.drawImage(impactLayer, 0, 0);
+    const label = hitCount === 1 ? '1 fotón detectado' : hitCount + ' fotones detectados';
+    if ($('hitCount').value !== label) $('hitCount').value = label;
+    return;
+  }
   const phase = current.fringe % 1;
-  const f = (model.wavelength - 450) / 230;
-  const hue = f < .42 ? 215 - 115 * f / .42 : 100 - 97 * (f - .42) / .58;
+  const hue = wavelengthHue(model.wavelength);
   for (let x = 0; x < w; x++) {
-    const intensity = .5 + .5 * Math.cos(2 * Math.PI * (x / 115 - phase));
+    const intensity = fringeIntensity(x, phase);
     fringeCtx.fillStyle = 'hsl(' + hue + ' 75% ' + (3 + 58 * intensity ** 1.6) + '%)';
     fringeCtx.fillRect(x, 0, 1, h);
   }
@@ -110,6 +149,28 @@ function drawFringes() {
   fringeCtx.moveTo(w / 2, 0);
   fringeCtx.lineTo(w / 2, h);
   fringeCtx.stroke();
+}
+
+function recordImpact() {
+  // A detection lands at one point. The fringe intensity weights its probability.
+  const phase = current.fringe % 1;
+  let x;
+  do {
+    x = Math.random() * impactLayer.width;
+  } while (Math.random() > fringeIntensity(x, phase));
+  const y = 3 + Math.random() * (impactLayer.height - 6);
+  const hue = wavelengthHue(model.wavelength);
+  impactCtx.fillStyle = 'hsl(' + hue + ' 86% 76%)';
+  impactCtx.beginPath();
+  impactCtx.arc(x, y, 2.4, 0, tau);
+  impactCtx.fill();
+  hitCount++;
+  drawFringes();
+}
+
+function clearImpacts() {
+  hitCount = 0;
+  impactCtx.clearRect(0, 0, impactLayer.width, impactLayer.height);
 }
 
 function radiusFor(length) {
@@ -191,7 +252,7 @@ function renderBoard() {
   image(images.espejo, ...armA, 34);
   image(images.espejo, ...armB, 34, Math.PI / 2);
   image(images.divisor, ...splitter, 56, Math.PI / 2);
-  image(images.detector, ...screen, 84, Math.PI / 2);
+  image(images.detector, screen[0], screen[1] + 16, 90);
 
   const emissionAge = sceneTime - emissionStart;
   if (model.emission === 'stream') {
@@ -201,7 +262,7 @@ function renderBoard() {
     }
   } else if (model.emission === 'single') {
     drawPulse(emissionStart, source, splitter, [armA, armB], screen);
-    if (emissionAge >= detectionTime()) photon(screen, '#eaf9ff');
+    if (detectedAt !== null) photon(screen, '#eaf9ff');
   }
   ctx.restore();
 
@@ -230,9 +291,15 @@ function animation(time) {
   const delta = Math.min((time - previousTime) / 1000, .05);
   previousTime = time;
   sceneTime += delta * (model.slow ? .28 : 1);
-  if (model.emission === 'single' && sceneTime - emissionStart >= detectionTime() + detectionFlash) {
-    setEmission('stopped');
-    return;
+  if (model.emission === 'single') {
+    if (detectedAt === null && sceneTime - emissionStart >= detectionTime()) {
+      detectedAt = sceneTime;
+      recordImpact();
+    }
+    if (detectedAt !== null && sceneTime - detectedAt >= detectionFlash) {
+      setEmission('stopped');
+      return;
+    }
   }
   renderBoard();
   frameId = requestAnimationFrame(animation);
@@ -248,8 +315,11 @@ function setPlaying(playing) {
 }
 
 function setEmission(mode, playing = mode !== 'stopped') {
+  if (mode === 'single') showImpacts = true;
+  if (mode === 'stream') showImpacts = false;
   model.emission = mode;
   emissionStart = sceneTime;
+  detectedAt = null;
   setPlaying(playing);
 }
 
@@ -332,8 +402,14 @@ $('stream').addEventListener('click', () => {
   if (model.emission !== 'stream') setEmission('stream');
   else if (!model.playing) setPlaying(true);
 });
+$('clearHits').addEventListener('click', () => {
+  if (hitCount === 0) return;
+  clearImpacts();
+  drawFringes();
+});
 $('reset').addEventListener('click', () => {
   Object.assign(model, initial, { ether: false, slow: false });
+  clearImpacts();
   sceneTime = 0;
   setEmission('stream', !matchMedia('(prefers-reduced-motion: reduce)').matches);
 });

@@ -8,10 +8,10 @@
   <link rel="icon" type="image/png" href="../../shared/vconce-fisica.png">
   <link rel="stylesheet" href="../../shared/marca-fisica.css">
   <link rel="stylesheet" href="../../shared/katex/katex.min.css">
-  <link rel="stylesheet" href="michelson-morley.css?v=emision">
+  <link rel="stylesheet" href="michelson-morley.css?v=detector">
   <script defer src="../../shared/katex/katex.min.js"></script>
   <script defer src="formulas.js"></script>
-  <script defer src="michelson-morley.js?v=emision"></script>
+  <script defer src="michelson-morley.js?v=detector"></script>
 </head>
 <body>
 <main>
@@ -44,9 +44,13 @@
       </div>
       <div class="measurement">
         <section class="detector" aria-labelledby="fringeTitle">
-          <h2 id="fringeTitle">Franjas en el detector</h2>
+          <div class="detector-bar">
+            <h2 id="fringeTitle">Franjas en el detector</h2>
+            <button type="button" id="clearHits" hidden>Borrar puntos</button>
+          </div>
           <canvas id="fringes" width="600" height="90" role="img" aria-label="Patrón de interferencia de los dos haces"></canvas>
-          <p>Patrón previsto tras muchas detecciones. Para comparar con 0°, deja los espejos fijos.</p>
+          <output id="hitCount" hidden></output>
+          <p id="detectorNote">Patrón previsto tras muchas detecciones. Para comparar con 0°, deja los espejos fijos.</p>
         </section>
         <dl class="readouts">
           <div><dt><span class="dot arm-a"></span>Ida y vuelta A</dt><dd id="timeA">—</dd></div>
