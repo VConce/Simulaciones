@@ -37,6 +37,9 @@ h3 { font-size: 1rem; }
 .name-morley { right: 9%; bottom: 12%; }
 .name-einstein { right: 15%; top: 20%; }
 figcaption { padding: 8px 12px; font-size: .82rem; color: #455d6a; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 3px 14px; }
+.emission { border-top: 1px solid var(--border); background: #f6fafc; padding: 8px 12px; }
+.emission-controls { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; max-width: 470px; }
+.emission p { color: #48606d; font-size: .8rem; line-height: 1.35; margin-top: 5px; }
 .measurement { border-top: 1px solid var(--border); display: grid; grid-template-columns: minmax(0,1fr) minmax(235px,.83fr); }
 .detector { min-width: 0; padding: 10px 13px; }
 .detector p, .small-note { color: #48606d; font-size: .82rem; line-height: 1.4; }
@@ -53,6 +56,7 @@ input[type=range]:disabled { opacity: .45; cursor: default; }
 .model-actions, .turn-controls, .play-controls { display: flex; gap: 5px; }
 button { flex: 1; min-height: 37px; border: 1px solid #b5c7d2; border-radius: 6px; padding: 4px 6px; background: white; color: #102c3e; font: 600 .85rem/1.2 system-ui, sans-serif; cursor: pointer; }
 button:hover { background: #e7f2f6; }
+button:disabled, button[aria-disabled=true] { opacity: .54; cursor: default; }
 button[aria-pressed=true] { background: #124e63; border-color: #124e63; color: white; }
 #ether[aria-pressed=true] { background: #215840; border-color: #215840; }
 #play { background: #154b60; border-color: #154b60; color: white; }

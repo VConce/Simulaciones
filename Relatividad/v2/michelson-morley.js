@@ -3,7 +3,13 @@
 const lightSpeed = 299792458;
 const initial = { angle: 0, armA: 11, armB: 11, speed: 30, wavelength: 550 };
 const $ = id => document.getElementById(id);
-const model = { ...initial, ether: false, slow: false, playing: !matchMedia('(prefers-reduced-motion: reduce)').matches };
+const model = {
+  ...initial,
+  ether: false,
+  slow: false,
+  emission: 'stream',
+  playing: !matchMedia('(prefers-reduced-motion: reduce)').matches
+};
 const photons = ['#73e4f5', '#ffd68b'];
 const degrees = Math.PI / 180;
 const wrapAngle = n => (n % 360 + 360) % 360;
@@ -33,7 +39,12 @@ const fringeCtx = detector.getContext('2d');
 const lab = document.querySelector('.lab-view');
 const images = {};
 const center = 320;
+const streamInterval = .85;
+const commonLegDuration = .30;
+const travelTimeScale = lightSpeed / 9;
+const detectionFlash = .21;
 let sceneTime = 0, previousTime = performance.now(), frameId = 0, drag = null, current;
+let emissionStart = 0;
 
 for (const name of ['mesa', 'espejo', 'fuente', 'divisor', 'detector']) {
   const img = new Image();
@@ -67,6 +78,17 @@ function update() {
   $('ether').setAttribute('aria-pressed', model.ether);
   $('slow').setAttribute('aria-pressed', model.slow);
   $('play').textContent = model.playing ? 'Pausar' : 'Reanudar';
+  $('play').disabled = $('stop').disabled = model.emission === 'stopped';
+  $('single').setAttribute('aria-disabled', model.emission === 'single');
+  $('stream').setAttribute('aria-pressed', model.emission === 'stream');
+  const status = {
+    stream: model.playing ? 'Chorro continuo en marcha.' : 'Chorro continuo en pausa.',
+    single: model.playing
+      ? 'Un fotón en camino. Tras el divisor se muestran sus dos recorridos posibles.'
+      : 'Fotón en pausa. Pulsa «Reanudar» para seguir su recorrido.',
+    stopped: 'Emisión detenida.'
+  }[model.emission];
+  if ($('emissionStatus').textContent !== status) $('emissionStatus').textContent = status;
   lab.classList.toggle('paused', !model.playing);
   drawFringes();
   renderBoard();
@@ -134,6 +156,20 @@ function pulseAlong(start, points, durations, color) {
   }
 }
 
+function detectionTime() {
+  const roundTrips = current.times.map(([out, back]) => (out + back) * travelTimeScale);
+  return Math.max(...roundTrips) + 2 * commonLegDuration;
+}
+
+function drawPulse(start, source, splitter, mirrors, screen) {
+  pulseAlong(start, [source, splitter], [commonLegDuration], '#eaf9ff');
+  current.times.forEach(([out, back], index) => {
+    const offset = index === 0 ? -5 : 5;
+    pulseAlong(start + commonLegDuration, [splitter, mirrors[index], splitter, [offset, screen[1]]],
+      [out * travelTimeScale, back * travelTimeScale, commonLegDuration], photons[index]);
+  });
+}
+
 function renderBoard() {
   if (!current) return;
   const orientation = model.angle * degrees;
@@ -157,17 +193,15 @@ function renderBoard() {
   image(images.divisor, ...splitter, 56, Math.PI / 2);
   image(images.detector, ...screen, 84, Math.PI / 2);
 
-  const emitted = sceneTime - sceneTime % .85;
-  for (let i = 0; i < 5; i++) {
-    const start = emitted - .85 * i;
-    if (start < 0) break;
-    pulseAlong(start, [source, splitter], [.30], '#eaf9ff');
-    current.times.forEach(([out, back], index) => {
-      const mirror = (index === 0) ? armA : armB;
-      const offset = (index === 0) ? -5 : 5;
-      const timeScale = lightSpeed / 9;
-      pulseAlong(start + .30, [splitter, mirror, splitter, [offset, screen[1]]], [out * timeScale, back * timeScale, .30], photons[index]);
-    });
+  const emissionAge = sceneTime - emissionStart;
+  if (model.emission === 'stream') {
+    const latest = Math.floor(emissionAge / streamInterval);
+    for (let i = latest; i >= Math.max(0, latest - 4); i--) {
+      drawPulse(emissionStart + i * streamInterval, source, splitter, [armA, armB], screen);
+    }
+  } else if (model.emission === 'single') {
+    drawPulse(emissionStart, source, splitter, [armA, armB], screen);
+    if (emissionAge >= detectionTime()) photon(screen, '#eaf9ff');
   }
   ctx.restore();
 
@@ -196,6 +230,10 @@ function animation(time) {
   const delta = Math.min((time - previousTime) / 1000, .05);
   previousTime = time;
   sceneTime += delta * (model.slow ? .28 : 1);
+  if (model.emission === 'single' && sceneTime - emissionStart >= detectionTime() + detectionFlash) {
+    setEmission('stopped');
+    return;
+  }
   renderBoard();
   frameId = requestAnimationFrame(animation);
 }
@@ -207,6 +245,12 @@ function setPlaying(playing) {
     frameId = requestAnimationFrame(animation);
   }
   update();
+}
+
+function setEmission(mode, playing = mode !== 'stopped') {
+  model.emission = mode;
+  emissionStart = sceneTime;
+  setPlaying(playing);
 }
 
 function boardPoint(event) {
@@ -280,10 +324,18 @@ $('equal').addEventListener('click', () => {
   update();
 });
 $('play').addEventListener('click', () => setPlaying(!model.playing));
+$('stop').addEventListener('click', () => setEmission('stopped'));
+$('single').addEventListener('click', () => {
+  if (model.emission !== 'single') setEmission('single');
+});
+$('stream').addEventListener('click', () => {
+  if (model.emission !== 'stream') setEmission('stream');
+  else if (!model.playing) setPlaying(true);
+});
 $('reset').addEventListener('click', () => {
   Object.assign(model, initial, { ether: false, slow: false });
   sceneTime = 0;
-  setPlaying(!matchMedia('(prefers-reduced-motion: reduce)').matches);
+  setEmission('stream', !matchMedia('(prefers-reduced-motion: reduce)').matches);
 });
 
 setPlaying(model.playing);

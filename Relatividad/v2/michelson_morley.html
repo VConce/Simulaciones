@@ -8,10 +8,10 @@
   <link rel="icon" type="image/png" href="../../shared/vconce-fisica.png">
   <link rel="stylesheet" href="../../shared/marca-fisica.css">
   <link rel="stylesheet" href="../../shared/katex/katex.min.css">
-  <link rel="stylesheet" href="michelson-morley.css">
+  <link rel="stylesheet" href="michelson-morley.css?v=emision">
   <script defer src="../../shared/katex/katex.min.js"></script>
   <script defer src="formulas.js"></script>
-  <script defer src="michelson-morley.js"></script>
+  <script defer src="michelson-morley.js?v=emision"></script>
 </head>
 <body>
 <main>
@@ -34,11 +34,19 @@
         </div>
         <figcaption><span>Arrastra el borde de la rueda para girarla. Arrastra A o B para cambiar la longitud del brazo.</span><span>El dibujo representa los recorridos ópticos sin plegarlos.</span></figcaption>
       </figure>
+      <div class="emission">
+        <div class="emission-controls" role="group" aria-label="Emisión de fotones">
+          <button type="button" id="stop">Detener</button>
+          <button type="button" id="single">Lanzar un fotón</button>
+          <button type="button" id="stream" aria-pressed="true">Chorro continuo</button>
+        </div>
+        <p id="emissionStatus" role="status">Chorro continuo en marcha.</p>
+      </div>
       <div class="measurement">
         <section class="detector" aria-labelledby="fringeTitle">
           <h2 id="fringeTitle">Franjas en el detector</h2>
           <canvas id="fringes" width="600" height="90" role="img" aria-label="Patrón de interferencia de los dos haces"></canvas>
-          <p>Compara con la posición a 0° sin tocar los espejos.</p>
+          <p>Patrón previsto tras muchas detecciones. Para comparar con 0°, deja los espejos fijos.</p>
         </section>
         <dl class="readouts">
           <div><dt><span class="dot arm-a"></span>Ida y vuelta A</dt><dd id="timeA">—</dd></div>
