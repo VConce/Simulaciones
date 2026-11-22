@@ -8,10 +8,10 @@
   <link rel="icon" type="image/png" href="../../shared/vconce-fisica.png">
   <link rel="stylesheet" href="../../shared/marca-fisica.css">
   <link rel="stylesheet" href="../../shared/katex/katex.min.css">
-  <link rel="stylesheet" href="michelson-morley.css?v=chorro">
+  <link rel="stylesheet" href="michelson-morley.css?v=ritmo">
   <script defer src="../../shared/katex/katex.min.js"></script>
   <script defer src="formulas.js"></script>
-  <script defer src="michelson-morley.js?v=chorro"></script>
+  <script defer src="michelson-morley.js?v=ritmo"></script>
 </head>
 <body>
 <main>
@@ -53,6 +53,10 @@
           </div>
           <canvas id="fringes" width="600" height="90" role="img" aria-label="Puntos de impacto de los fotones en el detector"></canvas>
           <output id="hitCount" aria-live="off"></output>
+          <div class="control detector-rate">
+            <label for="detectorRate">Llegadas del chorro <output id="detectorRateOut" for="detectorRate">1 fotón/s</output></label>
+            <input type="range" id="detectorRate" min="1" max="100" step="1" value="1">
+          </div>
           <p id="detectorNote">Las franjas se forman al acumularse los impactos. Si cambias el montaje, borra los puntos para empezar otra medida.</p>
         </section>
         <dl class="readouts">

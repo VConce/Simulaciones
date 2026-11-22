@@ -46,6 +46,7 @@ figcaption { padding: 8px 12px; font-size: .82rem; color: #455d6a; display: flex
 .detector-actions { display: flex; flex-wrap: wrap; gap: 5px; }
 .detector-bar button { flex: none; }
 #hitCount { display: block; color: #124e63; font-size: .85rem; font-weight: 650; margin: 4px 0 2px; }
+.detector-rate { margin: 8px 0 6px; }
 .detector p, .small-note { color: #48606d; font-size: .82rem; line-height: 1.4; }
 #fringes { display: block; width: 100%; height: 66px; margin: 4px 0; border-radius: 6px; background: #05111e; }
 .readouts { display: grid; grid-template-columns: 1fr 1fr; align-items: center; border-left: 1px solid var(--border); padding: 8px 11px; gap: 7px 12px; }

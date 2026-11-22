@@ -1,7 +1,7 @@
 'use strict';
 
 const lightSpeed = 299792458;
-const initial = { angle: 0, armA: 11, armB: 11, speed: 30, wavelength: 550 };
+const initial = { angle: 0, armA: 11, armB: 11, speed: 30, wavelength: 550, detectorRate: 1 };
 const $ = id => document.getElementById(id);
 const model = {
   ...initial,
@@ -54,7 +54,7 @@ const detectionFlash = .21;
 let sceneTime = 0, previousTime = performance.now(), frameId = 0, drag = null, current;
 let emissionStart = 0;
 let detectedAt = null;
-let nextStreamHit = 0;
+let streamHitCredit = 1;
 
 const optics = {
   mesa: 'michelson-mesa.webp',
@@ -85,6 +85,7 @@ function update() {
   $('armBOut').value = model.armB.toFixed(1) + ' m';
   $('speedOut').value = model.speed + ' km/s';
   $('lambdaOut').value = model.wavelength + ' nm';
+  $('detectorRateOut').value = model.detectorRate === 1 ? '1 fotón/s' : model.detectorRate + ' fotones/s';
   $('timeA').textContent = (armA * 1e9).toFixed(6) + ' ns';
   $('timeB').textContent = (armB * 1e9).toFixed(6) + ' ns';
   $('timeDifference').textContent = (current.delta === 0 ? '0' : (current.delta * 1e15).toFixed(3)) + ' fs';
@@ -290,16 +291,17 @@ function renderBoard() {
 
 function animation(time) {
   const delta = Math.min((time - previousTime) / 1000, .05);
+  const visualSpeed = model.slow ? .28 : 1;
   previousTime = time;
-  sceneTime += delta * (model.slow ? .28 : 1);
+  sceneTime += delta * visualSpeed;
   if (model.emission === 'stream') {
-    const lastArrived = Math.floor((sceneTime - emissionStart - detectionTime()) / streamInterval);
-    if (lastArrived >= nextStreamHit) {
-      while (nextStreamHit <= lastArrived) {
-        recordImpact();
-        nextStreamHit++;
-      }
-      drawFringes();
+    const timeAfterFirstArrival = (sceneTime - emissionStart - detectionTime()) / visualSpeed;
+    if (timeAfterFirstArrival >= 0) {
+      streamHitCredit += Math.min(delta, timeAfterFirstArrival) * model.detectorRate;
+      const arrivals = Math.floor(streamHitCredit);
+      streamHitCredit -= arrivals;
+      for (let i = 0; i < arrivals; i++) recordImpact();
+      if (arrivals > 0) drawFringes();
     }
   }
   if (model.emission === 'single') {
@@ -329,7 +331,7 @@ function setPlaying(playing) {
 function setEmission(mode, playing = mode !== 'stopped') {
   model.emission = mode;
   emissionStart = sceneTime;
-  nextStreamHit = 0;
+  streamHitCredit = 1;
   detectedAt = null;
   setPlaying(playing);
 }
