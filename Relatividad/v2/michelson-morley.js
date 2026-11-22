@@ -43,7 +43,7 @@ const impactCtx = impactLayer.getContext('2d');
 const fringeSpacing = 115;
 const tau = 2 * Math.PI;
 let hitCount = 0;
-let showImpacts = false;
+let showPattern = false;
 const lab = document.querySelector('.lab-view');
 const images = {};
 const center = 320;
@@ -54,6 +54,7 @@ const detectionFlash = .21;
 let sceneTime = 0, previousTime = performance.now(), frameId = 0, drag = null, current;
 let emissionStart = 0;
 let detectedAt = null;
+let nextStreamHit = 0;
 
 const optics = {
   mesa: 'michelson-mesa.webp',
@@ -121,19 +122,20 @@ function wavelengthHue(wavelength) {
 
 function drawFringes() {
   const w = detector.width, h = detector.height;
-  const impactsLabel = 'Puntos de impacto de los fotones individuales';
+  const impactsLabel = 'Puntos de impacto de los fotones en el detector';
   const patternLabel = 'Patrón de interferencia de los dos haces';
-  $('hitCount').hidden = $('clearHits').hidden = !showImpacts;
   $('clearHits').setAttribute('aria-disabled', hitCount === 0);
-  $('detectorNote').textContent = showImpacts
-    ? 'Acumula impactos para ver las franjas. Si cambias el montaje, borra los puntos para comparar una sola configuración.'
-    : 'Patrón previsto tras muchas detecciones. Para comparar con 0°, deja los espejos fijos.';
-  detector.setAttribute('aria-label', showImpacts ? impactsLabel : patternLabel);
-  if (showImpacts) {
+  $('pattern').setAttribute('aria-pressed', showPattern);
+  const label = hitCount === 1 ? '1 fotón detectado' : hitCount + ' fotones detectados';
+  if ($('hitCount').value !== label) $('hitCount').value = label;
+  const note = showPattern
+    ? 'Patrón previsto para la configuración actual. Pulsa de nuevo para volver a los impactos acumulados.'
+    : 'Las franjas se forman al acumularse los impactos. Si cambias el montaje, borra los puntos para empezar otra medida.';
+  if ($('detectorNote').textContent !== note) $('detectorNote').textContent = note;
+  detector.setAttribute('aria-label', showPattern ? patternLabel : impactsLabel);
+  if (!showPattern) {
     fringeCtx.clearRect(0, 0, w, h);
     fringeCtx.drawImage(impactLayer, 0, 0);
-    const label = hitCount === 1 ? '1 fotón detectado' : hitCount + ' fotones detectados';
-    if ($('hitCount').value !== label) $('hitCount').value = label;
     return;
   }
   const phase = current.fringe % 1;
@@ -165,7 +167,6 @@ function recordImpact() {
   impactCtx.arc(x, y, 2.4, 0, tau);
   impactCtx.fill();
   hitCount++;
-  drawFringes();
 }
 
 function clearImpacts() {
@@ -291,10 +292,21 @@ function animation(time) {
   const delta = Math.min((time - previousTime) / 1000, .05);
   previousTime = time;
   sceneTime += delta * (model.slow ? .28 : 1);
+  if (model.emission === 'stream') {
+    const lastArrived = Math.floor((sceneTime - emissionStart - detectionTime()) / streamInterval);
+    if (lastArrived >= nextStreamHit) {
+      while (nextStreamHit <= lastArrived) {
+        recordImpact();
+        nextStreamHit++;
+      }
+      drawFringes();
+    }
+  }
   if (model.emission === 'single') {
     if (detectedAt === null && sceneTime - emissionStart >= detectionTime()) {
       detectedAt = sceneTime;
       recordImpact();
+      drawFringes();
     }
     if (detectedAt !== null && sceneTime - detectedAt >= detectionFlash) {
       setEmission('stopped');
@@ -315,10 +327,9 @@ function setPlaying(playing) {
 }
 
 function setEmission(mode, playing = mode !== 'stopped') {
-  if (mode === 'single') showImpacts = true;
-  if (mode === 'stream') showImpacts = false;
   model.emission = mode;
   emissionStart = sceneTime;
+  nextStreamHit = 0;
   detectedAt = null;
   setPlaying(playing);
 }
@@ -402,14 +413,20 @@ $('stream').addEventListener('click', () => {
   if (model.emission !== 'stream') setEmission('stream');
   else if (!model.playing) setPlaying(true);
 });
+$('pattern').addEventListener('click', () => {
+  showPattern = !showPattern;
+  drawFringes();
+});
 $('clearHits').addEventListener('click', () => {
   if (hitCount === 0) return;
   clearImpacts();
+  showPattern = false;
   drawFringes();
 });
 $('reset').addEventListener('click', () => {
   Object.assign(model, initial, { ether: false, slow: false });
   clearImpacts();
+  showPattern = false;
   sceneTime = 0;
   setEmission('stream', !matchMedia('(prefers-reduced-motion: reduce)').matches);
 });
