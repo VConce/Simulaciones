@@ -89,3 +89,6 @@ h2 { font-size: 1.25rem; margin: 0 0 8px; }
   .timers > div { padding-inline: 7px; }
   .timers dt { font-size: .8rem; }
 }
+@media (max-width: 350px) {
+  .timers dt { min-height: 2.65em; }
+}
