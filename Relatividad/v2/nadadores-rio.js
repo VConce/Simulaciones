@@ -3,12 +3,15 @@
 const swimSpeed = 2.4;
 const radians = Math.PI / 180;
 const wrapAngle = degrees => (degrees % 360 + 360) % 360;
+const smallerAngle = degrees => Math.min(degrees, 360 - degrees);
 
-function snapPerpendicular(degrees, otherDegrees, snapped) {
+function snapCourseAngle(degrees, otherDegrees, snapped) {
   const relative = wrapAngle(degrees - otherDegrees);
-  const nearest = relative < 180 ? 90 : 270;
+  const separation = smallerAngle(relative);
+  const nearest = separation < 67.5 ? 45 : 90;
   const tolerance = snapped ? 11 : 7;
-  return Math.abs(relative - nearest) <= tolerance ? wrapAngle(otherDegrees + nearest) : null;
+  if (Math.abs(separation - nearest) > tolerance) return null;
+  return wrapAngle(otherDegrees + (relative <= 180 ? nearest : -nearest));
 }
 
 function swimRoute(angle, current, distance) {
@@ -93,6 +96,11 @@ function maxCourseRadius() {
 function layoutCourse() {
   const maxRadius = maxCourseRadius();
   radii = distances.map(input => maxRadius * Number(input.value) / Number(input.max));
+  const separation = smallerAngle(offsetB);
+  const arcStart = Number(angle.value) + (offsetB > 180 ? offsetB : 0) + 90;
+  course.style.setProperty("--arc-start", `${arcStart}deg`);
+  course.style.setProperty("--arc-angle", `${separation}deg`);
+  course.style.setProperty("--arc-size", `${Math.min(58, Math.min(...radii) * 1.8)}px`);
   swimmers.forEach(({ lane, buoy }, index) => {
     const route = routes[index];
     const radius = radii[index];
@@ -127,7 +135,9 @@ function reset() {
   });
   duration = Math.max(...routes.map(route => route.total));
   byId("angleOut").textContent = `${angle.value}°`;
-  byId("rightAngle").hidden = offsetB !== 90 && offsetB !== 270;
+  const separation = smallerAngle(offsetB);
+  byId("angleBetweenValue").textContent = `${separation}°`;
+  byId("angleBetween").classList.toggle("magnetic", separation === 45 || separation === 90);
   layoutCourse();
 }
 
@@ -181,7 +191,7 @@ swimmers.forEach(({ buoy }, index) => {
     if (radius <= 0) return;
     const degrees = Math.atan2(y, x) / radians;
     const otherDegrees = Number(angle.value) + (1 - index) * offsetB;
-    const snapped = snapPerpendicular(degrees, otherDegrees, drag.snapped);
+    const snapped = snapCourseAngle(degrees, otherDegrees, drag.snapped);
     drag.snapped = snapped !== null;
     const meters = Math.hypot(x, y) / radius * Number(distances[index].max);
     moveBuoy(index, meters, snapped ?? degrees);
