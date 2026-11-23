@@ -22,7 +22,19 @@ main { max-width: 1440px; margin: auto; padding: 10px 16px 26px; }
 .water-panel, .controls, .reading { min-width: 0; border: 1px solid var(--border); border-radius: 14px; background: #fff; }
 .water-panel { overflow: hidden; }
 .river { position: relative; height: clamp(350px, 52vh, 520px); overflow: hidden; background: #184d55 url('rio-fondo.webp') center / 100% 100%; }
-.flow { position: absolute; z-index: 2; top: 12px; left: 12px; padding: 5px 10px; border-radius: 6px; background: #102d38ed; color: white; font-size: .875rem; font-weight: 700; }
+.water-flow {
+  --water-tile: 768px;
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden; opacity: .84;
+  mask-image: linear-gradient(to bottom, transparent 7%, black 13%, black 87%, transparent 94%);
+}
+.water-texture {
+  position: absolute; inset: 0 calc(-1 * var(--water-tile)) 0 0;
+  background: url('rio-corriente.webp') repeat-x 0 50% / var(--water-tile) 100%;
+}
+.flow, .buoy-hint { position: absolute; z-index: 3; left: 12px; padding: 5px 10px; border-radius: 6px; background: #102d38ed; color: white; font-size: .875rem; font-weight: 700; pointer-events: none; }
+.flow { top: 12px; }
+.buoy-hint { bottom: 12px; }
+.visually-hidden { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .course { position: absolute; inset: 0; }
 .lane, .start-marker, .buoy, .swimmer { position: absolute; top: 50%; left: 50%; }
 .lane { width: var(--radius, 0px); border-top: 2px dashed var(--lane-color); transform-origin: left center; transform: rotate(var(--angle)); filter: drop-shadow(0 1px 1px #102532); }
@@ -30,11 +42,19 @@ main { max-width: 1440px; margin: auto; padding: 10px 16px 26px; }
 .lane-b, .buoy-b { --lane-color: var(--lane-b); }
 .start-marker { width: 12px; height: 12px; border: 2px solid #132e38; border-radius: 50%; background: white; transform: translate(-50%, -50%); }
 .buoy, .swimmer { transform: translate(var(--x, 0px), var(--y, 0px)); }
-.buoy { z-index: 1; padding-left: 16px; color: var(--lane-color); font-weight: 800; text-shadow: 0 1px 2px #062a33, 0 1px 4px #062630; }
-.buoy img { position: absolute; width: 28px; height: 28px; object-fit: contain; transform: translate(-50%, -50%); }
-.buoy img { left: 0; }
+.buoy {
+  z-index: 1; width: 44px; height: 44px; margin: -22px; padding: 0; border: 0; border-radius: 50%;
+  background: transparent; color: var(--lane-color); font-weight: 800; text-shadow: 0 1px 2px #062a33, 0 1px 4px #062630;
+  touch-action: none; cursor: grab; user-select: none;
+}
+.buoy:hover, .buoy.dragging { background: transparent; }
+.buoy:focus-visible { outline-color: var(--lane-color); }
+.buoy.dragging { cursor: grabbing; z-index: 3; }
+.buoy img { position: absolute; inset: 8px; width: 28px; height: 28px; object-fit: contain; pointer-events: none; }
+.buoy span { position: absolute; left: 37px; top: 27px; pointer-events: none; }
+.buoy:hover img, .buoy.dragging img,
 .buoy.touched img { filter: drop-shadow(0 0 7px var(--lane-color)); }
-.swimmer { z-index: 2; }
+.swimmer { z-index: 2; pointer-events: none; }
 .swimmer-a { --hand-y: -56%; }
 .swimmer-b { --hand-y: -60%; }
 .swimmer img {

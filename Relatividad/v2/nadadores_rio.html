@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nadadores en el río · VConce</title>
-  <meta name="description" content="Compara dos recorridos perpendiculares en un río con corriente y descubre la analogía con Michelson y Morley.">
+  <meta name="description" content="Mueve dos boyas en un río con corriente y compara el tiempo de ida y vuelta de los nadadores.">
   <link rel="icon" type="image/png" href="../../shared/vconce-fisica.png">
   <link rel="stylesheet" href="../../shared/marca-fisica.css">
   <link rel="stylesheet" href="../../shared/katex/katex.min.css">
-  <link rel="stylesheet" href="nadadores-rio.css?v=distancias">
+  <link rel="stylesheet" href="nadadores-rio.css?v=corriente">
   <script defer src="../../shared/katex/katex.min.js"></script>
   <script defer src="formulas.js"></script>
-  <script defer src="nadadores-rio.js?v=distancias"></script>
+  <script defer src="nadadores-rio.js?v=corriente"></script>
 </head>
 <body>
 <main>
@@ -24,16 +24,19 @@
   <div class="experiment">
     <section class="water-panel" aria-label="Carrera en el río">
       <div class="river" id="river">
+        <div class="water-flow" aria-hidden="true"><div class="water-texture" id="waterTexture"></div></div>
         <span class="flow" id="flow">Corriente →</span>
-        <div class="course" id="course" aria-hidden="true">
-          <span class="lane lane-a"></span>
-          <span class="lane lane-b"></span>
-          <span class="start-marker"></span>
-          <span class="buoy buoy-a"><img src="rio-boya.webp" alt="">A</span>
-          <span class="buoy buoy-b"><img src="rio-boya.webp" alt="">B</span>
-          <span class="swimmer swimmer-a"><img src="rio-nadador-a.webp" alt=""></span>
-          <span class="swimmer swimmer-b"><img src="rio-nadador-b.webp" alt=""></span>
+        <div class="course" id="course">
+          <span class="lane lane-a" aria-hidden="true"></span>
+          <span class="lane lane-b" aria-hidden="true"></span>
+          <span class="start-marker" aria-hidden="true"></span>
+          <button class="buoy buoy-a" type="button" aria-label="Boya A" aria-describedby="buoyKeys"><img src="rio-boya.webp" alt="" draggable="false"><span aria-hidden="true">A</span></button>
+          <button class="buoy buoy-b" type="button" aria-label="Boya B" aria-describedby="buoyKeys"><img src="rio-boya.webp" alt="" draggable="false"><span aria-hidden="true">B</span></button>
+          <span class="swimmer swimmer-a" aria-hidden="true"><img src="rio-nadador-a.webp" alt=""></span>
+          <span class="swimmer swimmer-b" aria-hidden="true"><img src="rio-nadador-b.webp" alt=""></span>
         </div>
+        <span class="buoy-hint" aria-hidden="true">Arrastra las boyas</span>
+        <span class="visually-hidden" id="buoyKeys">Usa las flechas arriba y abajo para cambiar la distancia, e izquierda y derecha para cambiar el ángulo.</span>
       </div>
       <dl class="timers">
         <div><dt>Nadador <span class="mark a">A</span></dt><dd><output id="timeA" aria-live="off">0.00 s</output><small id="phaseA">En la salida</small></dd></div>
@@ -57,7 +60,7 @@
         <input type="range" id="angle" min="0" max="359" step="1" value="0">
         <div class="actions">
           <button type="button" id="turn">Girar 90°</button>
-          <button type="button" id="diagonal">Poner a 45°</button>
+          <button type="button" id="diagonal" title="Colocar las boyas a 45° y 135°">Poner a 45°</button>
         </div>
       </div>
       <div class="control">
@@ -91,7 +94,7 @@
       </article>
       <article>
         <h3>¿Qué cambia al girar?</h3>
-        <p>Con las boyas a la misma distancia, un giro de 90° intercambia los tiempos. A 45° empatan, igual que en agua en calma. Si una boya está más lejos, la diferencia de tiempos también depende de la longitud de los recorridos.</p>
+        <p>Con las boyas a la misma distancia y los recorridos perpendiculares, un giro de 90° intercambia los tiempos. Si A está a 45° y B a 135°, empatan. En agua en calma, el tiempo depende solo de la distancia a la boya.</p>
         <p>Las boyas hacen de espejos y los recorridos hacen de brazos del interferómetro. El río representa el hipotético viento de éter. Si la luz se comportara así, al girar se desplazarían las franjas. El experimento encontró un corrimiento mucho menor que el previsto.</p>
       </article>
     </div>
