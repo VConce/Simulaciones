@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nadadores en el río · VConce</title>
+  <meta name="description" content="Compara dos recorridos perpendiculares en un río con corriente y descubre la analogía con Michelson y Morley.">
+  <link rel="icon" type="image/png" href="../../shared/vconce-fisica.png">
+  <link rel="stylesheet" href="../../shared/marca-fisica.css">
+  <link rel="stylesheet" href="../../shared/katex/katex.min.css">
+  <link rel="stylesheet" href="nadadores-rio.css">
+  <script defer src="../../shared/katex/katex.min.js"></script>
+  <script defer src="formulas.js"></script>
+  <script defer src="nadadores-rio.js"></script>
+</head>
+<body>
+<main>
+  <header class="top">
+    <a class="marca-fisica" href="https://www.vconce.com/simulaciones/f%C3%ADsica" aria-label="Volver a las simulaciones de Física de VConce"><img src="../../electromagnetism/assets/electric/vconce.png" alt="VConce" width="38" height="38"></a>
+    <h1>Nadadores en el río</h1>
+    <a class="button" href="michelson_morley.html">Volver a Michelson y Morley</a>
+  </header>
+
+  <div class="experiment">
+    <section class="water-panel" aria-label="Carrera en el río">
+      <div class="river" id="river">
+        <span class="flow" id="flow">Corriente →</span>
+        <div class="course" id="course" aria-hidden="true">
+          <span class="lane lane-a"></span>
+          <span class="lane lane-b"></span>
+          <span class="start-marker"></span>
+          <span class="buoy buoy-a"><img src="rio-boya.webp" alt="">A</span>
+          <span class="buoy buoy-b"><img src="rio-boya.webp" alt="">B</span>
+          <span class="swimmer swimmer-a"><img src="rio-nadador-a.webp" alt=""></span>
+          <span class="swimmer swimmer-b"><img src="rio-nadador-b.webp" alt=""></span>
+        </div>
+      </div>
+      <dl class="timers">
+        <div><dt><span class="mark a" aria-hidden="true">A</span> Nadador A</dt><dd><output id="timeA" aria-live="off">0.00 s</output><small id="phaseA">En la salida</small></dd></div>
+        <div><dt><span class="mark b" aria-hidden="true">B</span> Nadadora B</dt><dd><output id="timeB" aria-live="off">0.00 s</output><small id="phaseB">En la salida</small></dd></div>
+        <div><dt>Diferencia final</dt><dd><output id="difference">—</output><small id="result" role="status">Ida y vuelta</small></dd></div>
+      </dl>
+    </section>
+
+    <aside class="controls" aria-label="Controles de la carrera">
+      <div class="actions">
+        <button id="play" type="button" class="primary">Iniciar</button>
+        <button id="reset" type="button">Reiniciar</button>
+      </div>
+      <div class="control">
+        <label for="current">Velocidad de la corriente <output id="currentOut" for="current">1.4 m/s</output></label>
+        <input type="range" id="current" min="0" max="2.1" step="0.1" value="1.4">
+        <span class="hint">Ambos nadan a 2.4 m/s respecto al agua.</span>
+      </div>
+      <div class="control">
+        <label for="angle">Orientación del recorrido A <output id="angleOut" for="angle">0°</output></label>
+        <input type="range" id="angle" min="0" max="359" step="1" value="0">
+        <div class="actions">
+          <button type="button" id="turn">Girar 90°</button>
+          <button type="button" id="diagonal">Poner a 45°</button>
+        </div>
+      </div>
+      <div class="control">
+        <label for="distance">Distancia a cada boya <output id="distanceOut" for="distance">12 m</output></label>
+        <input type="range" id="distance" min="5" max="20" step="1" value="12">
+      </div>
+      <div class="control">
+        <label for="pace">Velocidad de reproducción</label>
+        <select id="pace">
+          <option value=".5">0.5×</option>
+          <option value="1">1×</option>
+          <option value="2" selected>2×</option>
+          <option value="4">4×</option>
+        </select>
+      </div>
+      <p class="hint">Los dos salen del mismo punto, tocan su boya y vuelven. Si cambias la corriente, la orientación o la distancia, la carrera vuelve a la salida.</p>
+    </aside>
+  </div>
+
+  <section class="reading" aria-labelledby="reading-title">
+    <h2 id="reading-title">Del río al interferómetro</h2>
+    <div class="reading-columns">
+      <article>
+        <h3>A favor y en contra</h3>
+        <p>En el recorrido paralelo, la corriente ayuda en un tramo y frena en el otro. Para la misma distancia, el tramo en contra añade más tiempo del que se ahorra en el tramo a favor. Aquí <i>L</i> es la distancia a la boya, <i>v</i> la rapidez al nadar respecto al agua y <i>u</i> la rapidez de la corriente.</p>
+        <div data-tex>t_{\parallel}=\frac{L}{v+u}+\frac{L}{v-u}</div>
+      </article>
+      <article>
+        <h3>Cruzando la corriente</h3>
+        <p>Para llegar a una boya situada justo enfrente, el nadador apunta un poco río arriba. Así compensa la deriva y le queda una componente transversal menor que su rapidez respecto al agua.</p>
+        <div data-tex>t_{\perp}=\frac{2L}{\sqrt{v^2-u^2}}</div>
+      </article>
+      <article>
+        <h3>¿Qué cambia al girar?</h3>
+        <p>Gira 90° y los nadadores intercambian sus tiempos. A 45°, los recorridos son simétricos y empatan. Sin corriente, cualquier orientación da el mismo tiempo.</p>
+        <p>Las boyas hacen de espejos y los recorridos hacen de brazos del interferómetro. El río representa el hipotético viento de éter. Si la luz se comportara así, al girar se desplazarían las franjas. El experimento encontró un corrimiento mucho menor que el previsto.</p>
+      </article>
+    </div>
+  </section>
+</main>
+</body>
+</html>
