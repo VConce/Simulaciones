@@ -31,9 +31,10 @@ main { max-width: 1440px; margin: auto; padding: 10px 16px 26px; }
   position: absolute; inset: 0 calc(-1 * var(--water-tile)) 0 0;
   background: url('rio-corriente.webp') repeat-x 0 50% / var(--water-tile) 100%;
 }
-.flow, .buoy-hint { position: absolute; z-index: 3; left: 12px; padding: 5px 10px; border-radius: 6px; background: #102d38ed; color: white; font-size: .875rem; font-weight: 700; pointer-events: none; }
-.flow { top: 12px; }
-.buoy-hint { bottom: 12px; }
+.flow, .buoy-hint, .right-angle { position: absolute; z-index: 3; padding: 5px 10px; border-radius: 6px; background: #102d38ed; color: white; font-size: .875rem; font-weight: 700; pointer-events: none; }
+.flow { top: 12px; left: 12px; }
+.buoy-hint { bottom: 12px; left: 12px; }
+.right-angle { top: 12px; right: 12px; color: var(--lane-a); }
 .visually-hidden { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .course { position: absolute; inset: 0; }
 .lane, .start-marker, .buoy, .swimmer { position: absolute; top: 50%; left: 50%; }

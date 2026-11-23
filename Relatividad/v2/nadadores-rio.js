@@ -4,6 +4,13 @@ const swimSpeed = 2.4;
 const radians = Math.PI / 180;
 const wrapAngle = degrees => (degrees % 360 + 360) % 360;
 
+function snapPerpendicular(degrees, otherDegrees, snapped) {
+  const relative = wrapAngle(degrees - otherDegrees);
+  const nearest = relative < 180 ? 90 : 270;
+  const tolerance = snapped ? 11 : 7;
+  return Math.abs(relative - nearest) <= tolerance ? wrapAngle(otherDegrees + nearest) : null;
+}
+
 function swimRoute(angle, current, distance) {
   const x = Math.cos(angle);
   const y = Math.sin(angle);
@@ -120,6 +127,7 @@ function reset() {
   });
   duration = Math.max(...routes.map(route => route.total));
   byId("angleOut").textContent = `${angle.value}°`;
+  byId("rightAngle").hidden = offsetB !== 90 && offsetB !== 270;
   layoutCourse();
 }
 
@@ -157,7 +165,8 @@ swimmers.forEach(({ buoy }, index) => {
     drag = {
       id: event.pointerId,
       offsetX: event.clientX - rect.left - rect.width / 2,
-      offsetY: event.clientY - rect.top - rect.height / 2
+      offsetY: event.clientY - rect.top - rect.height / 2,
+      snapped: false
     };
     buoy.setPointerCapture(event.pointerId);
     buoy.classList.add("dragging");
@@ -169,7 +178,13 @@ swimmers.forEach(({ buoy }, index) => {
     const x = event.clientX - rect.left - rect.width / 2 - drag.offsetX;
     const y = event.clientY - rect.top - rect.height / 2 - drag.offsetY;
     const radius = maxCourseRadius();
-    if (radius > 0) moveBuoy(index, Math.hypot(x, y) / radius * Number(distances[index].max), Math.atan2(y, x) / radians);
+    if (radius <= 0) return;
+    const degrees = Math.atan2(y, x) / radians;
+    const otherDegrees = Number(angle.value) + (1 - index) * offsetB;
+    const snapped = snapPerpendicular(degrees, otherDegrees, drag.snapped);
+    drag.snapped = snapped !== null;
+    const meters = Math.hypot(x, y) / radius * Number(distances[index].max);
+    moveBuoy(index, meters, snapped ?? degrees);
   });
 
   buoy.addEventListener("lostpointercapture", () => {
