@@ -23,9 +23,9 @@ main { max-width: 1440px; margin: auto; padding: 10px 16px 26px; }
 .water-panel { overflow: hidden; }
 .river { position: relative; height: clamp(350px, 52vh, 520px); overflow: hidden; background: #184d55 url('rio-fondo.webp') center / 100% 100%; }
 .flow { position: absolute; z-index: 2; top: 12px; left: 12px; padding: 5px 10px; border-radius: 6px; background: #102d38ed; color: white; font-size: .875rem; font-weight: 700; }
-.course { position: absolute; inset: 0; --radius: 0px; }
+.course { position: absolute; inset: 0; }
 .lane, .start-marker, .buoy, .swimmer { position: absolute; top: 50%; left: 50%; }
-.lane { width: var(--radius); border-top: 2px dashed var(--lane-color); transform-origin: left center; transform: rotate(var(--angle)); filter: drop-shadow(0 1px 1px #102532); }
+.lane { width: var(--radius, 0px); border-top: 2px dashed var(--lane-color); transform-origin: left center; transform: rotate(var(--angle)); filter: drop-shadow(0 1px 1px #102532); }
 .lane-a, .buoy-a { --lane-color: var(--lane-a); }
 .lane-b, .buoy-b { --lane-color: var(--lane-b); }
 .start-marker { width: 12px; height: 12px; border: 2px solid #132e38; border-radius: 50%; background: white; transform: translate(-50%, -50%); }
@@ -35,9 +35,11 @@ main { max-width: 1440px; margin: auto; padding: 10px 16px 26px; }
 .buoy img { left: 0; }
 .buoy.touched img { filter: drop-shadow(0 0 7px var(--lane-color)); }
 .swimmer { z-index: 2; }
+.swimmer-a { --hand-y: -56%; }
+.swimmer-b { --hand-y: -60%; }
 .swimmer img {
-  position: absolute; width: clamp(39px, 7vw, 79px); height: auto; top: 0; left: 0;
-  transform: rotate(var(--heading)) translate(-70%, -50%); transform-origin: 0 0;
+  position: absolute; width: clamp(28px, 5vw, 52px); height: auto; top: 0; left: 0;
+  transform: rotate(var(--heading)) translate(-100%, var(--hand-y)); transform-origin: 0 0;
   filter: drop-shadow(0 1px 2px #062b36a6);
 }
 
@@ -60,7 +62,7 @@ main { max-width: 1440px; margin: auto; padding: 10px 16px 26px; }
 .control label { display: flex; align-items: baseline; justify-content: space-between; gap: 5px; font-weight: 650; font-size: .925rem; }
 .control output { font-variant-numeric: tabular-nums; color: var(--primary); white-space: nowrap; }
 input[type=range] { width: 100%; margin: 0; min-height: 22px; accent-color: var(--primary); }
-.button, button, select {
+.button, button {
   min-height: 39px; padding: 7px 11px; border: 1px solid #9fbbc7; border-radius: 7px;
   background: white; color: var(--ink); font: 650 .875rem/1.3 system-ui, sans-serif; cursor: pointer;
 }

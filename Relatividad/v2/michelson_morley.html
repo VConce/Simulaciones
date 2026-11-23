@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" href="../../shared/vconce-fisica.png">
   <link rel="stylesheet" href="../../shared/marca-fisica.css">
   <link rel="stylesheet" href="../../shared/katex/katex.min.css">
-  <link rel="stylesheet" href="michelson-morley.css?v=rio">
+  <link rel="stylesheet" href="michelson-morley.css?v=laboratorio">
   <script defer src="../../shared/katex/katex.min.js"></script>
   <script defer src="formulas.js"></script>
   <script defer src="michelson-morley.js?v=predicciones"></script>
@@ -21,52 +21,36 @@
     <a class="river-link" href="nadadores_rio.html">Nadadores en el río</a>
   </header>
   <div class="workbench">
-    <section class="predictions" aria-labelledby="predictionTitle">
-      <h2 id="predictionTitle">Predicciones al girar</h2>
-      <figure class="prediction prediction-ether">
-        <figcaption>Con éter</figcaption>
-        <canvas id="etherFringes" width="600" height="48" role="img" aria-label="Franjas previstas con éter"></canvas>
-      </figure>
-      <figure class="prediction prediction-isotropic">
-        <figcaption>Sin éter</figcaption>
-        <canvas id="isotropicFringes" width="600" height="48" role="img" aria-label="Franjas previstas sin éter"></canvas>
-      </figure>
-      <p>Parten alineadas a 0°. Al girar la rueda, el viento de éter desplaza la verde. La azul se queda fija, como en el experimento.</p>
-    </section>
-    <section class="emission" aria-label="Emisión y llegadas de fotones">
-      <div class="emission-controls">
-        <button type="button" id="stop">Detener</button>
-        <button type="button" id="single">Lanzar un fotón</button>
-        <button type="button" id="stream" aria-pressed="true">Chorro continuo</button>
-      </div>
-      <div class="control detector-rate">
-        <label for="detectorRate">Llegadas del chorro <output id="detectorRateOut" for="detectorRate">1 fotón/s</output></label>
-        <input type="range" id="detectorRate" min="1" max="100" step="1" value="1">
-      </div>
-    </section>
     <section class="experiment" aria-label="Interferómetro">
-      <figure>
-        <div class="lab-view">
-          <img class="workshop" src="michelson-taller.webp" alt="Michelson y Morley manejan el instrumento mientras Einstein, con la mano en la barbilla, observa la escena." fetchpriority="high">
-          <div class="fog" id="fog" hidden></div>
-          <canvas id="apparatus" width="640" height="640" role="img" aria-label="Vista cenital de la mesa giratoria, con divisor de haz, dos espejos, fuente y detector. Arrastra la rueda o los espejos."></canvas>
-          <div class="model-label" id="modelLabel">En el laboratorio · luz isotrópica</div>
-          <span class="wind" id="wind" hidden>← Viento de éter</span>
-          <span class="person name-michelson">Michelson</span>
-          <span class="person name-morley">Morley</span>
-          <span class="person name-einstein">Einstein</span>
-        </div>
-        <figcaption><span>Arrastra el borde de la rueda para girarla. Arrastra A o B para cambiar la longitud del brazo.</span><span>El dibujo representa los recorridos ópticos sin plegarlos.</span></figcaption>
-      </figure>
+      <div class="lab-view">
+        <img class="workshop" src="michelson-taller.webp" alt="Michelson y Morley manejan el instrumento mientras Einstein, con la mano en la barbilla, observa la escena." fetchpriority="high">
+        <div class="fog" id="fog" hidden></div>
+        <canvas id="apparatus" width="640" height="640" role="img" aria-label="Vista cenital de la mesa giratoria, con divisor de haz, dos espejos, fuente y detector. Arrastra la rueda o los espejos."></canvas>
+        <div class="model-label" id="modelLabel">En el laboratorio · luz isotrópica</div>
+        <span class="wind" id="wind" hidden>← Viento de éter</span>
+        <span class="person name-michelson">Michelson</span>
+        <span class="person name-morley">Morley</span>
+        <span class="person name-einstein">Einstein</span>
+      </div>
+      <section class="predictions" aria-labelledby="predictionTitle">
+        <h2 id="predictionTitle">Franjas previstas al girar</h2>
+        <figure class="prediction prediction-ether">
+          <figcaption>Con éter</figcaption>
+          <canvas id="etherFringes" width="600" height="48" role="img" aria-label="Franjas previstas con éter"></canvas>
+        </figure>
+        <figure class="prediction prediction-isotropic">
+          <figcaption>Sin éter</figcaption>
+          <canvas id="isotropicFringes" width="600" height="48" role="img" aria-label="Franjas previstas sin éter"></canvas>
+        </figure>
+      </section>
       <div class="measurement">
         <section class="detector" aria-labelledby="fringeTitle">
           <div class="detector-bar">
-            <h2 id="fringeTitle">Franjas en el detector</h2>
+            <h2 id="fringeTitle">Impactos en el detector</h2>
             <button type="button" id="clearHits">Borrar puntos</button>
           </div>
           <canvas id="fringes" width="600" height="90" role="img" aria-label="Puntos de impacto de los fotones en el detector"></canvas>
           <output id="hitCount" aria-live="off"></output>
-          <p>Si cambias el montaje, borra los puntos para empezar otra medida.</p>
         </section>
         <dl class="readouts">
           <div><dt><span class="dot arm-a"></span>Ida y vuelta A</dt><dd id="timeA">—</dd></div>
@@ -77,47 +61,61 @@
       </div>
     </section>
 
-    <aside class="controls" aria-label="Controles del interferómetro">
-      <div class="model-actions">
-        <button type="button" id="ether" aria-pressed="false">Éter</button>
-        <button type="button" id="slow" aria-pressed="false">Ralentizar fotones</button>
-      </div>
-      <div class="control">
-        <label for="angle">Orientación del instrumento <output id="angleOut" for="angle"></output></label>
-        <input type="range" id="angle" min="0" max="359" step="1" value="0">
-        <div class="turn-controls">
-          <button type="button" data-turn="-15" aria-label="Girar quince grados en sentido antihorario">−15°</button>
-          <button type="button" data-turn="15" aria-label="Girar quince grados en sentido horario">+15°</button>
-          <button type="button" data-turn="90" aria-label="Girar noventa grados">+90°</button>
+    <aside class="sidebar" aria-label="Controles del interferómetro">
+      <section class="emission" aria-label="Emisión y llegadas de fotones">
+        <div class="emission-controls">
+          <button type="button" id="stop">Detener</button>
+          <button type="button" id="single">Lanzar un fotón</button>
+          <button type="button" id="stream" aria-pressed="true">Chorro continuo</button>
         </div>
+        <div class="control detector-rate">
+          <label for="detectorRate">Llegadas del chorro <output id="detectorRateOut" for="detectorRate">1 fotón/s</output></label>
+          <input type="range" id="detectorRate" min="1" max="100" step="1" value="1">
+        </div>
+      </section>
+      <div class="controls">
+        <div class="model-actions">
+          <button type="button" id="ether" aria-pressed="false">Éter</button>
+          <button type="button" id="slow" aria-pressed="false">Ralentizar fotones</button>
+        </div>
+        <div class="control">
+          <label for="angle">Orientación del instrumento <output id="angleOut" for="angle"></output></label>
+          <input type="range" id="angle" min="0" max="359" step="1" value="0">
+          <div class="turn-controls">
+            <button type="button" data-turn="-15" aria-label="Girar quince grados en sentido antihorario">−15°</button>
+            <button type="button" data-turn="15" aria-label="Girar quince grados en sentido horario">+15°</button>
+            <button type="button" data-turn="90" aria-label="Girar noventa grados">+90°</button>
+          </div>
+        </div>
+        <div class="control arm-input">
+          <label for="armA"><span><i class="dot arm-a"></i>Espejo A</span><output id="armAOut" for="armA"></output></label>
+          <input type="range" id="armA" min="2" max="15" step="0.1" value="11">
+        </div>
+        <div class="control arm-input">
+          <label for="armB"><span><i class="dot arm-b"></i>Espejo B</span><output id="armBOut" for="armB"></output></label>
+          <input type="range" id="armB" min="2" max="15" step="0.1" value="11">
+        </div>
+        <button type="button" id="equal">Igualar los brazos</button>
+        <div class="control">
+          <label for="speed">Velocidad respecto al éter <output id="speedOut" for="speed"></output></label>
+          <input type="range" id="speed" min="0" max="60" step="1" value="30">
+        </div>
+        <div class="control">
+          <label for="wavelength">Longitud de onda <output id="lambdaOut" for="wavelength"></output></label>
+          <input type="range" id="wavelength" min="450" max="680" step="1" value="550">
+        </div>
+        <div class="play-controls">
+          <button type="button" id="play">Pausar</button>
+          <button type="button" id="reset">Restablecer</button>
+        </div>
+        <p class="small-note">La ralentización solo afecta al dibujo. Los tiempos y el corrimiento se calculan con la velocidad de la luz.</p>
       </div>
-      <div class="control arm-input">
-        <label for="armA"><span><i class="dot arm-a"></i>Espejo A</span><output id="armAOut" for="armA"></output></label>
-        <input type="range" id="armA" min="2" max="15" step="0.1" value="11">
-      </div>
-      <div class="control arm-input">
-        <label for="armB"><span><i class="dot arm-b"></i>Espejo B</span><output id="armBOut" for="armB"></output></label>
-        <input type="range" id="armB" min="2" max="15" step="0.1" value="11">
-      </div>
-      <button type="button" id="equal">Igualar los brazos</button>
-      <div class="control">
-        <label for="speed">Velocidad respecto al éter <output id="speedOut" for="speed"></output></label>
-        <input type="range" id="speed" min="0" max="60" step="1" value="30">
-      </div>
-      <div class="control">
-        <label for="wavelength">Longitud de onda <output id="lambdaOut" for="wavelength"></output></label>
-        <input type="range" id="wavelength" min="450" max="680" step="1" value="550">
-      </div>
-      <div class="play-controls">
-        <button type="button" id="play">Pausar</button>
-        <button type="button" id="reset">Restablecer</button>
-      </div>
-      <p class="small-note">La ralentización solo afecta al dibujo. Los tiempos y el corrimiento se calculan con la velocidad de la luz.</p>
     </aside>
   </div>
 
   <section class="reading">
     <h2>¿Qué esperaban ver al girar la mesa?</h2>
+    <p>Arrastra el borde de la rueda para girarla y los espejos A y B para cambiar la longitud de los brazos. Usa «Borrar puntos» para empezar otra medida después de cambiar el montaje.</p>
     <div class="reading-columns">
       <article>
         <h3>Dos recorridos, un patrón</h3>
@@ -128,6 +126,7 @@
       <article>
         <h3>La predicción del éter clásico</h3>
         <p>En este modelo histórico el montaje se mueve a velocidad <i>v</i> respecto al supuesto éter. Con brazos iguales, el viaje de ida y vuelta dura más en el brazo paralelo al viento que en el perpendicular. Un giro de 90° intercambia sus papeles.</p>
+        <p>Las dos predicciones parten alineadas a 0°. Al girar la rueda, el viento de éter desplaza la franja verde. La azul se queda fija, como en el experimento.</p>
         <div data-tex>t_{\parallel}=\frac{2L}{c(1-\beta^2)},\quad t_{\perp}=\frac{2L}{c\sqrt{1-\beta^2}},\quad \beta=\frac{v}{c}</div>
         <p>Con 11 m por brazo, 30 km/s y 550 nm, el desplazamiento previsto entre 0° y 90° es de unas 0.40 franjas.</p>
       </article>

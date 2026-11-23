@@ -8,10 +8,10 @@
   <link rel="icon" type="image/png" href="../../shared/vconce-fisica.png">
   <link rel="stylesheet" href="../../shared/marca-fisica.css">
   <link rel="stylesheet" href="../../shared/katex/katex.min.css">
-  <link rel="stylesheet" href="nadadores-rio.css">
+  <link rel="stylesheet" href="nadadores-rio.css?v=distancias">
   <script defer src="../../shared/katex/katex.min.js"></script>
   <script defer src="formulas.js"></script>
-  <script defer src="nadadores-rio.js"></script>
+  <script defer src="nadadores-rio.js?v=distancias"></script>
 </head>
 <body>
 <main>
@@ -61,17 +61,16 @@
         </div>
       </div>
       <div class="control">
-        <label for="distance">Distancia a cada boya <output id="distanceOut" for="distance">12 m</output></label>
-        <input type="range" id="distance" min="5" max="20" step="1" value="12">
+        <label for="distanceA"><span>Distancia a la boya <span class="mark a">A</span></span> <output id="distanceAOut" for="distanceA">12 m</output></label>
+        <input type="range" id="distanceA" min="5" max="20" step="1" value="12">
       </div>
       <div class="control">
-        <label for="pace">Velocidad de reproducción</label>
-        <select id="pace">
-          <option value=".5">0.5×</option>
-          <option value="1">1×</option>
-          <option value="2" selected>2×</option>
-          <option value="4">4×</option>
-        </select>
+        <label for="distanceB"><span>Distancia a la boya <span class="mark b">B</span></span> <output id="distanceBOut" for="distanceB">12 m</output></label>
+        <input type="range" id="distanceB" min="5" max="20" step="1" value="12">
+      </div>
+      <div class="control">
+        <label for="pace">Velocidad de reproducción <output id="paceOut" for="pace">2×</output></label>
+        <input type="range" id="pace" min="1" max="10" step="1" value="2">
       </div>
       <p class="hint">Los dos salen del mismo punto, tocan su boya y vuelven. Si cambias la corriente, la orientación o la distancia, la carrera vuelve a la salida.</p>
     </aside>
@@ -92,7 +91,7 @@
       </article>
       <article>
         <h3>¿Qué cambia al girar?</h3>
-        <p>Gira 90° y los nadadores intercambian sus tiempos. A 45°, los recorridos son simétricos y empatan. Sin corriente, cualquier orientación da el mismo tiempo.</p>
+        <p>Con las boyas a la misma distancia, un giro de 90° intercambia los tiempos. A 45° empatan, igual que en agua en calma. Si una boya está más lejos, la diferencia de tiempos también depende de la longitud de los recorridos.</p>
         <p>Las boyas hacen de espejos y los recorridos hacen de brazos del interferómetro. El río representa el hipotético viento de éter. Si la luz se comportara así, al girar se desplazarían las franjas. El experimento encontró un corrimiento mucho menor que el previsto.</p>
       </article>
     </div>

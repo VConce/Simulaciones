@@ -24,7 +24,7 @@ const byId = id => document.getElementById(id);
 const play = byId("play");
 const current = byId("current");
 const angle = byId("angle");
-const distance = byId("distance");
+const distances = [byId("distanceA"), byId("distanceB")];
 const pace = byId("pace");
 const course = byId("course");
 const result = byId("result");
@@ -41,7 +41,7 @@ const swimmers = ["A", "B"].map(letter => ({
 let elapsed = 0;
 let routes;
 let duration;
-let radius;
+let radii;
 let frame = null;
 let lastStamp = null;
 
@@ -60,9 +60,8 @@ function draw() {
       ? (route.total - clock) / (route.total - route.outTime)
       : clock / route.outTime;
     const stroke = frame === null || done ? 0 : Math.sin(clock * 7) * .07;
-    const separation = (index === 0 ? -9 : 9) * Math.max(0, 1 - progress * 7);
-
-    position(sprite, radius * progress * route.x, radius * progress * route.y + separation);
+    const radius = radii[index];
+    position(sprite, radius * progress * route.x, radius * progress * route.y);
     sprite.style.setProperty("--heading", `${(returning ? route.backHeading : route.outHeading) + stroke}rad`);
     buoy.classList.toggle("touched", returning);
     time.textContent = `${clock.toFixed(2)} s`;
@@ -73,10 +72,12 @@ function draw() {
 }
 
 function layoutCourse() {
-  radius = (Math.min(course.clientWidth, course.clientHeight) / 2 - 57) * Number(distance.value) / Number(distance.max);
-  course.style.setProperty("--radius", `${radius}px`);
+  const maxRadius = Math.max(0, Math.min(course.clientWidth, course.clientHeight) / 2 - 57);
+  radii = distances.map(input => maxRadius * Number(input.value) / Number(input.max));
   swimmers.forEach(({ lane, buoy }, index) => {
     const route = routes[index];
+    const radius = radii[index];
+    lane.style.setProperty("--radius", `${radius}px`);
     lane.style.setProperty("--angle", `${route.angle}rad`);
     position(buoy, radius * route.x, radius * route.y);
   });
@@ -97,12 +98,14 @@ function reset() {
   result.textContent = "Ida y vuelta";
   const water = Number(current.value);
   const direction = Number(angle.value) * Math.PI / 180;
-  const length = Number(distance.value);
-  routes = [swimRoute(direction, water, length), swimRoute(direction + Math.PI / 2, water, length)];
+  routes = distances.map((input, index) => {
+    const length = Number(input.value);
+    byId(`${input.id}Out`).textContent = `${length} m`;
+    return swimRoute(direction + index * Math.PI / 2, water, length);
+  });
   duration = Math.max(...routes.map(route => route.total));
   byId("currentOut").textContent = `${water.toFixed(1)} m/s`;
   byId("angleOut").textContent = `${angle.value}°`;
-  byId("distanceOut").textContent = `${length} m`;
   byId("flow").textContent = water === 0 ? "Agua en calma" : "Corriente →";
   layoutCourse();
 }
@@ -133,7 +136,10 @@ play.addEventListener("click", () => {
   frame = requestAnimationFrame(tick);
 });
 
-[current, angle, distance].forEach(input => input.addEventListener("input", reset));
+[current, angle, ...distances].forEach(input => input.addEventListener("input", reset));
+pace.addEventListener("input", () => {
+  byId("paceOut").textContent = `${pace.value}×`;
+});
 byId("reset").addEventListener("click", reset);
 byId("turn").addEventListener("click", () => {
   angle.value = (Number(angle.value) + 90) % 360;
