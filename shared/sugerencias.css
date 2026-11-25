@@ -59,6 +59,7 @@
 .vconce-suggestions--corner.vconce-suggestions--wide-logo { left: 88px; top: 27px; }
 
 html.vconce-suggestions-clearance body > header { padding-left: max(145px, env(safe-area-inset-left)) !important; }
+html.vconce-suggestions-clearance-wide body > header { padding-left: max(162px, env(safe-area-inset-left)) !important; }
 
 @media (max-width: 700px) {
   .vconce-suggestions.vconce-suggestions { width: 58px; }
