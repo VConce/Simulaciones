@@ -285,17 +285,14 @@ function gravitySurface3D() {
   for (const { o, p } of drawn) {
     const radius = o.type === 'blackhole' ? horizonRadius(o) : o.radius;
     const size = Math.max(12, Math.min(2 * Math.max(W, H), radius * 2 * p.s));
+    let labelOffset = size / 2;
     if (o.type === 'blackhole') {
       drawBlackHoleSprite(p, size);
       traceHorizon(o, project, p);
     } else {
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(drawAngle(o));
-      ctx.drawImage(getSprite(o), -size / 2, -size / 2, size, size);
-      ctx.restore();
+      labelOffset = paintGravityBody(o, p, size);
     }
-    if (ui.labels.checked) gravityLabel(o.name, p.x, p.y + 13 + size * 0.55);
+    if (ui.labels.checked) gravityLabel(o.name, p.x, p.y + 14 + labelOffset);
   }
   paintRecordedCaptures(project);
 }

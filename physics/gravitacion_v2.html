@@ -28,17 +28,27 @@ canvas{display:block;width:100%;height:100%;touch-action:none}.toolsCanvas{posit
 .horizon-examples button{flex:1;padding:6px;font-size:.75rem}
 #blackHoleControls select{width:100%;font-size:.8rem;margin-top:5px}
 #blackHoleControls strong{font-size:.8rem}
+.planet-picker{display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:3px 7px;align-items:center;margin-top:8px}
+.planet-picker[hidden]{display:none}.planet-picker label{font-size:.8rem;font-weight:750}
+.planet-picker select,#backgroundPlanet{max-width:100%;min-width:0;width:100%;padding:5px;font-size:.8rem}
+.planet-picker img{grid-column:2;grid-row:1 / 3;width:48px;height:44px;object-fit:contain;border-radius:6px;background:#0b1322}
+.context-planet{display:grid;gap:4px;margin:4px 0 8px;font-size:.8rem}
 .theory .katex-display{font-size:.9rem;overflow-x:auto}
 @media(max-width:760px){#horizonStatus{bottom:123px}}
 </style>
 <script defer src="assets/gravity-model.js"></script>
+<script defer src="assets/gravity-planets.js"></script>
 <script defer src="assets/gravity-horizons.js"></script>
 </head>
 <body><a class="marca-fisica vconceLogo" href="https://www.vconce.com/simulaciones/f%C3%ADsica" aria-label="Volver a las simulaciones de Física de VConce"><img src="../electromagnetism/assets/electric/vconce.png" alt="VConce"></a><a class="vconce-suggestions vconce-suggestions--corner vconce-suggestions--movable" href="https://docs.google.com/forms/d/e/1FAIpQLSfc_37sXLS0Gs1n4gbuyYWUXV7bdKnVrztUn_QZqpYvwVcIVA/viewform?usp=pp_url&amp;entry.907903432=Laboratorio+de+gravitaci%C3%B3n" target="_blank" rel="noopener noreferrer" aria-label="Sugerencias sobre Laboratorio de gravitación (abre en otra pestaña)" title="Sugerencias"><img src="../shared/sobre-sugerencias.webp" alt="" width="196" height="97"></a>
 <header><div><h1>Gravitaci&oacute;n</h1><p class="sub">Laboratorio educativo de estrellas, planetas, agujeros negros, meteoritos y naves.</p></div><a class="back" href="./">Volver a Physics</a></header>
 <div class="layout theoryClosed" id="layout">
 <aside class="side">
-<div class="title">Objetos</div><div class="tools" id="toolGrid"></div><button id="addCenter" class="primary" style="width:100%;margin-top:10px">A&ntilde;adir seleccionado</button>
+<div class="title">Objetos</div><div class="tools" id="toolGrid"></div>
+<div class="planet-picker" id="planetPicker" hidden>
+<label for="planetToAdd">Planeta o satélite</label><select id="planetToAdd"></select><img id="planetPreview" alt="">
+</div>
+<button id="addCenter" class="primary" style="width:100%;margin-top:10px">A&ntilde;adir seleccionado</button>
 
 <section class="horizon-examples" aria-labelledby="exampleTitle">
 <div class="title" id="exampleTitle">Cerca de un agujero negro</div>
@@ -86,7 +96,7 @@ const G_SI=6.67430e-11, LENGTH_UNIT=149597870700/290;
 const TIME_UNIT=Math.sqrt(G*LENGTH_UNIT**3/(G_SI*EARTH)), SOFTENING=4;
 let elapsed=0;
 let seq=1;
-const st={tool:'star',objs:[],view3:false,view:{zoom:1,cx:W/2,cy:H/2,yaw:-.58,pitch:.78,panX:0,panY:54},drag:null,camDrag:null,active:null,last:performance.now(),sprites:{},stars:[]};
+const st={tool:'star',planetPreset:'earth',objs:[],view3:false,view:{zoom:1,cx:W/2,cy:H/2,yaw:-.58,pitch:.78,panX:0,panY:54},drag:null,camDrag:null,active:null,last:performance.now(),sprites:{},stars:[]};
 const $=id=>document.getElementById(id);
 const ui={grid:$('toolGrid'),dynamic:$('dynamic'),power:$('power'),time:$('time'),launch:$('launch'),curv:$('curv'),powerOut:$('powerOut'),timeOut:$('timeOut'),launchOut:$('launchOut'),curvOut:$('curvOut'),field:$('showField'),trails:$('showTrails'),labels:$('showLabels'),potential:$('showPotential'),list:$('objectList'),rObjects:$('rObjects'),rEnergy:$('rEnergy'),rActive:$('rActive'),rScale:$('rScale')};
 const tools=[['star','Estrella','sun'],['planet','Planeta','earth'],['blackhole','Agujero negro','blackhole'],['small','Meteorito','meteor'],['ship','Nave','ship']];
@@ -96,18 +106,27 @@ const spectralPresets={ob:['O/B azul',18000],a:['A blanca',9000],f:['F amarillo-
 function spectralKey(k){if(k>=10000)return 'ob';if(k>=7500)return 'a';if(k>=6000)return 'f';if(k>=5000)return 'g';if(k>=3500)return 'k';return 'm'}
 function starMassSliderValue(o,u){let v=massVal(o,u);if(u==='solar')return Math.max(.01,Math.min(80,v));if(u==='earth')return Math.max(.1,Math.min(30000,v));return Math.max(1e20,Math.min(1e32,v))}
 function starMassSliderAttrs(u){if(u==='solar')return 'min="0.01" max="80" step="0.01"';if(u==='earth')return 'min="0.1" max="30000" step="0.1"';return 'min="1e20" max="1e32" step="1e20"'}
-const planetP={earth:['Tierra',EARTH,18,'earth'],generic:['Planeta generico',2.5*EARTH,21,'genericPlanet'],mars:['Marte',.107*EARTH,15,'mars'],jupiter:['Jupiter',317.8*EARTH,31,'jupiter'],moon:['Luna',.0123*EARTH,10,'moon'],titan:['Titan',.0225*EARTH,12,'titan'],proximab:['Proxima b',1.27*EARTH,17,'exoplanet'],kepler:['Kepler-22b',9.1*EARTH,25,'kepler']};
 function makeC(n){let c=document.createElement('canvas');c.width=c.height=n;return c}
 function circle(n,stops,spots){let c=makeC(n),g=c.getContext('2d'),r=n/2,gr=g.createRadialGradient(r*.65,r*.55,n*.04,r,r,n*.52);stops.forEach(s=>gr.addColorStop(s[0],s[1]));g.fillStyle=gr;g.beginPath();g.arc(r,r,n*.43,0,7);g.fill();(spots||[]).forEach(p=>{g.fillStyle=p.c;g.globalAlpha=p.a||1;g.beginPath();g.ellipse(r+p.x*n,r+p.y*n,p.rx*n,p.ry*n,p.rot||0,0,7);g.fill();g.globalAlpha=1});return c}
 function sprites(){let s={},c,g,r,gr;s.sun=makeC(128);g=s.sun.getContext('2d');r=64;gr=g.createRadialGradient(r,r,8,r,r,62);gr.addColorStop(0,'#fff9b0');gr.addColorStop(.45,'#fbbf24');gr.addColorStop(.78,'#f97316');gr.addColorStop(1,'rgba(249,115,22,0)');g.fillStyle=gr;g.beginPath();g.arc(r,r,62,0,7);g.fill();for(let i=0;i<90;i++){let a=i*2.399,rr=18+(i%17)*2.3;g.fillStyle='rgba(255,255,180,.22)';g.beginPath();g.arc(r+Math.cos(a)*rr,r+Math.sin(a)*rr,1.2+(i%4)*.35,0,7);g.fill()}
 s.blueStar=circle(128,[[0,'#fff'],[.28,'#c8e7ff'],[.65,'#3b82f6'],[1,'rgba(37,99,235,0)']]);s.whiteStar=circle(128,[[0,'#fff'],[.45,'#f8fafc'],[.75,'#cbd5e1'],[1,'rgba(226,232,240,0)']]);s.redStar=circle(128,[[0,'#fff1d0'],[.35,'#fb923c'],[.72,'#b91c1c'],[1,'rgba(153,27,27,0)']]);
-s.earth=circle(128,[[0,'#d6f7ff'],[.38,'#1d9bf0'],[.72,'#1455a0'],[1,'#071b3d']],[{x:-.12,y:-.05,rx:.12,ry:.06,c:'#38a169',rot:.4},{x:.1,y:.12,rx:.16,ry:.075,c:'#2f855a',rot:-.25},{x:.02,y:-.22,rx:.2,ry:.035,c:'#e8f5ff',a:.8}]);
-s.genericPlanet=circle(128,[[0,'#fff2c4'],[.38,'#d99a45'],[.78,'#8b5a2b'],[1,'#1f130a']],[{x:-.1,y:.04,rx:.25,ry:.025,c:'#f6d365',a:.85},{x:.08,y:-.13,rx:.22,ry:.025,c:'#7c4a1f',a:.4}]);
-s.mars=circle(128,[[0,'#ffd6a8'],[.4,'#d66b32'],[.8,'#7f1d1d'],[1,'#2a0b0b']],[{x:.08,y:.08,rx:.14,ry:.05,c:'#8a2c20',a:.55}]);s.jupiter=circle(128,[[0,'#fff7df'],[.42,'#d7a86e'],[.76,'#8b5e34'],[1,'#2d1609']],[{x:0,y:-.18,rx:.32,ry:.025,c:'#fff1c2',a:.9},{x:0,y:.02,rx:.34,ry:.03,c:'#9a5a32',a:.65},{x:.18,y:.12,rx:.08,ry:.045,c:'#b45309',a:.8}]);
-s.moon=circle(128,[[0,'#f8fafc'],[.5,'#aeb7c4'],[1,'#374151']],[{x:-.08,y:-.1,rx:.05,ry:.05,c:'#6b7280',a:.55},{x:.12,y:.14,rx:.07,ry:.05,c:'#6b7280',a:.45}]);s.titan=circle(128,[[0,'#fff4cf'],[.45,'#d8a648'],[1,'#6b3f12']],[{x:0,y:.02,rx:.32,ry:.035,c:'#f6d365',a:.38}]);s.exoplanet=circle(128,[[0,'#d8ffe5'],[.42,'#16a34a'],[.78,'#166534'],[1,'#052e16']],[{x:.1,y:-.08,rx:.18,ry:.06,c:'#38bdf8',a:.55}]);s.kepler=circle(128,[[0,'#e0e7ff'],[.42,'#7c3aed'],[.78,'#312e81'],[1,'#111827']],[{x:0,y:0,rx:.34,ry:.025,c:'#c4b5fd',a:.55}]);
 s.meteor=makeC(128);g=s.meteor.getContext('2d');g.translate(64,64);g.rotate(-.35);gr=g.createRadialGradient(-12,-14,4,0,0,44);gr.addColorStop(0,'#d6d3d1');gr.addColorStop(.45,'#78716c');gr.addColorStop(1,'#292524');g.fillStyle=gr;g.beginPath();g.moveTo(-42,-16);g.lineTo(-18,-38);g.lineTo(22,-30);g.lineTo(45,-4);g.lineTo(30,31);g.lineTo(-6,42);g.lineTo(-39,18);g.closePath();g.fill();g.fillStyle='rgba(30,30,30,.45)';for(let i=0;i<10;i++){g.beginPath();g.arc(-22+(i*17)%54,-20+(i*29)%48,3+(i%4),0,7);g.fill()}g.setTransform(1,0,0,1,0,0);
 s.ship=makeC(128);g=s.ship.getContext('2d');g.translate(64,64);g.rotate(-Math.PI/2);gr=g.createLinearGradient(-35,0,38,0);gr.addColorStop(0,'#94a3b8');gr.addColorStop(.5,'#f8fafc');gr.addColorStop(1,'#64748b');g.fillStyle=gr;g.beginPath();g.moveTo(44,0);g.lineTo(-28,-22);g.lineTo(-18,0);g.lineTo(-28,22);g.closePath();g.fill();g.fillStyle='#0ea5e9';g.beginPath();g.ellipse(10,0,12,7,0,0,7);g.fill();g.fillStyle='#ef4444';g.fillRect(-31,-18,10,12);g.fillRect(-31,6,10,12);g.setTransform(1,0,0,1,0,0);st.sprites=s}
+function updatePlanetPicker(){
+  $('planetPicker').hidden=st.tool!=='planet';
+  const isPlanet=st.tool==='planet';
+  $('addCenter').textContent=isPlanet?'Añadir '+GravityPlanets.properties(st.planetPreset).name:'Añadir seleccionado';
+  if(isPlanet){
+    const src=GravityPlanets.url(st.planetPreset);
+    $('planetPreview').src=src;
+    ui.grid.querySelector('[data-type="planet"] img').src=src;
+    GravityPlanets.imageFor(st.planetPreset);
+  }
+}
 function initTools(){
+  const picker=$('planetToAdd');
+  GravityPlanets.populate(picker,st.planetPreset);
+  picker.onchange=()=>{st.planetPreset=picker.value;updatePlanetPicker()};
   for(const [type,label,sprite] of tools){
     const button=document.createElement('button');
     button.className='tool';
@@ -116,10 +135,11 @@ function initTools(){
     const active=type===st.tool;
     button.classList.toggle('active',active);
     button.setAttribute('aria-pressed',active);
-    const source=type==='blackhole'?blackHoleSprite.src:st.sprites[sprite].toDataURL('image/png');
+    const source=type==='planet'?GravityPlanets.url(st.planetPreset):type==='blackhole'?blackHoleSprite.src:st.sprites[sprite].toDataURL('image/png');
     button.innerHTML='<img src="'+source+'" alt=""><span>'+label+'</span>';
     button.onclick=()=>{
       st.tool=type;
+      updatePlanetPicker();
       for(const child of ui.grid.children){
         const selected=child===button;
         child.classList.toggle('active',selected);
@@ -137,12 +157,18 @@ function spectralLabel(k){if(k>=10000)return 'O/B azul';if(k>=7500)return 'A bla
 function starSprite(o){let key='custom_'+o.id+'_'+Math.round(o.tempK||5778)+'_'+Math.round(o.stage??1)+'_'+Math.round(o.radius||30);if(st.sprites[key])return st.sprites[key];let c=makeC(128),g=c.getContext('2d'),col=tempColor(o.tempK||5778),r=64,stage=+(o.stage??1),core=44+Math.min(18,stage*4);let gr=g.createRadialGradient(r,r,5,r,r,62);gr.addColorStop(0,'#ffffff');gr.addColorStop(.28,col);gr.addColorStop(.62,col);gr.addColorStop(1,'rgba(255,255,255,0)');g.globalAlpha=.95;g.fillStyle=gr;g.beginPath();g.arc(r,r,62,0,7);g.fill();g.globalAlpha=1;let body=g.createRadialGradient(r*.65,r*.55,4,r,r,core);body.addColorStop(0,'#fff');body.addColorStop(.42,col);body.addColorStop(1,'rgba(80,20,0,.88)');g.fillStyle=body;g.beginPath();g.arc(r,r,core,0,7);g.fill();for(let i=0;i<70;i++){let a=i*2.399,rr=14+(i%18)*2.2;g.fillStyle='rgba(255,255,220,.18)';g.beginPath();g.arc(r+Math.cos(a)*rr,r+Math.sin(a)*rr,1+(i%4)*.35,0,7);g.fill()}st.sprites[key]=c;return c}
 function getSprite(o){return o.type==='star'?starSprite(o):st.sprites[o.sprite]}
 function drawAngle(o){return o.angle||0}
+function paintGravityBody(o,p,diameter){
+  if(o.type==='planet')return GravityPlanets.paint(o,p,diameter);
+  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(drawAngle(o));
+  ctx.drawImage(getSprite(o),-diameter/2,-diameter/2,diameter,diameter);ctx.restore();
+  return diameter/2;
+}
 function mE(o){return o.mass/EARTH}function fmtMass(kg){if(kg>.05*SUN)return (kg/SUN).toPrecision(3)+' masas solares';if(kg>.01*EARTH)return (kg/EARTH).toPrecision(3)+' masas terrestres';return kg.toExponential(2)+' kg'}
-function base(type){if(type==='star'){let p=starP.sun;return{type,name:p[0],mass:p[1],radius:p[2],spin:p[2],sprite:p[3],sub:'sun',tempK:p[4],stage:1,fixed:true}}if(type==='planet'){let n=st.objs.filter(o=>o.type==='planet').length,p=n?planetP.generic:planetP.earth;return{type,name:p[0],mass:p[1],radius:p[2],spin:p[2],sprite:p[3],planet:n?'generic':'earth',fixed:false}}if(type==='blackhole')return{type,name:'Agujero negro',mass:6*SUN,radius:30,spin:30,sprite:'blackhole',fixed:true};if(type==='small')return{type,name:'Meteorito',mass:8e15,radius:12,spin:0,sprite:'meteor',fixed:false};return{type,name:'Nave',mass:2.2e5,radius:16,spin:0,sprite:'ship',fixed:false}}
-function add(type,x,y){let o=Object.assign({id:seq++,x,y,vx:0,vy:0,trail:[],fixedTrail:false,angle:0,alive:true},base(type));st.objs.push(o);st.active=o.id;return o}
+function base(type,planetKey){if(type==='star'){let p=starP.sun;return{type,name:p[0],mass:p[1],radius:p[2],spin:p[2],sprite:p[3],sub:'sun',tempK:p[4],stage:1,fixed:true}}if(type==='planet')return{type,...GravityPlanets.properties(planetKey),fixed:false};if(type==='blackhole')return{type,name:'Agujero negro',mass:6*SUN,radius:30,spin:30,sprite:'blackhole',fixed:true};if(type==='small')return{type,name:'Meteorito',mass:8e15,radius:12,spin:0,sprite:'meteor',fixed:false};return{type,name:'Nave',mass:2.2e5,radius:16,spin:0,sprite:'ship',fixed:false}}
+function add(type,x,y,planetKey=st.planetPreset){let o=Object.assign({id:seq++,x,y,vx:0,vy:0,trail:[],fixedTrail:false,angle:0,alive:true},base(type,planetKey));if(type==='planet')GravityPlanets.imageFor(o.planet);st.objs.push(o);st.active=o.id;return o}
 function setup(compact=false){
   resetCaptures();elapsed=0;st.objs=[];
-  const source=add(compact===true?'blackhole':'star',W/2,H/2),earth=add('planet',W/2+290,H/2);
+  const source=add(compact===true?'blackhole':'star',W/2,H/2),earth=add('planet',W/2+290,H/2,'earth');
   const mu=G*(+ui.power.value)*mE(source);
   earth.vy=-Math.sqrt(mu*290**2/(290**2+SOFTENING**2)**1.5);
   st.active=earth.id;clearTrails();
@@ -184,15 +210,14 @@ function potential(){let step=18,ref=G*(SUN/EARTH)/290;for(let sy=0;sy<H;sy+=ste
 function drawObj(o){
   const p=w2s(o.x,o.y),radius=o.type==='blackhole'?horizonRadius(o):o.radius;
   const size=Math.max(12,Math.min(Math.max(W,H)*2,radius*2*st.view.zoom));
-  if(p.x<-size||p.x>W+size||p.y<-size||p.y>H+size)return;
+  const span=o.planet==='saturn'?size*1.1:size;
+  if(p.x<-span||p.x>W+span||p.y<-span||p.y>H+span)return;
+  let labelOffset=size/2;
   if(o.type==='blackhole'){
     drawBlackHoleSprite(p,size);
     traceHorizon(o,w2s,p);
-  }else{
-    ctx.save();ctx.translate(p.x,p.y);ctx.rotate(drawAngle(o));
-    ctx.drawImage(getSprite(o),-size/2,-size/2,size,size);ctx.restore();
-  }
-  if(ui.labels.checked)gravityLabel(o.name,p.x,p.y+size/2+16);
+  }else labelOffset=paintGravityBody(o,p,size);
+  if(ui.labels.checked)gravityLabel(o.name,p.x,p.y+labelOffset+16);
 }
 function trails(){if(!ui.trails.checked)return;ctx.lineWidth=2.1;for(const o of st.objs){if(o.trail.length<2)continue;ctx.strokeStyle=o.type==='ship'?'rgba(248,250,252,.62)':'rgba(96,165,250,.55)';ctx.beginPath();o.trail.forEach((q,i)=>{let p=w2s(q.x,q.y);if(i)ctx.lineTo(p.x,p.y);else ctx.moveTo(p.x,p.y)});ctx.stroke()}}
 function draw2(){space();if(ui.potential.checked)potential();if(ui.field.checked)field();trails();st.objs.forEach(drawObj);paintRecordedCaptures(w2s)}
@@ -216,20 +241,37 @@ const EARTH_RADIUS=6371,SOLAR_RADIUS=696340;
 function massVal(o,u){return u==='earth'?o.mass/EARTH:u==='solar'?o.mass/SUN:o.mass}function massFrom(v,u){v=Number(v)||0;return u==='earth'?v*EARTH:u==='solar'?v*SUN:v}
 function massSliderValue(o,u){let v=massVal(o,u);if(u==='solar')return Math.max(1e-6,Math.min(80,v));if(u==='earth')return Math.max(1e-6,Math.min(50000,v));return Math.max(1,Math.min(1e32,v))}
 function massSliderAttrs(u){if(u==='solar')return 'min="0.000001" max="80" step="0.000001"';if(u==='earth')return 'min="0.000001" max="50000" step="0.000001"';return 'min="1" max="1e32" step="1"'}
-function radiusKm(o){if(o.type==='blackhole')return GravityModel.schwarzschildRadius(o.mass)/1000;if(o.radiusKm)return o.radiusKm;if(o.type==='star')return SOLAR_RADIUS*Math.max(.02,o.radius/38);if(o.planet==='earth')return EARTH_RADIUS;if(o.planet==='moon')return 1737;if(o.planet==='mars')return 3390;if(o.planet==='jupiter')return 69911;if(o.planet==='titan')return 2575;if(o.type==='ship')return .03;if(o.type==='small')return 8;return Math.max(1,o.radius*500)}
+function radiusKm(o){if(o.type==='blackhole')return GravityModel.schwarzschildRadius(o.mass)/1000;if(o.radiusKm)return o.radiusKm;if(o.type==='star')return SOLAR_RADIUS*Math.max(.02,o.radius/38);if(o.type==='ship')return .03;if(o.type==='small')return 8;return Math.max(1,o.radius*500)}
 function radiusVal(o,u){let km=radiusKm(o);return u==='earth'?km/EARTH_RADIUS:u==='solar'?km/SOLAR_RADIUS:km}
 function radiusFrom(v,u){v=Number(v)||0;return u==='earth'?v*EARTH_RADIUS:u==='solar'?v*SOLAR_RADIUS:v}
 function radiusSliderValue(o,u){let v=radiusVal(o,u);if(u==='solar')return Math.max(.000001,Math.min(10,v));if(u==='earth')return Math.max(.0001,Math.min(200,v));return Math.max(.001,Math.min(2000000,v))}
 function radiusSliderAttrs(u){if(u==='solar')return 'min="0.000001" max="10" step="0.000001"';if(u==='earth')return 'min="0.0001" max="200" step="0.0001"';return 'min="0.001" max="2000000" step="0.001"'}
-function setRadiusFromUnit(o,v,u){let km=radiusFrom(v,u);o.radiusKm=km;if(o.type==='star')o.radius=Math.max(8,Math.min(120,22+18*Math.log10(km/SOLAR_RADIUS+0.08)));else if(o.type==='ship')o.radius=Math.max(8,Math.min(44,10+Math.log10(km+1)*6));else o.radius=Math.max(5,Math.min(90,8+13*Math.log10(km/EARTH_RADIUS+1.15)))}
+function setRadiusFromUnit(o,v,u){let km=radiusFrom(v,u);o.radiusKm=km;if(o.type==='star')o.radius=Math.max(8,Math.min(120,22+18*Math.log10(km/SOLAR_RADIUS+0.08)));else if(o.type==='ship')o.radius=Math.max(8,Math.min(44,10+Math.log10(km+1)*6));else if(o.type==='planet'){
+  const preset=GravityPlanets.properties(o.planet);
+  o.radius=Math.max(5,Math.min(90,preset.radius*(km/preset.radiusKm)**.45));
+}else o.radius=Math.max(5,Math.min(90,8+13*Math.log10(km/EARTH_RADIUS+1.15)))}
 function compactControls(o,unit){let massUnit=unit,rv=o.radiusUnit||'km',mv=massSliderValue(o,massUnit),rvv=radiusSliderValue(o,rv);return '<div class="compactControl"><span>Masa</span><input id="massRange" type="range" '+massSliderAttrs(massUnit)+' value="'+mv+'"><input id="mass" type="number" step="any" value="'+massVal(o,massUnit).toPrecision(6)+'"><select id="unit"><option value="kg" '+(massUnit==='kg'?'selected':'')+'>kg</option><option value="earth" '+(massUnit==='earth'?'selected':'')+'>M&oplus;</option><option value="solar" '+(massUnit==='solar'?'selected':'')+'>M&#9737;</option></select></div><div class="compactControl"><span>Radio</span><input id="rad" type="range" '+radiusSliderAttrs(rv)+' value="'+rvv+'"><input id="radNum" type="number" step="any" value="'+radiusVal(o,rv).toPrecision(6)+'"><select id="radUnit"><option value="km" '+(rv==='km'?'selected':'')+'>km</option><option value="earth" '+(rv==='earth'?'selected':'')+'>R&oplus;</option><option value="solar" '+(rv==='solar'?'selected':'')+'>R&#9737;</option></select></div><div class="compactControl"><span>Giro visual</span><input id="spin" type="range" min="0" max="140" step="0.1" value="'+o.spin+'"><input id="spinNum" type="number" step="0.1" value="'+Number(o.spin).toPrecision(4)+'"><span class="unitText">rad/s</span></div>'}
-function showMenu(o,p){st.active=o.id;let unit=o.massUnit||(o.mass>.05*SUN?'solar':o.mass>.01*EARTH?'earth':'kg'),refs=st.objs.filter(x=>x.id!==o.id).map(x=>'<option value="'+x.id+'">'+x.name+'</option>').join(''),extra='';if(o.type==='star'){let massUnit=unit;extra='<div class="line"><span>Tipo</span><select id="sub">'+Object.keys(starP).map(k=>'<option value="'+k+'" '+(o.sub===k?'selected':'')+'>'+starP[k][0]+'</option>').join('')+'</select></div><div class="line"><span>Clase espectral</span><select id="spectral">'+Object.keys(spectralPresets).map(k=>'<option value="'+k+'" '+(spectralKey(o.tempK||5778)===k?'selected':'')+'>'+spectralPresets[k][0]+'</option>').join('')+'</select></div><label class="slider">Temperatura <output id="tempO">'+Math.round(o.tempK||5778)+' K</output><input id="temp" type="range" min="2500" max="25000" step="50" value="'+Math.round(o.tempK||5778)+'"></label><div class="line"><span>Color / clase</span><output id="colorO">'+spectralLabel(o.tempK||5778)+'</output></div><div class="line"><span>Etapa</span><select id="stageSelect">'+starStages.map((s,i)=>'<option value="'+i+'" '+(Math.round(o.stage??1)===i?'selected':'')+'>'+s+'</option>').join('')+'</select></div><label class="slider">Etapa fina <output id="stageO">'+starStages[Math.round(o.stage??1)]+'</output><input id="stellarStage" type="range" min="0" max="5" step="1" value="'+Math.round(o.stage??1)+'"></label><label class="slider">Tama&ntilde;o estelar <output id="starSizeO">'+Math.round(o.radius)+'</output><input id="starSize" type="range" min="8" max="120" step="1" value="'+Math.round(o.radius)+'"></label>';}if(o.type==='planet')extra='<div class="line"><span>Planeta</span><select id="planet">'+Object.keys(planetP).map(k=>'<option value="'+k+'" '+(o.planet===k?'selected':'')+'>'+planetP[k][0]+'</option>').join('')+'</select></div><div class="row"><button id="addMoonBtn" class="primary">A&ntilde;adir luna</button><button id="freeMoonBtn">Liberar &oacute;rbita</button></div>';
+function showMenu(o,p){st.active=o.id;let unit=o.massUnit||(o.mass>.05*SUN?'solar':o.mass>.01*EARTH?'earth':'kg'),refs=st.objs.filter(x=>x.id!==o.id).map(x=>'<option value="'+x.id+'">'+x.name+'</option>').join(''),extra='';if(o.type==='star'){let massUnit=unit;extra='<div class="line"><span>Tipo</span><select id="sub">'+Object.keys(starP).map(k=>'<option value="'+k+'" '+(o.sub===k?'selected':'')+'>'+starP[k][0]+'</option>').join('')+'</select></div><div class="line"><span>Clase espectral</span><select id="spectral">'+Object.keys(spectralPresets).map(k=>'<option value="'+k+'" '+(spectralKey(o.tempK||5778)===k?'selected':'')+'>'+spectralPresets[k][0]+'</option>').join('')+'</select></div><label class="slider">Temperatura <output id="tempO">'+Math.round(o.tempK||5778)+' K</output><input id="temp" type="range" min="2500" max="25000" step="50" value="'+Math.round(o.tempK||5778)+'"></label><div class="line"><span>Color / clase</span><output id="colorO">'+spectralLabel(o.tempK||5778)+'</output></div><div class="line"><span>Etapa</span><select id="stageSelect">'+starStages.map((s,i)=>'<option value="'+i+'" '+(Math.round(o.stage??1)===i?'selected':'')+'>'+s+'</option>').join('')+'</select></div><label class="slider">Etapa fina <output id="stageO">'+starStages[Math.round(o.stage??1)]+'</output><input id="stellarStage" type="range" min="0" max="5" step="1" value="'+Math.round(o.stage??1)+'"></label><label class="slider">Tama&ntilde;o estelar <output id="starSizeO">'+Math.round(o.radius)+'</output><input id="starSize" type="range" min="8" max="120" step="1" value="'+Math.round(o.radius)+'"></label>';}if(o.type==='planet')extra='<div class="line"><label for="planet">Planeta o satélite</label><select id="planet"></select></div><div class="row"><button id="addMoonBtn" class="primary">A&ntilde;adir luna</button><button id="freeMoonBtn">Liberar &oacute;rbita</button></div>';
 menu.innerHTML='<button class="close" id="close">x</button><h3>'+o.name+'</h3><p class="mini">'+o.type+' - '+fmtMass(o.mass)+'</p>'+compactControls(o,unit)+extra+'<div class="line"><span>Nombre</span><input id="name" value="'+o.name.replace(/"/g,'&quot;')+'"></div><label class="check"><input id="fixed" type="checkbox" '+(o.fixed?'checked':'')+'> Fijar a pantalla</label><label class="check"><input id="fixedTrail" type="checkbox" '+(o.fixedTrail?'checked':'')+'> Rastro fijo</label><div class="title">Convertir en satelite</div><div class="line"><span>Respecto a</span><select id="ref">'+refs+'</select></div><label class="slider">Excentricidad <output id="eccO">0.20</output><input id="ecc" type="range" min="0" max="0.95" step="0.01" value="0.2"></label><div class="line"><span>Sentido</span><select id="dir"><option value="1">antihorario</option><option value="-1">horario</option></select></div><div class="row"><button id="orbit" class="primary">Aplicar orbita</button><button id="stop">Velocidad 0</button></div><div class="row"><button id="center">Centrar</button><button id="del" class="danger">Eliminar</button></div><div style="text-align:right;margin-top:8px"><button id="trashEnd" class="trashMini" title="Eliminar objeto">&#128465;</button></div>';
 placeMenu(menu,p,410);
 function bind(src){if(['mass','massRange','rad','radNum','fixed'].includes(src))unlockObject(o);o.name=$('name').value||o.name;o.fixed=$('fixed').checked;if(o.fixed){o.vx=0;o.vy=0}o.fixedTrail=$('fixedTrail').checked;if(src==='massRange')$('mass').value=Number($('massRange').value).toPrecision(6);if(src==='mass')$('massRange').value=$('mass').value;if(src==='mass'||src==='massRange'){const m=massFrom($('mass').value,$('unit').value);if(Number.isFinite(m)&&m>0)o.mass=m;}if(src==='rad')$('radNum').value=Number($('rad').value).toPrecision(6);if(src==='radNum')$('rad').value=$('radNum').value;if(src==='rad'||src==='radNum'){const r=+$('radNum').value;if(Number.isFinite(r)&&r>0)setRadiusFromUnit(o,r,$('radUnit').value);}if(src==='spin')$('spinNum').value=Number($('spin').value).toPrecision(4);if(src==='spinNum')$('spin').value=$('spinNum').value;if(src==='spin'||src==='spinNum')o.spin=+$('spinNum').value;}['name','fixed','fixedTrail','massRange','mass','rad','radNum','spin','spinNum'].forEach(id=>$(id).addEventListener('input',()=>bind(id)));$('unit').onchange=()=>{o.massUnit=$('unit').value;showMenu(o,{x:parseFloat(menu.style.left),y:parseFloat(menu.style.top)})};$('radUnit').onchange=()=>{o.radiusUnit=$('radUnit').value;showMenu(o,{x:280,y:120})};
-if($('sub'))$('sub').onchange=e=>{let preset=starP[e.target.value];Object.assign(o,{sub:e.target.value,name:preset[0],mass:preset[1],radius:preset[2],spin:preset[2],sprite:preset[3],tempK:preset[4],stage:preset[5]});showMenu(o,{x:280,y:120})};if($('temp')){const menuPos=()=>({x:parseFloat(menu.style.left)||280,y:parseFloat(menu.style.top)||120});const syncTemp=()=>{$('temp').value=o.tempK;$('tempO').textContent=Math.round(o.tempK)+' K';$('colorO').textContent=spectralLabel(o.tempK);if($('spectral'))$('spectral').value=spectralKey(o.tempK)};$('spectral').onchange=e=>{o.tempK=spectralPresets[e.target.value][1];syncTemp()};$('temp').oninput=()=>{o.tempK=+$('temp').value;syncTemp()};$('tempO').onclick=()=>{const old=$('tempO'),ed=document.createElement('input');ed.type='number';ed.step='50';ed.value=Math.round(o.tempK||5778);ed.style.width='78px';ed.style.padding='4px 6px';ed.style.font='inherit';ed.style.fontWeight='900';ed.style.textAlign='right';old.replaceWith(ed);ed.focus();ed.select();let done=false;const commit=()=>{if(done)return;done=true;o.tempK=Math.max(2500,Math.min(25000,+ed.value||5778));showMenu(o,menuPos())};ed.onkeydown=e=>{if(e.key==='Enter')commit();if(e.key==='Escape')showMenu(o,menuPos())};ed.onblur=commit};$('stageSelect').onchange=e=>{o.stage=+e.target.value;$('stellarStage').value=o.stage;$('stageO').textContent=starStages[Math.round(o.stage)]};$('stellarStage').oninput=()=>{o.stage=+$('stellarStage').value;$('stageSelect').value=Math.round(o.stage);$('stageO').textContent=starStages[Math.round(o.stage)]};$('starSize').oninput=()=>{unlockObject(o);o.radius=+$('starSize').value;o.radiusKm=o.type==='star'?SOLAR_RADIUS*Math.max(.02,o.radius/38):radiusKm(o);let ru=$('radUnit').value;$('rad').value=radiusSliderValue(o,ru);$('radNum').value=radiusVal(o,ru).toPrecision(6);$('starSizeO').textContent=o.radius.toFixed(0)};};if($('planet'))$('planet').onchange=e=>{unlockObject(o);let preset=planetP[e.target.value];Object.assign(o,{planet:e.target.value,name:preset[0],mass:preset[1],radius:preset[2],spin:preset[2],sprite:preset[3]});showMenu(o,{x:280,y:120})};if($('addMoonBtn'))$('addMoonBtn').onclick=()=>addMoon(o);if($('freeMoonBtn'))$('freeMoonBtn').onclick=()=>{unlockObject(o);o.trail=[]};
+if($('sub'))$('sub').onchange=e=>{let preset=starP[e.target.value];Object.assign(o,{sub:e.target.value,name:preset[0],mass:preset[1],radius:preset[2],spin:preset[2],sprite:preset[3],tempK:preset[4],stage:preset[5]});showMenu(o,{x:280,y:120})};if($('temp')){const menuPos=()=>({x:parseFloat(menu.style.left)||280,y:parseFloat(menu.style.top)||120});const syncTemp=()=>{$('temp').value=o.tempK;$('tempO').textContent=Math.round(o.tempK)+' K';$('colorO').textContent=spectralLabel(o.tempK);if($('spectral'))$('spectral').value=spectralKey(o.tempK)};$('spectral').onchange=e=>{o.tempK=spectralPresets[e.target.value][1];syncTemp()};$('temp').oninput=()=>{o.tempK=+$('temp').value;syncTemp()};$('tempO').onclick=()=>{const old=$('tempO'),ed=document.createElement('input');ed.type='number';ed.step='50';ed.value=Math.round(o.tempK||5778);ed.style.width='78px';ed.style.padding='4px 6px';ed.style.font='inherit';ed.style.fontWeight='900';ed.style.textAlign='right';old.replaceWith(ed);ed.focus();ed.select();let done=false;const commit=()=>{if(done)return;done=true;o.tempK=Math.max(2500,Math.min(25000,+ed.value||5778));showMenu(o,menuPos())};ed.onkeydown=e=>{if(e.key==='Enter')commit();if(e.key==='Escape')showMenu(o,menuPos())};ed.onblur=commit};$('stageSelect').onchange=e=>{o.stage=+e.target.value;$('stellarStage').value=o.stage;$('stageO').textContent=starStages[Math.round(o.stage)]};$('stellarStage').oninput=()=>{o.stage=+$('stellarStage').value;$('stageSelect').value=Math.round(o.stage);$('stageO').textContent=starStages[Math.round(o.stage)]};$('starSize').oninput=()=>{unlockObject(o);o.radius=+$('starSize').value;o.radiusKm=o.type==='star'?SOLAR_RADIUS*Math.max(.02,o.radius/38):radiusKm(o);let ru=$('radUnit').value;$('rad').value=radiusSliderValue(o,ru);$('radNum').value=radiusVal(o,ru).toPrecision(6);$('starSizeO').textContent=o.radius.toFixed(0)};};if($('planet')){
+  const select=$('planet');
+  GravityPlanets.populate(select,o.planet);
+  select.onchange=()=>{
+    unlockObject(o);
+    Object.assign(o,GravityPlanets.properties(select.value),{angle:0});
+    GravityPlanets.imageFor(o.planet);
+    showMenu(o,p);
+  };
+}if($('addMoonBtn'))$('addMoonBtn').onclick=()=>addMoon(o);if($('freeMoonBtn'))$('freeMoonBtn').onclick=()=>{unlockObject(o);o.trail=[]};
 $('close').onclick=()=>menu.hidden=true;$('stop').onclick=()=>{unlockObject(o);o.vx=0;o.vy=0;o.trail=[]};$('center').onclick=()=>{st.view.cx=o.x;st.view.cy=o.y};const deleteCurrent=()=>{st.objs=st.objs.filter(x=>x.id!==o.id);menu.hidden=true};$('del').onclick=deleteCurrent;$('trashEnd').onclick=deleteCurrent;$('ecc').oninput=e=>$('eccO').textContent=(+e.target.value).toFixed(2);$('orbit').onclick=()=>orbit(o,+$('ref').value,+$('ecc').value,+$('dir').value)}
-function addMoon(parent){const p=planetP.moon,r=Math.max(70,parent.radius+46),moon=add('planet',parent.x+r,parent.y);Object.assign(moon,{name:parent.planet==='earth'||parent.name==='Tierra'?'Luna':'Luna de '+parent.name,planet:'moon',mass:p[1],radius:p[2],spin:0,sprite:p[3],fixed:false,moonLock:{parentId:parent.id,radius:r,angle:0,omega:1.15}});moon.vx=parent.vx;moon.vy=parent.vy+r*moon.moonLock.omega;moon.trail=[];st.active=moon.id;menu.hidden=true;}
+function addMoon(parent){
+  const r=Math.max(70,parent.radius+46),moon=add('planet',parent.x+r,parent.y,'moon');
+  if(parent.planet!=='earth'&&parent.name!=='Tierra')moon.name='Luna de '+parent.name;
+  moon.spin=0;moon.moonLock={parentId:parent.id,radius:r,angle:0,omega:1.15};
+  moon.vx=parent.vx;moon.vy=parent.vy+r*moon.moonLock.omega;st.active=moon.id;menu.hidden=true;
+}
 function orbit(o,refId,e,dir){unlockObject(o);let ref=st.objs.find(x=>x.id===refId);if(!ref)return;let dx=o.x-ref.x,dy=o.y-ref.y,r=Math.max(40,Math.hypot(dx,dy)),tx=-dy/r*dir,ty=dx/r*dir,mu=G*(+ui.power.value)*(mE(ref)+mE(o)),v=Math.sqrt(Math.max(0,mu/r*(1-e)));o.vx=ref.vx+tx*v;o.vy=ref.vy+ty*v;o.fixed=false;o.trail=[];menu.hidden=true}
 function visibleEmptySpot(o){const pts=[{x:W*.38,y:H*.38},{x:W*.55,y:H*.42},{x:W*.45,y:H*.58},{x:W*.62,y:H*.58},{x:W*.30,y:H*.55},{x:W*.70,y:H*.42}];for(const p of pts){let w=s2w(p),free=st.objs.every(x=>x===o||Math.hypot(x.x-w.x,x.y-w.y)>Math.max(80,x.radius+o.radius+28));if(free)return w;}return s2w({x:W*.52,y:H*.48})}
 function recoverObject(id){let o=st.objs.find(x=>x.id===+id);if(!o)return;unlockObject(o);let w=visibleEmptySpot(o);o.x=w.x;o.y=w.y;o.vx=0;o.vy=0;o.trail=[];st.active=o.id}
@@ -276,15 +318,27 @@ function mainStar(){return st.objs.find(o=>o.type==='star'&&(o.name==='Sol'||o.s
 function centerMainStar(){let o=mainStar();if(!o)return;st.view.cx=o.x;st.view.cy=o.y;if(st.view3){st.view.panX=0;st.view.panY=-130}}
 function hideMenus(){menu.hidden=true;$('backgroundMenu').hidden=true;$('objectPopup').hidden=true}
 function placeMenu(el,p,w){let r=stage.getBoundingClientRect(),pad=8,gap=14;el.hidden=false;el.style.maxHeight=Math.max(180,r.height-pad*2)+'px';let mw=Math.min(el.offsetWidth||w||410,r.width-pad*2),mh=Math.min(el.offsetHeight||360,r.height-pad*2),left=p.x+gap;if(left+mw>r.width-pad)left=p.x-mw-gap;if(left<pad)left=pad;if(left+mw>r.width-pad)left=Math.max(pad,r.width-mw-pad);let top=p.y+gap;if(top+mh>r.height-pad)top=p.y-mh-gap;if(top<pad)top=pad;if(top+mh>r.height-pad)top=Math.max(pad,r.height-mh-pad);el.style.left=left+'px';el.style.top=top+'px'}
-function addAt(type,w){const o=add(type,w.x,w.y);if(type==='star')o.fixed=true;return o}
-function showBackgroundMenu(p,w){const bm=$('backgroundMenu');bm.innerHTML='<h3>A&ntilde;adir objeto</h3><div class="bgMenuGrid"><button data-add="planet">A&ntilde;adir planeta</button><button data-add="star">A&ntilde;adir sol</button><button data-add="small">A&ntilde;adir meteorito</button><button data-add="ship">A&ntilde;adir nave</button></div>';placeMenu(bm,p,410);menu.hidden=true;$('objectPopup').hidden=true;bm.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{addAt(b.dataset.add,w);bm.hidden=true})}
+function addAt(type,w,planetKey){const o=add(type,w.x,w.y,planetKey);if(type==='star')o.fixed=true;return o}
+function showBackgroundMenu(p,w){
+  const menu=$('backgroundMenu');
+  menu.innerHTML='<h3>Añadir objeto</h3><label class="context-planet">Planeta o satélite<select id="backgroundPlanet"></select></label><div class="bgMenuGrid"><button data-add="planet">Añadir planeta</button><button data-add="star">Añadir sol</button><button data-add="small">Añadir meteorito</button><button data-add="ship">Añadir nave</button></div>';
+  const picker=$('backgroundPlanet');
+  GravityPlanets.populate(picker,st.planetPreset);
+  placeMenu(menu,p,410);$('objectMenu').hidden=true;$('objectPopup').hidden=true;
+  for(const button of menu.querySelectorAll('[data-add]')){
+    button.onclick=()=>{addAt(button.dataset.add,w,picker.value);menu.hidden=true};
+  }
+}
 function showObjectPopup(){const op=$('objectPopup'),r=stage.getBoundingClientRect();let selected=st.active||st.objs[0]?.id||'';op.innerHTML='<h3>Objetos</h3><div class="objectPicker"><select id="popupObjectSelect">'+st.objs.map(o=>'<option value="'+o.id+'" '+(String(o.id)===String(selected)?'selected':'')+'>'+o.name+' - '+fmtMass(o.mass)+'</option>').join('')+'</select><div class="row"><button id="popupRecover">Recuperar</button><button id="popupDelete" class="trashMini" title="Eliminar objeto">&#128465;</button></div></div>';op.style.left='12px';op.style.top=Math.max(72,r.height-220)+'px';op.hidden=false;menu.hidden=true;$('backgroundMenu').hidden=true;const sel=$('popupObjectSelect');if(sel){sel.onchange=()=>{st.active=+sel.value};$('popupRecover').onclick=()=>{recoverObject(sel.value);op.hidden=true};$('popupDelete').onclick=()=>{deleteObjectById(sel.value);op.hidden=true}}}
 function makeSideOutputsEditable(){[['powerOut','power'],['timeOut','time'],['launchOut','launch'],['curvOut','curv']].forEach(([oid,rid])=>{const out=$(oid),range=$(rid);out.tabIndex=0;out.setAttribute('role','button');out.onclick=()=>{if(out.querySelector('input'))return;const ed=document.createElement('input');ed.type='text';ed.inputMode='decimal';ed.value=range.value;ed.setAttribute('aria-label','Editar '+range.closest('label').childNodes[0].textContent.trim());out.textContent='';out.append(ed);ed.focus();ed.select();let done=false;function end(save){if(done)return;const n=Number(ed.value.trim().replace(',','.'));if(save&&(!Number.isFinite(n)||!ed.value.trim())){ed.setAttribute('aria-invalid','true');return}done=true;ed.remove();if(save)range.value=String(Math.max(+range.min,Math.min(+range.max,n)));reads()}ed.onkeydown=e=>{if(e.key==='Enter')end(true);if(e.key==='Escape')end(false)};ed.onblur=()=>end(true)};out.onkeydown=e=>{if(e.target===out&&(e.key==='Enter'||e.key===' ')){e.preventDefault();out.click()}}})}
 canvas.onpointerdown=e=>{let p=pt(e);if(e.button===2)return;hideMenus();if(st.view3){let h=hit3(p);if(h&&!e.altKey){unlockObject(h);st.active=h.id;st.drag={kind:'obj3',o:h,last:p,t:performance.now(),vx:0,vy:0};canvas.setPointerCapture(e.pointerId);return}st.camDrag={x:e.clientX,y:e.clientY,yaw:st.view.yaw,pitch:st.view.pitch,panX:st.view.panX,panY:st.view.panY,pan:e.altKey};canvas.setPointerCapture(e.pointerId);return}let w=s2w(p),h=hit(w);if(h){unlockObject(h);st.active=h.id;st.drag={kind:'obj',o:h,last:w,t:performance.now(),vx:0,vy:0};canvas.setPointerCapture(e.pointerId)}else{st.drag={kind:'pan2',last:p,cx:st.view.cx,cy:st.view.cy};canvas.setPointerCapture(e.pointerId)}};
 canvas.onpointermove=e=>{if(st.camDrag){if(st.camDrag.pan){st.view.panX=st.camDrag.panX+(e.clientX-st.camDrag.x);st.view.panY=st.camDrag.panY+(e.clientY-st.camDrag.y)}else{st.view.yaw=st.camDrag.yaw+(e.clientX-st.camDrag.x)*.006;st.view.pitch=Math.max(-.18,Math.min(1.42,st.camDrag.pitch+(e.clientY-st.camDrag.y)*.006))}return}if(!st.drag)return;let p=pt(e),now=performance.now(),dt=Math.max(.045,(now-(st.drag.t||now))/1000);if(st.drag.kind==='pan2'){st.view.cx=st.drag.cx-(p.x-st.drag.last.x)/st.view.zoom;st.view.cy=st.drag.cy-(p.y-st.drag.last.y)/st.view.zoom;return}if(st.drag.kind==='obj'){let w=s2w(p),o=st.drag.o;st.drag.vx=(w.x-st.drag.last.x)/dt;st.drag.vy=(w.y-st.drag.last.y)/dt;o.x=w.x;o.y=w.y;o.trail=[];st.drag.last=w;st.drag.t=now}else{let o=st.drag.o,d=delta3(o,p.x-st.drag.last.x,p.y-st.drag.last.y);st.drag.vx=d.dx/dt;st.drag.vy=d.dy/dt;o.x+=d.dx;o.y+=d.dy;o.trail=[];st.drag.last=p;st.drag.t=now}};
 canvas.onpointerup=()=>{if(st.drag&&st.drag.kind==='pan2'){st.drag=null;st.camDrag=null;return}if(st.drag&&st.drag.o){let o=st.drag.o;if(ui.dynamic.checked&&!o.fixed){if(performance.now()-st.drag.t>120){st.drag.vx=0;st.drag.vy=0}let v=Math.hypot(st.drag.vx||0,st.drag.vy||0);if(v>8){o.vx=(st.drag.vx||0)*(+ui.launch.value);o.vy=(st.drag.vy||0)*(+ui.launch.value)}else{o.vx=0;o.vy=0}}}st.drag=null;st.camDrag=null};canvas.onpointercancel=()=>{if(st.drag?.o){st.drag.o.vx=0;st.drag.o.vy=0}st.drag=null;st.camDrag=null};
 canvas.oncontextmenu=e=>{e.preventDefault();let p=pt(e),r=stage.getBoundingClientRect(),css={x:e.clientX-r.left,y:e.clientY-r.top},w=s2w(p),h=st.view3?hit3(p):hit(w);if(h)showMenu(h,css);else showBackgroundMenu(css,w)};canvas.ondragover=e=>e.preventDefault();canvas.ondrop=e=>{e.preventDefault();let type=e.dataTransfer.getData('text/plain')||st.tool,w=s2w(pt(e));add(type,w.x,w.y)};canvas.onwheel=e=>{e.preventDefault();let before=s2w(pt(e));st.view.zoom=Math.max(.25,Math.min(10,st.view.zoom*Math.exp(-e.deltaY*.001)));let after=s2w(pt(e));st.view.cx+=before.x-after.x;st.view.cy+=before.y-after.y};
-$('theoryToggle').onclick=()=>$('layout').classList.add('theoryClosed');$('theoryTab').onclick=()=>{$('layout').classList.remove('theoryClosed');loadGravityTheory()};$('objectsReadout').onclick=showObjectPopup;$('addCenter').onclick=()=>add(st.tool,st.view.cx,st.view.cy);$('view2d').onclick=()=>{st.view3=false;$('view2d').classList.add('active');$('view3d').classList.remove('active')};$('view3d').onclick=()=>{st.view3=true;$('view3d').classList.add('active');$('view2d').classList.remove('active');centerMainStar()};$('fitView').onclick=centerMainStar;$('zoomIn').onclick=()=>st.view.zoom=Math.min(10,st.view.zoom*1.18);$('zoomOut').onclick=()=>st.view.zoom=Math.max(.25,st.view.zoom/1.18);$('clearTrails').onclick=clearTrails;$('calmAll').onclick=()=>st.objs.forEach(o=>{o.vx=0;o.vy=0;o.trail=[]});$('resetSystem').onclick=()=>setup();$('compareBH').onclick=()=>setup(true);$('deleteFree').onclick=()=>{st.objs=st.objs.filter(o=>o.fixed||o.type==='star');clearTrails()};
+$('theoryToggle').onclick=()=>$('layout').classList.add('theoryClosed');$('theoryTab').onclick=()=>{$('layout').classList.remove('theoryClosed');loadGravityTheory()};$('objectsReadout').onclick=showObjectPopup;$('addCenter').onclick=()=>{
+  const position=st.tool==='planet'?visibleEmptySpot(GravityPlanets.properties(st.planetPreset)):{x:st.view.cx,y:st.view.cy};
+  addAt(st.tool,position);
+};$('view2d').onclick=()=>{st.view3=false;$('view2d').classList.add('active');$('view3d').classList.remove('active')};$('view3d').onclick=()=>{st.view3=true;$('view3d').classList.add('active');$('view2d').classList.remove('active');centerMainStar()};$('fitView').onclick=centerMainStar;$('zoomIn').onclick=()=>st.view.zoom=Math.min(10,st.view.zoom*1.18);$('zoomOut').onclick=()=>st.view.zoom=Math.max(.25,st.view.zoom/1.18);$('clearTrails').onclick=clearTrails;$('calmAll').onclick=()=>st.objs.forEach(o=>{o.vx=0;o.vy=0;o.trail=[]});$('resetSystem').onclick=()=>setup();$('compareBH').onclick=()=>setup(true);$('deleteFree').onclick=()=>{st.objs=st.objs.filter(o=>o.fixed||o.type==='star');clearTrails()};
 </script>
 
 
@@ -313,7 +367,7 @@ reviewStyle.textContent=`
 `;
 document.head.append(reviewStyle);
 const note=document.createElement('div');note.className='reviewNote';
-note.innerHTML='Escala: 290 unidades de tablero = 1 ua. Los tamaños de los dibujos están ampliados. La malla y los colores representan un potencial ilustrativo. Usa los tres ejemplos para explorar la dinámica cerca del horizonte.';
+note.innerHTML='Escala: 290 unidades de tablero = 1 ua. Los tamaños de los dibujos están ampliados. Los planetas usan masas y radios medios de <a href="https://ssd.jpl.nasa.gov/planets/phys_par.html" target="_blank" rel="noopener">NASA/JPL</a>. Sus tamaños en pantalla están comprimidos para compararlos. Los exoplanetas tienen imágenes interpretativas y valores orientativos. La malla y los colores representan un potencial ilustrativo.';
 document.querySelector('.side').append(note);
 const extra=document.createElement('section');
 extra.innerHTML='<label class="check"><input id="mergeBodies" type="checkbox"> Fusionar al tocar los dibujos</label><p class="reviewNote">La fusión por contacto gráfico es opcional para los cuerpos ordinarios. El agujero negro captura al cruzar su horizonte aunque esta opción esté desactivada.</p><div class="title">Objeto y órbita</div><select id="reviewObject" aria-label="Seleccionar objeto" style="width:100%"></select><div class="row"><button id="reviewEdit">Propiedades</button><button id="reviewRecover">Recuperar</button></div><div id="orbitReadout"></div><button id="advanceStep" style="width:100%">Avanzar un paso</button><p id="clockReadout" class="reviewNote"></p>';
@@ -354,6 +408,7 @@ updateMoonLocks=function(dt){for(const o of st.objs){if(!o.moonLock||o.fixed)con
 const baseShowMenu=showMenu;
 showMenu=function(o,p){baseShowMenu(o,p);
   menu.querySelector('.mini').textContent=fmtMass(o.mass)+(o.moonLock?' · órbita circular asistida':'');
+  if(o.planet==='saturn')$('spin').closest('.compactControl').hidden=true;
   if(o.type==='blackhole'){
     for(const id of ['rad','spin'])$(id).closest('.compactControl').hidden=true;
     const radius=document.createElement('p');radius.className='reviewNote';menu.querySelector('.mini').after(radius);
@@ -387,7 +442,7 @@ orbit=function(o,refId,e,dir){
   o.vx=ref.vx+dy/r*dir*speed;o.vy=ref.vy-dx/r*dir*speed;o.fixed=false;o.trail=[];menu.hidden=true;
 };
 const originalAdd=add;
-add=function(type,x,y){const o=originalAdd(type,x,y);o.spin=type==='ship'||type==='small'?0:.06;if(!gravitySnapSuspended)snapGravityObject(o);return o};
+add=function(type,x,y,planetKey){const o=originalAdd(type,x,y,planetKey);o.spin=type==='ship'||type==='small'?0:.06;if(!gravitySnapSuspended)snapGravityObject(o);return o};
 st.objs.forEach(o=>o.spin=o.type==='ship'||o.type==='small'?0:.06);
 const originalAddMoon=addMoon;
 addMoon=function(parent){gravitySnapSuspended++;try{originalAddMoon(parent);updateMoonLocks(0)}finally{gravitySnapSuspended--}};
