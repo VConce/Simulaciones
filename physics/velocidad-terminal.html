@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Velocidad terminal · VConce</title>
+<link rel="icon" href="../shared/vconce-fisica.png">
+<link rel="stylesheet" href="../shared/sugerencias.css">
+<link rel="stylesheet" href="../shared/katex/katex.min.css">
+<link rel="stylesheet" href="assets/terminal/lab.css">
+<script defer src="../shared/katex/katex.min.js"></script>
+<script defer src="../shared/katex/auto-render.min.js"></script>
+<script defer src="assets/terminal/model.js"></script>
+<script defer src="assets/terminal/lab.js"></script>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <a href="https://www.vconce.com/simulaciones/f%C3%ADsica" aria-label="Simulaciones de Física de VConce"><img class="logo" src="../shared/vconce-fisica.png" alt="VConce"></a>
+    <a class="vconce-suggestions" href="https://docs.google.com/forms/d/e/1FAIpQLSfc_37sXLS0Gs1n4gbuyYWUXV7bdKnVrztUn_QZqpYvwVcIVA/viewform?usp=pp_url&amp;entry.907903432=Velocidad+terminal" target="_blank" rel="noopener noreferrer" aria-label="Sugerencias sobre Velocidad terminal"><img src="../shared/sobre-sugerencias.webp" alt="" width="196" height="97"></a>
+  </div>
+  <div class="heading"><span>Bloque A.2 · Fuerzas y cantidad de movimiento</span><h1>Velocidad terminal</h1></div>
+</header>
+<main>
+  <div class="bench">
+    <section class="experiment" aria-label="Experimento">
+      <div class="controls">
+        <label>Objeto <select id="object">
+          <option value="parachute">Paracaidista con paracaídas abierto</option>
+          <option value="coin">Moneda</option>
+          <option value="feather">Pluma</option>
+          <option value="ball">Pelota de tenis</option>
+        </select></label>
+        <label>Altura <span class="range"><input id="height" type="range" min="10" max="160" value="70"><output id="heightValue" for="height"></output></span></label>
+        <div class="actions">
+          <button class="primary" id="drop">Dejar caer</button>
+          <button id="pause" disabled>Pausar</button>
+          <button id="reset">Reiniciar</button>
+        </div>
+      </div>
+      <div class="scene">
+        <canvas id="world" aria-label="Escena. Agarra el objeto, arrástralo y suéltalo para lanzarlo. También puedes introducir la velocidad en Ajustes del lanzamiento."></canvas>
+        <div class="readouts">
+          <span>Tiempo <strong id="time">0.00 s</strong></span>
+          <span>Velocidad terminal <strong id="terminal"></strong></span>
+        </div>
+        <p id="hint" class="hint">Arrastra el objeto y suéltalo en la dirección del lanzamiento.</p>
+      </div>
+      <div class="display-controls">
+        <label class="air"><span>Con aire</span><select id="airTrail" aria-label="Rastro con aire"><option value="solid">Rastro</option><option value="dash" selected>Discontinuo</option><option value="none">Sin línea</option></select></label>
+        <label class="vacuum"><span>Sin aire</span><select id="vacuumTrail" aria-label="Rastro sin aire"><option value="solid">Rastro</option><option value="dash" selected>Discontinuo</option><option value="none">Sin línea</option></select></label>
+        <label><input id="dots" type="checkbox" checked> Puntos de medida</label>
+        <label>Reproducción <select id="speed"><option value=".25">¼×</option><option value=".5">½×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+      </div>
+    </section>
+    <section class="data" aria-labelledby="graphTitle">
+      <h2 id="graphTitle">Datos del lanzamiento</h2>
+      <div class="graph-controls">
+        <label>Gráfica <select id="quantity"><option value="down">Velocidad vertical</option><option value="speed">Rapidez</option><option value="y">Altura</option><option value="x">Posición horizontal</option></select></label>
+        <label>Muestra cada <span class="range"><input id="interval" type="range" min="0.1" max="2" step="0.1" value="0.5"><output id="intervalValue" for="interval"></output></span></label>
+      </div>
+      <canvas id="graph" aria-label="Gráfica de los puntos de medida en función del tiempo"></canvas>
+      <div class="legend"><span class="air">● Con aire</span><span class="vacuum">◆ Sin aire</span></div>
+      <div class="data-footer"><span id="samples">0 muestras</span><button id="export" disabled>Descargar Excel</button></div>
+    </section>
+  </div>
+  <details class="settings">
+    <summary>Ajustes del lanzamiento</summary>
+    <p id="measurements"></p>
+    <div class="settings-grid">
+      <label>Densidad del aire <span class="range"><input id="rho" type="range" min="0" max="2" step="0.01" value="1.20"><output id="rhoValue" for="rho"></output></span></label>
+      <label>Velocidad hacia la derecha (m/s) <input id="vx" type="number" min="-65" max="65" step="0.1" value="18"></label>
+      <label>Velocidad hacia arriba (m/s) <input id="vy" type="number" min="-65" max="65" step="0.1" value="12"></label>
+      <button id="launch">Lanzar con estos valores</button>
+    </div>
+  </details>
+  <section class="theory" aria-labelledby="theoryTitle">
+    <h2 id="theoryTitle">¿Por qué deja de acelerar?</h2>
+    <div class="theory-grid">
+      <article><h3>Dos lanzamientos idénticos</h3><p>El azul y el naranja parten de la misma posición con la misma velocidad. Sin aire, la componente horizontal es constante y la componente vertical cambia a razón de \(g\). La trayectoria libre es parabólica si hay velocidad horizontal.</p><p>\[x=x_0+v_{0x}t,\qquad y=y_0+v_{0y}t-\tfrac12 gt^2\]</p></article>
+      <article><h3>Con resistencia del aire</h3><p>El peso apunta hacia abajo. El arrastre se opone a la velocidad, incluso cuando el objeto sube. Usamos aire quieto, densidad y área constantes, y despreciamos el empuje y los giros.</p><p>\[m\,\dot{\vec v}=-mg\,\hat y-\tfrac12\rho C_d A\,|\vec v|\,\vec v\]</p></article>
+      <article><h3>El límite en caída vertical</h3><p>Al aumentar la rapidez, el arrastre se acerca al peso y la aceleración tiende a cero. Desde el reposo, la rapidez se aproxima a este límite, si hay altura suficiente. Al abrir un paracaídas aumenta el área efectiva y baja la velocidad terminal.</p><p>\[v_{\mathrm t}=\sqrt{\frac{2mg}{\rho C_d A}}\]</p></article>
+    </div>
+    <p class="note">En la gráfica de velocidad vertical, el descenso es positivo. Cada punto corresponde a una medida en ese mismo instante. Prueba con la pluma y observa cómo la distancia entre puntos se vuelve casi constante. Los parámetros de cada objeto son orientativos. En una moneda real el arrastre cambia si va dando vueltas.</p>
+  </section>
+</main>
+</body>
+</html>
