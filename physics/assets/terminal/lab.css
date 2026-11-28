@@ -4,7 +4,7 @@ body{margin:0;background:var(--paper);color:var(--ink);font:16px system-ui,sans-
 header{display:flex;align-items:center;gap:18px;background:#132c41;color:white;padding:8px max(14px,calc((100% - 1440px)/2));min-height:66px}
 .brand{display:flex;flex-shrink:0;align-items:center;gap:7px}
 .brand a{display:flex;align-items:center}
-.brand .logo{width:39px;height:39px;object-fit:contain}
+.brand .logo{width:39px;height:39px;object-fit:contain;padding:3px;background:#f3f7fb;border-radius:7px}
 .brand .vconce-suggestions{width:78px;max-width:78px;height:auto;position:static}
 .heading span{display:block;font-size:.75rem;color:#c0d8e9}
 h1{font-size:clamp(1.25rem,2.5vw,1.8rem);margin:0}

@@ -2,6 +2,14 @@
 .topic{margin:26px 0}.topic h2{margin:0 0 12px;padding:10px 14px;border-radius:6px;background:#dbeaf4;color:#143d58;font-size:1.2rem}
 .card h3{font-size:1.1rem;margin:5px 0}.jump{gap:8px}.jump a{padding:7px 10px;border:1px solid #b1c9db;border-radius:6px;background:#fff}
 .integrado header,.integrado main>nav:not(.jump){display:none}.integrado main{padding-top:10px}
+.ib-heading{display:none}.integrado .ib-heading{display:block;margin:0 0 12px;font-size:clamp(1.18rem,3vw,1.62rem)}
+.integrado .jump{position:sticky;top:0;z-index:1;background:#f6f8fb;padding:7px 0;margin-bottom:12px}
+.integrado .topic h2{scroll-margin-top:118px}
+@media(max-width:540px){
+  .integrado main{padding:10px}.integrado .jump{gap:5px}.integrado .jump a{padding:5px;font-size:.8rem}
+  .integrado .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.integrado .card .body{padding:8px}
+  .integrado .card h3{font-size:.9rem}.integrado .card p{font-size:.78rem}.integrado .tag{font-size:.69rem}
+}
 </style></head><body><header><img src="../electromagnetism/assets/electric/vconce.png" alt="VConce"><div><h1>Física</h1><p>Simulaciones interactivas de VConce</p></div></header><main><nav><a href="../">Todas las colecciones</a><a href="https://www.vconce.com/">VConce</a></nav><div class="filters"><input id="search" type="search" aria-label="Buscar simulaciones" placeholder="Buscar una simulación"><span id="count" class="count"></span></div><nav class="jump" aria-label="Bloques de Física IB">
 <a href="#labs">Laboratorios</a>
 <a href="#bloque-a">Bloque A</a>
@@ -82,6 +90,10 @@ function filter(){
 }
 if(new URLSearchParams(location.search).has('integrado')){
   document.documentElement.classList.add('integrado');
+  const title=document.createElement('h1');
+  title.className='ib-heading';
+  title.textContent='Simulaciones de Física por bloques del IB';
+  document.querySelector('.filters').before(title);
   for(const [card] of cards){card.target='_blank';card.rel='noopener'}
 }
 search.addEventListener('input',filter);filter();
